@@ -1,30 +1,45 @@
+@use '../variables.scss' as *;
+
 .main {
   margin: auto;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4rem;
+  align-items: center;
+  gap: $spacing-2xl;
+  min-height: 100%;
+
   > * {
-    max-width: 450px;
+    max-width: 28rem;
+    width: 100%;
   }
 }
 
 .logo {
   display: block;
+  margin: 0 auto;
+  max-width: 12rem;
+  filter: drop-shadow($shadow-md);
 }
 
 .form {
   width: 100%;
+  background-color: var(--surface);
+  padding: $spacing-2xl;
+  border-radius: 1.5rem;
+  box-shadow: $shadow-xl;
+  border: 1px solid var(--border-color);
+
   display: grid;
-  gap: 2rem;
+  gap: $spacing-xl;
+
   & > * {
-    max-width: 450px;
+    max-width: 100%;
   }
 }
 
 .btns {
-  --gap: 2rem;
+  --gap: $spacing-md;
 
   width: 100%;
   display: flex;
@@ -33,10 +48,42 @@
 }
 
 .btn {
-  width: calc(50% - var(--gap)/2);
-  aspect-ratio: 4 / 1;
-  border-radius: 10px;
+  flex: 1;
+  min-height: 3rem;
+  padding: $spacing-md $spacing-xl;
+  border-radius: $b-r;
   box-sizing: border-box;
-  border: solid 1px black;
-  font-size: 0.9lh;
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $t-time ease;
+  box-shadow: $shadow-sm;
+
+  &[type="submit"] {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+
+    &:hover {
+      background-color: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+  }
+
+  &[type="button"], &[type="reset"] {
+    background-color: var(--surface);
+    color: var(--color);
+
+    &:hover {
+      background-color: var(--bg);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }

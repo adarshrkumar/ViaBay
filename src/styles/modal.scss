@@ -1,26 +1,101 @@
+@use './variables.scss' as *;
+
 .modal:not([open]) {
   display: none;
   position: absolute;
   z-index: -1;
-  width: 10;
-  height: 10;
+  width: 0;
+  height: 0;
   padding: 0;
   border: none;
 }
 
 .modal[open] {
   box-sizing: border-box;
-  height: 100%;
-  border-radius: calc(25px - (8px)*2);
-  display: grid;
+  width: 90%;
+  max-width: 32rem;
+  max-height: 80vh;
+  padding: 0;
+  border: none;
+  border-radius: 1.5rem;
+  background-color: var(--surface);
+  box-shadow: $shadow-xl;
+  overflow: hidden;
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
   & content {
     height: 100%;
+    padding: $spacing-2xl;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: $spacing-lg;
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color);
+      text-align: center;
+      margin: 0;
+    }
+
     .message {
       flex: 1;
+      text-align: center;
+      color: var(--color-secondary);
+      line-height: 1.6;
+      font-size: 1rem;
     }
+
+    .modal-actions {
+      display: flex;
+      gap: $spacing-md;
+      width: 100%;
+
+      button {
+        flex: 1;
+        padding: $spacing-md $spacing-xl;
+        border-radius: $b-r;
+        border: 1px solid var(--border-color);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all $t-time ease;
+
+        &.primary {
+          background-color: var(--accent);
+          color: white;
+          border-color: var(--accent);
+
+          &:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+          }
+        }
+
+        &.secondary {
+          background-color: var(--surface);
+          color: var(--color);
+
+          &:hover {
+            background-color: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: $shadow-sm;
+          }
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+
     * {
       text-align: center;
     }

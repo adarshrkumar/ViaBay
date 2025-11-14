@@ -1,40 +1,81 @@
+@use './variables.scss' as *;
+
 .menu, .notifications {
   display: grid;
-  grid-template-rows: repeat(auto-fit, minmax(12rem, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: $spacing-lg;
 }
 
 :is(.menu, .notifications) item {
-  --p-i: 5rem;
-  --s-w: calc(100% - var(--p-i)*2) - 3px;
+  min-height: 10rem;
+  padding: $spacing-xl;
 
-  height: 14rem;
-  width: var(--s-w);
-  
-  padding-inline: var(--p-i);
-  
-  background-color: black;
+  background-color: var(--surface);
   color: var(--color);
 
-  border-radius: 10px;
-  border: solid 3px var(--color);
+  border-radius: $b-r;
+  border: 1px solid var(--border-color);
   outline: none;
-  
+  box-shadow: $shadow-md;
+
   display: flex;
-  gap: var(--p-i);
-  align-items: center;
+  flex-direction: column;
+  gap: $spacing-md;
+  justify-content: center;
+  align-items: flex-start;
 
   cursor: pointer;
+  transition: all $t-time ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    border-color: var(--accent);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+
+  .item-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color);
+  }
+
+  .item-description {
+    font-size: 0.9375rem;
+    color: var(--color-secondary);
+    line-height: 1.5;
+  }
 }
 
 .notifications item {
-  padding-left: calc(var(--p-i)/2);
+  padding: $spacing-lg;
+  flex-direction: row;
+  align-items: center;
+  gap: $spacing-md;
+
   .icon {
-    height: calc(100% - var(--p-i));
-    aspect-ratio: 1;
+    height: 3rem;
+    width: 3rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: var(--accent);
+    color: white;
+    display: grid;
+    place-items: center;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
   }
-  & item-content {
-    padding-inline: var(--p-i);
+
+  item-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
   }
 }

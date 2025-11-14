@@ -1,21 +1,47 @@
-$border-size: 2px;
-$border: solid #{$border-size} var(--color);
-$hf-size: 3.5rem;
+// Modern Design Tokens
+$border-size: 1px;
+$border: solid #{$border-size} var(--border-color);
+$hf-size: 4rem;
+
+// Spacing
+$spacing-xs: 0.5rem;
+$spacing-sm: 0.75rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
 
 // Inputs
-$p-i: 1rem;
+$p-i: $spacing-md;
 $s-w: calc(100% - #{$p-i} - $border-size);
-$b-r: 10px;
+$b-r: 12px;
 
 // Input Labels
-$t-time: 0.5s;
-$skew: 10deg;
+$t-time: 0.3s;
+$skew: 8deg;
 
-// Colors
-$lbg: #3d85c6;
-$lclr: white;
-$lacc: black;
+// Shadows
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
-$dbg: #333;
-$dclr: white;
-$dacc: #3d85c6;
+// Modern Color Palette - Light Theme
+$lbg: #f8fafc;
+$lbg-secondary: #ffffff;
+$lclr: #1e293b;
+$lclr-secondary: #64748b;
+$lacc: #3b82f6;
+$lacc-hover: #2563eb;
+$lborder: #e2e8f0;
+$lsurface: #ffffff;
+
+// Modern Color Palette - Dark Theme
+$dbg: #0f172a;
+$dbg-secondary: #1e293b;
+$dclr: #f1f5f9;
+$dclr-secondary: #94a3b8;
+$dacc: #60a5fa;
+$dacc-hover: #3b82f6;
+$dborder: #334155;
+$dsurface: #1e293b;

@@ -1,14 +1,52 @@
+@use '../variables.scss' as *;
+
 .settings {
     margin-inline: auto;
-    max-width: 500px;
+    max-width: 42rem;
+    width: 100%;
 }
 
 setting-option {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: $spacing-md;
+    padding: $spacing-xl;
+    background-color: var(--surface);
+    border-radius: $b-r;
+    border: 1px solid var(--border-color);
+    box-shadow: $shadow-sm;
+    margin-bottom: $spacing-lg;
+    transition: all $t-time ease;
+
+    &:hover {
+        box-shadow: $shadow-md;
+        transform: translateY(-2px);
+    }
 
     label {
-        font-size: 2em;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--color);
+        letter-spacing: -0.01em;
+    }
+
+    select, .select {
+        padding: $spacing-sm $spacing-md;
+        border-radius: $spacing-xs;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg);
+        color: var(--color);
+        font-size: 1rem;
+        transition: all $t-time ease;
+
+        &:hover {
+            border-color: var(--accent);
+        }
+
+        &:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
     }
 }
