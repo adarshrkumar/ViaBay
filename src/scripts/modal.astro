@@ -1,3 +1,4 @@
+<script is:inline>
 var modal = document.querySelector('.modal')
 
 function showModal(title, content) {
@@ -19,10 +20,11 @@ modal.querySelector('.btn').addEventListener('click', function(e) {
 function checkIfOuterModal(e) {
     const dimensions = modal.getBoundingClientRect()
     if (
-        e.clientX < dimensions.left || 
-        e.clientX > dimensions.right || 
-        e.clientY < dimensions.top || 
+        e.clientX < dimensions.left ||
+        e.clientX > dimensions.right ||
+        e.clientY < dimensions.top ||
         e.clientY > dimensions.bottom
     ) return true
     else return false
 }
+</script>

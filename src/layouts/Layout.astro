@@ -2,6 +2,17 @@
 import '../styles/globals.scss'
 import '../styles/modal.scss'
 
+import Cookies from '../scripts/cookies.astro'
+import Index from '../scripts/index.astro'
+import Authentication from '../scripts/authentication.astro'
+import Request511 from '../scripts/511Request.astro'
+import NotificationManager from '../scripts/notificationManager.astro'
+import Settings from '../scripts/settings.astro'
+import Modal from '../scripts/modal.astro'
+import Select from '../scripts/select.astro'
+import Directions from '../scripts/directions.astro'
+import Notifications from '../scripts/notifications.astro'
+
 interface Script {
     name?: string
     location?: string
@@ -15,7 +26,6 @@ interface Props {
 }
 
 var sTitle = 'TransTrack'
-var mainScripts = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
 
 var { title, classItems: classItemsProp, headItems: headItemsProp, scripts = [] } = Astro.props as Props
 
@@ -71,13 +81,13 @@ var yearStr = year == startingYear ? '' : `-${year}`
         { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
         {
             mainScripts.map(function(script: string, i: number) {
-                return <script src={`/scripts/${script}.js`} is:inline></script>
+                return <{s.name}></{s.name}>
             })
         }
         {
             scripts.map(function(s: Script, i: number) {
                 if (s.location === 'head' && s.name) {
-                    return <script src={`/scripts/${s.name}.js`}></script>
+                    return <{s.name}></{s.name}>
                 }
             })
         }
@@ -129,7 +139,7 @@ var yearStr = year == startingYear ? '' : `-${year}`
         {
             scripts.map(function(s: Script, i: number) {
                 if (s.location !== 'head' && s.name) {
-                    return <script src={`/scripts/${s.name}.js`}></script>
+                    return <{s.name}></{s.name}>
                 }
             })
         }

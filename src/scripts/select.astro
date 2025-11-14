@@ -1,3 +1,4 @@
+<script is:inline>
 function openSelection(e) {
     while (!e.className.includes('select') ) e = e.parentNode
     document.querySelectorAll('.select').forEach(function(s, i) {
@@ -33,3 +34,4 @@ if (!!document.querySelector('.select')) {
         e.style.setProperty('--amt', e.querySelectorAll('select-option').length)
     })
 }
+</script>

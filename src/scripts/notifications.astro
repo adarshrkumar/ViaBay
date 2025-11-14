@@ -1,3 +1,4 @@
+<script is:inline>
 var nGroup = document.querySelector('.notifications')
 
 
@@ -28,11 +29,11 @@ function addNotification(notification) {
     nEleIcon.classList.add('icon')
     nEleIcon.src = `/icons/${nIcon}.svg`
     nEle.appendChild(nEleIcon)
-    
+
     var nEleContent = document.createElement('item-content')
     nEleContent.textContent = nTitle
     nEle.appendChild(nEleContent)
-    
+
     nGroup.appendChild(nEle)
 
     nEle.onclick = function(e) {
@@ -41,4 +42,4 @@ function addNotification(notification) {
         }
     }
 }
-
+</script>

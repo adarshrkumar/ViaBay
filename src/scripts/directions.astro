@@ -1,3 +1,4 @@
+<script is:inline>
 var Microsoft = null
 var BingMapsKey = 'AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS'
 var watchID = null
@@ -38,14 +39,14 @@ function addDirections(e) {
         }
     })
 
-    
+
     // Load the directions module.
     Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
         if (directionsManager) directionsManager.clearAll()
 
         // Create an instance of the directions manager.
         directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-        
+
         // // Calculate a date time that is 1 hour from now.
         var date = new Date();
 
@@ -59,16 +60,16 @@ function addDirections(e) {
             dateTime: `${month}/${day}/${year}`,
             timeType: Microsoft.Maps.Directions.TimeTypes.departure,
         });
-        
+
         // Add waypoints.
         places.forEach(function(p, i) {
             var waypoint = new Microsoft.Maps.Directions.Waypoint({ address: p });
             directionsManager.addWaypoint(waypoint);
         })
-        
+
         // Set the element in which the itinerary will be rendered.
         directionsManager.setRenderOptions({ itineraryContainer: directionsElement });
-        
+
         // Calculate directions.
         directionsManager.calculateDirections();
     });
@@ -115,7 +116,7 @@ document.querySelector('.add-stop').addEventListener('click', function(e) {
     var options = document.createElement('div')
     options.classList.add('options')
     stopContainer.appendChild(options)
-    
+
     stops.appendChild(stopContainer)
 })
 
@@ -145,7 +146,7 @@ function stopChange(e, i) {
     var searchText = e.target.value
 
     var optionsEle = stops.querySelectorAll('.options')[i]
-    
+
     optionsEle.querySelectorAll('.option').forEach(function(o) {
         o.remove()
     })
@@ -163,7 +164,7 @@ function stopChange(e, i) {
                     answer.results.forEach(function(r, i) {
                         adds.push(r.address.formattedAddress)
                     })
-    
+
                     adds.forEach(function(a) {
                         createOption(a, i, optionsEle)
                     })
@@ -207,3 +208,4 @@ function selectOption(e, i) {
 }
 
 goBtn.addEventListener('click', addDirections)
+</script>
