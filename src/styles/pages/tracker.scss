@@ -28,20 +28,20 @@ $hf-size: 4rem;
 
         display: flex;
         flex-direction: column;
-        gap: $spacing-md;
+        gap: $spacing-medium;
 
         button {
             background-color: var(--surface);
             border: 1px solid var(--border-color);
-            border-radius: $b-r;
-            padding: $spacing-sm;
-            box-shadow: $shadow-md;
+            border-radius: $border-radius;
+            padding: $spacing-small;
+            box-shadow: $shadow-medium;
             cursor: pointer;
-            transition: all $t-time ease;
+            transition: all $transition-time ease;
 
             &:hover {
                 transform: translateY(-2px);
-                box-shadow: $shadow-lg;
+                box-shadow: $shadow-large;
                 background-color: var(--accent);
                 color: white;
             }
@@ -78,33 +78,74 @@ $hf-size: 4rem;
             top: unset;
             left: unset;
         }
-        .infobox-close {
-            right: $padding;
-            top: $padding;
-        }
     }
 }
 
 .infobox {
+    position: relative;
+
     box-sizing: border-box;
-    padding: $spacing-lg;
+    padding: $spacing-large;
+
+    display: flex;
+    flex-direction: column;
+    
+    max-width: 750px;
 
     background-color: var(--surface);
     color: var(--color);
 
-    border-radius: $b-r;
+    border-radius: $border-radius;
     border: 1px solid var(--border-color);
-    box-shadow: $shadow-xl;
+    box-shadow: $shadow-xlarge;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 
     overflow: auto;
 
+    .infobox-close-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        padding: $spacing-small;
+
+        aspect-ratio: 1;
+
+        background: none;
+        color: var(--color);
+
+        border: none;
+        border-radius: 4px;
+
+        font-size: 1.5rem;
+        line-height: 0;
+
+        z-index: 1000;
+
+        cursor: pointer;
+
+        transition: all $transition-time ease;
+
+        &:hover {
+            background-color: var(--bg);
+            color: var(--accent);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+    }
+
     .title {
         font-weight: 700;
         font-size: 1.125rem;
-        margin-bottom: $spacing-md;
+        padding-right: 2rem;
         color: var(--color);
+    }
+
+    > span {
+        display: block;
     }
 
     .stops {
@@ -112,20 +153,20 @@ $hf-size: 4rem;
             margin-block: 0;
         }
         display: grid;
-        gap: $spacing-sm;
+        gap: $spacing-small;
 
         .stop {
             max-width: 25rem;
             word-wrap: break-word;
-            padding: $spacing-sm;
+            padding: $spacing-small;
             background-color: var(--bg);
-            border-radius: $spacing-xs;
+            border-radius: $spacing-xsmall;
             border-left: 3px solid var(--accent);
-            transition: all $t-time ease;
+            transition: all $transition-time ease;
 
             &:hover {
                 transform: translateX(4px);
-                box-shadow: $shadow-sm;
+                box-shadow: $shadow-small;
             }
         }
 

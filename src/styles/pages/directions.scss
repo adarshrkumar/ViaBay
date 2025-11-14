@@ -2,7 +2,7 @@
 
 .main {
     .directions-container {
-        --gap: $spacing-lg;
+        --gap: $spacing-large;
 
         box-sizing: border-box;
 
@@ -57,10 +57,10 @@
 
                     min-height: 3rem;
 
-                    border-radius: $b-r;
+                    border-radius: $border-radius;
                     border: 1px solid var(--border-color);
-                    box-shadow: $shadow-sm;
-                    transition: all $t-time ease;
+                    box-shadow: $shadow-small;
+                    transition: all $transition-time ease;
 
                     &:has(.stop:focus-visible) {
                         border-color: var(--accent);
@@ -68,7 +68,7 @@
                     }
 
                     &:hover {
-                        box-shadow: $shadow-md;
+                        box-shadow: $shadow-medium;
                     }
 
                     z-index: 1;
@@ -87,11 +87,11 @@
 
                         display: grid;
                         grid-template-columns: 1fr 2rem;
-                        gap: $spacing-xs;
+                        gap: $spacing-xsmall;
 
                         .stop {
                             box-sizing: border-box;
-                            padding: $spacing-sm $spacing-md;
+                            padding: $spacing-small $spacing-medium;
 
                             height: auto;
                             max-width: 100%;
@@ -115,7 +115,7 @@
                             aspect-ratio: 1;
 
                             border-radius: 50%;
-                            transition: all $t-time ease;
+                            transition: all $transition-time ease;
                             display: grid;
                             place-items: center;
 
@@ -149,7 +149,7 @@
 
                         .option {
                             box-sizing: border-box;
-                            padding: $spacing-sm $spacing-md;
+                            padding: $spacing-small $spacing-medium;
 
                             color: var(--color);
                             background-color: var(--surface);
@@ -159,7 +159,7 @@
                             font-size: 0.9375rem;
 
                             cursor: pointer;
-                            transition: all $t-time ease;
+                            transition: all $transition-time ease;
 
                             &:hover {
                                 background-color: var(--bg);
@@ -184,19 +184,19 @@
 
                 > button {
                     border: 1px solid var(--border-color);
-                    border-radius: $b-r;
+                    border-radius: $border-radius;
                     background-color: var(--accent);
                     color: white;
                     font-weight: 600;
                     font-size: 0.9375rem;
                     cursor: pointer;
-                    transition: all $t-time ease;
-                    box-shadow: $shadow-sm;
+                    transition: all $transition-time ease;
+                    box-shadow: $shadow-small;
 
                     &:hover {
                         background-color: var(--accent-hover);
                         transform: translateY(-2px);
-                        box-shadow: $shadow-md;
+                        box-shadow: $shadow-medium;
                     }
 
                     &:active {

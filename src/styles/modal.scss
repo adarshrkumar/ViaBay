@@ -19,7 +19,7 @@
     border: none;
     border-radius: 1.5rem;
     background-color: var(--surface);
-    box-shadow: $shadow-xl;
+    box-shadow: $shadow-xlarge;
     overflow: hidden;
 
     &::backdrop {
@@ -30,11 +30,11 @@
 
     & content {
         height: 100%;
-        padding: $spacing-2xl;
+        padding: $spacing-xxlarge;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: $spacing-lg;
+        gap: $spacing-large;
 
         .modal-title {
             font-size: 1.5rem;
@@ -54,18 +54,18 @@
 
         .modal-actions {
             display: flex;
-            gap: $spacing-md;
+            gap: $spacing-medium;
             width: 100%;
 
             button {
                 flex: 1;
-                padding: $spacing-md $spacing-xl;
-                border-radius: $b-r;
+                padding: $spacing-medium $spacing-xlarge;
+                border-radius: $border-radius;
                 border: 1px solid var(--border-color);
                 font-weight: 600;
                 font-size: 1rem;
                 cursor: pointer;
-                transition: all $t-time ease;
+                transition: all $transition-time ease;
 
                 &.primary {
                     background-color: var(--accent);
@@ -75,7 +75,7 @@
                     &:hover {
                         background-color: var(--accent-hover);
                         transform: translateY(-2px);
-                        box-shadow: $shadow-md;
+                        box-shadow: $shadow-medium;
                     }
                 }
 
@@ -86,7 +86,7 @@
                     &:hover {
                         background-color: var(--bg);
                         transform: translateY(-2px);
-                        box-shadow: $shadow-sm;
+                        box-shadow: $shadow-small;
                     }
                 }
 

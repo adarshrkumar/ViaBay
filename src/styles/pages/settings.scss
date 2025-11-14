@@ -9,17 +9,17 @@
 setting-option {
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
-    padding: $spacing-xl;
+    gap: $spacing-medium;
+    padding: $spacing-xlarge;
     background-color: var(--surface);
-    border-radius: $b-r;
+    border-radius: $border-radius;
     border: 1px solid var(--border-color);
-    box-shadow: $shadow-sm;
-    margin-bottom: $spacing-lg;
-    transition: all $t-time ease;
+    box-shadow: $shadow-small;
+    margin-bottom: $spacing-large;
+    transition: all $transition-time ease;
 
     &:hover {
-        box-shadow: $shadow-md;
+        box-shadow: $shadow-medium;
         transform: translateY(-2px);
     }
 
@@ -31,13 +31,13 @@ setting-option {
     }
 
     select, .select {
-        padding: $spacing-sm $spacing-md;
-        border-radius: $spacing-xs;
+        padding: $spacing-small $spacing-medium;
+        border-radius: $spacing-xsmall;
         border: 1px solid var(--border-color);
         background-color: var(--bg);
         color: var(--color);
         font-size: 1rem;
-        transition: all $t-time ease;
+        transition: all $transition-time ease;
 
         &:hover {
             border-color: var(--accent);

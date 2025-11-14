@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "./variables.scss" as *;
 
 :root {
     --bg: #{$lbg};
@@ -106,17 +106,17 @@ body {
 }
 
 .header {
-    padding-inline: $spacing-xl;
+    padding-inline: $spacing-xlarge;
     background-color: var(--surface);
     border-bottom: $border;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    box-shadow: $shadow-sm;
+    box-shadow: $shadow-small;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: $spacing-xl;
+    gap: $spacing-xlarge;
 
     font-size: 1.25rem;
     font-weight: 600;
@@ -131,19 +131,25 @@ body {
 
 .nav {
     flex: 1;
+    box-sizing: border-box;
+
     display: flex;
     justify-content: right;
-    gap: $spacing-xs;
+    gap: $spacing-xsmall;
     z-index: 2;
+    padding: $spacing-small $spacing-medium;
+
 
     .link {
-        position: relative;
+        aspect-ratio: 1;
+
         display: grid;
         place-items: center;
-        padding: $spacing-sm $spacing-md;
-        border-radius: $b-r;
-        transition: all $t-time ease;
+
         color: var(--color-secondary);
+        border-radius: $border-radius;
+
+        transition: all $transition-time ease;
 
         &:hover {
             background-color: var(--bg);
@@ -158,7 +164,7 @@ body {
         .icon {
             height: 1.5rem;
             aspect-ratio: 1;
-            transition: all $t-time ease;
+            transition: all $transition-time ease;
         }
     }
 
@@ -168,8 +174,8 @@ body {
             top: 0;
             right: 0;
             height: 4rem;
-            gap: $spacing-xs;
-            padding-right: $spacing-md;
+            gap: $spacing-xsmall;
+            padding-right: $spacing-medium;
 
             .link {
                 min-width: 3.5rem;
@@ -285,13 +291,13 @@ body {
     background-color: var(--surface);
     color: var(--color);
 
-    border-radius: $b-r;
+    border-radius: $border-radius;
     border: solid $border-size var(--border-color);
     outline: none;
-    box-shadow: $shadow-sm;
+    box-shadow: $shadow-small;
 
     font-size: 2rem;
-    transition: all $t-time ease;
+    transition: all $transition-time ease;
 
     z-index: 1;
 
@@ -323,12 +329,12 @@ body {
         transform: skewX(#{-1*$skew});
 
         transition:
-            padding $t-time ease-in-out,
-            border $t-time ease-in-out,
-            background-color $t-time ease-in-out,
-            transform $t-time ease-in-out,
-            translate $t-time ease-in-out,
-            font-size $t-time ease-in-out
+            padding $transition-time ease-in-out,
+            border $transition-time ease-in-out,
+            background-color $transition-time ease-in-out,
+            transform $transition-time ease-in-out,
+            translate $transition-time ease-in-out,
+            font-size $transition-time ease-in-out
         ;
 
         > span {
@@ -374,7 +380,7 @@ body {
         line-height: 1;
     }
     :is(input, textarea, select) {
-        border-radius: calc($b-r - $border-size);
+        border-radius: calc($border-radius - $border-size);
         width: calc(calc(100% - $border-size) + $border-size);
         height: calc(100% - $border-size/2);
         padding-inline: $p-i;
