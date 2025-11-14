@@ -4,31 +4,31 @@ import '../styles/pages/login.scss'
 import Layout from '../layouts/Layout.astro'
 
 var scripts = [
-  {
-    name: 'login'
-  }
+    {
+        name: 'login'
+    }
 ]
 
 return Astro.redirect('/landing')
 ---
 <Layout title="Login" scripts={scripts}>
-  <img class="logo" src="/assets/logo.svg">
-  <div role="form" class="form">
-    <div class="input-parent">
-      <label for="email" class="label">
-        <span>Email <span class="star">*</span></span>
-      </label>
-      <input type="text" id="email" required pattern="[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?">
+    <img class="logo" src="/assets/logo.svg">
+    <div role="form" class="form">
+        <div class="input-parent">
+            <label for="email" class="label">
+                <span>Email <span class="star">*</span></span>
+            </label>
+            <input type="text" id="email" required pattern="[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?">
+        </div>
+        <div class="input-parent">
+            <label for="password" class="label">
+                <span>Password <span class="star">*</span></span>
+            </label>
+            <input type="password" id="password" required>
+        </div>
+        <div class="btns">
+            <button class="btn">Login Help</button>
+            <button class="btn" id="login" onclick="login()">Sign In</button>
+        </div>
     </div>
-    <div class="input-parent">
-      <label for="password" class="label">
-        <span>Password <span class="star">*</span></span>
-      </label>
-      <input type="password" id="password" required>
-    </div>
-    <div class="btns">
-      <button class="btn">Login Help</button>
-      <button class="btn" id="login" onclick="login()">Sign In</button>
-    </div>
-  </div>
 </Layout>

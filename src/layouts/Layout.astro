@@ -10,20 +10,20 @@ var { title, classItems, headItems, scripts } = Astro.props
 
 var docTitle = ''
 if (
-  title === 'Home' || title === '' || 
-  !!title === false || title === null
+    title === 'Home' || title === '' ||
+    !!title === false || title === null
 ) {
-  docTitle = sTitle
+    docTitle = sTitle
 }
 else {
-  docTitle = `${title} | ${sTitle}`
+    docTitle = `${title} | ${sTitle}`
 }
 
 if (!!classItems === false || classItems === null) {
-  classItems = []
+    classItems = []
 }
 if (classItems.length < 0) {
-  classItems = []
+    classItems = []
 }
 classItems.unshift('page')
 classItems.unshift('main')
@@ -31,19 +31,19 @@ classItems.unshift('main')
 classItems = classItems.join(' ')
 
 if (!!headItems === false || headItems === null) {
-  headItems = []
+    headItems = []
 }
 if (headItems.length < 0) {
-  headItems = []
+    headItems = []
 }
 
 headItems = headItems.join('')
 
 if (!!scripts === false || scripts === null) {
-  scripts = []
+    scripts = []
 }
 if (scripts.length < 0) {
-  scripts = []
+    scripts = []
 }
 
 var d = new Date()
@@ -52,74 +52,79 @@ var startingYear = 2024
 var yearStr = year == startingYear ? '' : `-${year}`
 ---
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{docTitle}</title>
-    <link rel="icon" href="/assets/favicon.png" />
-    { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
-    {
-      mainScripts.map(function(script, i) {
-        return <script src={`/scripts/${script}.js`} is:inline></script>
-      })
-    }
-    {
-      scripts.map(function(s, i) {
-        if (s.location === 'head' && s.name) {
-          return <script src={`/scripts/${s.name}.js`}></script>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{docTitle}</title>
+        <link rel="icon" href="/assets/favicon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
+        {
+            mainScripts.map(function(script, i) {
+                return <script src={`/scripts/${script}.js`} is:inline></script>
+            })
         }
-      })
-    }
-    <script src="https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS" async defer is:inline></script>
-  </head>
-  <body sTitle={sTitle}>
-    <div class="app">
-      <header class="header">
-        <h1 class="title">{title}</h1>
-      </header>
-      <main id="content" class={classItems}>
-        <slot />
-      </main>
-      <footer class="footer" site-title={sTitle} current-year={yearStr}>
-        <nav class="nav" hidden>
-          <a class="link" href="/tracker">
-            <img class="icon" src="/icons/map.svg">
-          </a>
-          <a class="link" href="/directions">
-            <img class="icon" src="/icons/location.svg">
-          </a>
-          <!-- <a class="link" href="/book">
-            <img class="icon" src="/icons/book-online.svg">
-          </a> -->
-          <!-- <a class="link" href="/notifications">
-            <img class="icon" src="/icons/notification.svg">
-          </a> -->
-          <!-- <a class="link" href="/more">
-            <img class="icon" src="/icons/more-horiz.svg">
-          </a> -->
-          <a class="link" href="/settings">
-            <img class="icon" src="/icons/settings.svg">
-          </a>
-        </nav>
-      </footer>
-    </div>
-    <dialog class="modal">
-      <content>
-        <h1 class="title"></h1>
-        <section class="message"></section>
-        <button class="btn">OK</button>
-      </content>
-    </dialog>
-    <script src="/scripts/modal.js" is:inline></script>
-    <script src="/scripts/select.js" is:inline></script>
-    {
-      scripts.map(function(s, i) {
-        if (s.location !== 'head' && s.name) {
-          return <script src={`/scripts/${s.name}.js`}></script>
+        {
+            scripts.map(function(s, i) {
+                if (s.location === 'head' && s.name) {
+                    return <script src={`/scripts/${s.name}.js`}></script>
+                }
+            })
         }
-      })
-    }
-    <!-- <script src="/scripts/eruda.js" is:inline></script> -->
-  </body>
+        <script src="https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS" async defer is:inline></script>
+    </head>
+    <body sTitle={sTitle}>
+        <div class="app">
+            <header class="header">
+                <h1 class="title">{title}</h1>
+            </header>
+            <main id="content" class={classItems}>
+                <slot />
+            </main>
+            <footer class="footer" site-title={sTitle} current-year={yearStr}>
+                <nav class="nav" hidden>
+                    <a class="link" href="/tracker">
+                        <img class="icon" src="/icons/map.svg">
+                    </a>
+                    <a class="link" href="/directions">
+                        <img class="icon" src="/icons/location.svg">
+                    </a>
+                    <!-- <a class="link" href="/book">
+                        <img class="icon" src="/icons/book-online.svg">
+                    </a> -->
+                    <!-- <a class="link" href="/notifications">
+                        <img class="icon" src="/icons/notification.svg">
+                    </a> -->
+                    <!-- <a class="link" href="/more">
+                        <img class="icon" src="/icons/more-horiz.svg">
+                    </a> -->
+                    <a class="link" href="/settings">
+                        <img class="icon" src="/icons/settings.svg">
+                    </a>
+                </nav>
+            </footer>
+        </div>
+        <dialog class="modal">
+            <content>
+                <h1 class="modal-title title"></h1>
+                <section class="message"></section>
+                <div class="modal-actions">
+                    <button class="btn primary">OK</button>
+                </div>
+            </content>
+        </dialog>
+        <script src="/scripts/modal.js" is:inline></script>
+        <script src="/scripts/select.js" is:inline></script>
+        {
+            scripts.map(function(s, i) {
+                if (s.location !== 'head' && s.name) {
+                    return <script src={`/scripts/${s.name}.js`}></script>
+                }
+            })
+        }
+        <!-- <script src="/scripts/eruda.js" is:inline></script> -->
+    </body>
 </html>
