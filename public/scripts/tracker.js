@@ -284,7 +284,7 @@ function showVehicleInfo(e) {
                 li.style.color = color
                 li.textContent = `${stop.StopPointName} (${stop.StopPointRef}): ${stopTime} (${earlyLateText})`
 
-                liS.publishedLineName(li)
+                liS.push(li)
             }
     
         })
