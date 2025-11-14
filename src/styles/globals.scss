@@ -1,21 +1,21 @@
 @import "variables.scss";
 
 :root {
-  --bg: #{$lbg};
-  --bg-secondary: #{$lbg-secondary};
-  --color: #{$lclr};
-  --color-secondary: #{$lclr-secondary};
-  --accent: #{$lacc};
-  --accent-hover: #{$lacc-hover};
-  --border-color: #{$lborder};
-  --surface: #{$lsurface};
+    --bg: #{$lbg};
+    --bg-secondary: #{$lbg-secondary};
+    --color: #{$lclr};
+    --color-secondary: #{$lclr-secondary};
+    --accent: #{$lacc};
+    --accent-hover: #{$lacc-hover};
+    --border-color: #{$lborder};
+    --surface: #{$lsurface};
 
-  color: var(--color);
-  background-color: var(--bg);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    color: var(--color);
+    background-color: var(--bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 @media (prefers-color-scheme: light) {
