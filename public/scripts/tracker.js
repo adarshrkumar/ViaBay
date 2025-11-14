@@ -4,6 +4,8 @@ var BingMapsKey = 'AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7
 var agencyIds = []
 var agencies = {}
 var allPins = []
+var userPin = null
+var userLocation = null
 // var lines = []
 // var patterns = []
 
@@ -28,6 +30,89 @@ var customColors = {
 
 var directionsElement = document.querySelector('#hiddenDirections')
 var directionsManager = false
+
+// Calculate distance between two locations in miles using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    var R = 3958.8 // Earth's radius in miles
+    var dLat = (lat2 - lat1) * Math.PI / 180
+    var dLon = (lon2 - lon1) * Math.PI / 180
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
+}
+
+// Show nearby vehicles when user clicks their location pin
+function showNearbyVehicles() {
+    if (!userLocation) return
+
+    var nearbyVehicles = []
+    var maxDistance = 1.5 // 1.5 mile radius
+
+    // Search through all agencies and their vehicles
+    agencyIds.forEach(function(agency) {
+        var aObj = agencies[agency.Id]
+        if (!aObj || !aObj.vehicles || !aObj.vehicles.data) return
+
+        aObj.vehicles.data.forEach(function(vehicle) {
+            var vehicleActivity = vehicle.MonitoredVehicleJourney
+            if (!vehicleActivity || !vehicleActivity.VehicleLocation) return
+
+            var vehicleLoc = vehicleActivity.VehicleLocation
+            var distance = calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                vehicleLoc.Latitude,
+                vehicleLoc.Longitude
+            )
+
+            if (distance <= maxDistance) {
+                nearbyVehicles.push({
+                    distance: distance,
+                    agency: aObj.name,
+                    route: vehicleActivity.LineRef,
+                    lineName: vehicleActivity.PublishedLineName || vehicleActivity.LineRef,
+                    destination: vehicleActivity.DestinationName || 'Unknown',
+                    vehicleRef: vehicleActivity.VehicleRef
+                })
+            }
+        })
+    })
+
+    // Sort by distance
+    nearbyVehicles.sort(function(a, b) {
+        return a.distance - b.distance
+    })
+
+    // Build HTML content
+    var content = '<div class="infobox">'
+    content += '<button class="infobox-close-btn" onclick="if(window.infobox) window.infobox.setOptions({visible: false});">&times;</button>'
+    content += '<span class="title">Nearby Vehicles</span>'
+    content += '<span>Within 1.5 miles of your location</span><br>'
+
+    if (nearbyVehicles.length === 0) {
+        content += '<span>No vehicles nearby</span>'
+    } else {
+        content += '<ol class="stops">'
+        nearbyVehicles.forEach(function(v) {
+            content += '<li class="stop">'
+            content += '<strong>' + v.route + '</strong> - ' + v.lineName + '<br>'
+            content += 'To: ' + v.destination + '<br>'
+            content += 'Distance: ' + v.distance.toFixed(2) + ' mi'
+            content += '</li>'
+        })
+        content += '</ol>'
+    }
+
+    content += '</div>'
+
+    infobox.setOptions({
+        location: userLocation,
+        htmlContent: content,
+        visible: true
+    })
+}
 
 
 function onMapLoad() {
@@ -191,7 +276,7 @@ function GetMap() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function(position) {
-                    var userLocation = new Microsoft.Maps.Location(
+                    userLocation = new Microsoft.Maps.Location(
                         position.coords.latitude,
                         position.coords.longitude
                     );
@@ -203,10 +288,14 @@ function GetMap() {
                     });
 
                     // Add a marker for user's location
-                    var userPin = new Microsoft.Maps.Pushpin(userLocation, {
+                    userPin = new Microsoft.Maps.Pushpin(userLocation, {
                         color: 'green',
                         title: 'Your Location'
                     });
+
+                    // Add click handler to show nearby vehicles
+                    Microsoft.Maps.Events.addHandler(userPin, 'click', showNearbyVehicles);
+
                     map.entities.push(userPin);
                 },
                 function(error) {
