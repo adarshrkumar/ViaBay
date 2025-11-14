@@ -1,89 +1,89 @@
 @use '../variables.scss' as *;
 
 .main {
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: $spacing-2xl;
-  min-height: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-2xl;
+    min-height: 100%;
 
-  > * {
-    max-width: 28rem;
-    width: 100%;
-  }
+    > * {
+        max-width: 28rem;
+        width: 100%;
+    }
 }
 
 .logo {
-  display: block;
-  margin: 0 auto;
-  max-width: 12rem;
-  filter: drop-shadow($shadow-md);
+    display: block;
+    margin: 0 auto;
+    max-width: 12rem;
+    filter: drop-shadow($shadow-md);
 }
 
 .form {
-  width: 100%;
-  background-color: var(--surface);
-  padding: $spacing-2xl;
-  border-radius: 1.5rem;
-  box-shadow: $shadow-xl;
-  border: 1px solid var(--border-color);
+    width: 100%;
+    background-color: var(--surface);
+    padding: $spacing-2xl;
+    border-radius: 1.5rem;
+    box-shadow: $shadow-xl;
+    border: 1px solid var(--border-color);
 
-  display: grid;
-  gap: $spacing-xl;
+    display: grid;
+    gap: $spacing-xl;
 
-  & > * {
-    max-width: 100%;
-  }
+    & > * {
+        max-width: 100%;
+    }
 }
 
 .btns {
-  --gap: $spacing-md;
+    --gap: $spacing-md;
 
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  gap: var(--gap);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gap);
 }
 
 .btn {
-  flex: 1;
-  min-height: 3rem;
-  padding: $spacing-md $spacing-xl;
-  border-radius: $b-r;
-  box-sizing: border-box;
-  border: 1px solid var(--border-color);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all $t-time ease;
-  box-shadow: $shadow-sm;
+    flex: 1;
+    min-height: 3rem;
+    padding: $spacing-md $spacing-xl;
+    border-radius: $b-r;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $t-time ease;
+    box-shadow: $shadow-sm;
 
-  &[type="submit"] {
-    background-color: var(--accent);
-    color: white;
-    border-color: var(--accent);
+    &[type="submit"] {
+        background-color: var(--accent);
+        color: white;
+        border-color: var(--accent);
 
-    &:hover {
-      background-color: var(--accent-hover);
-      transform: translateY(-2px);
-      box-shadow: $shadow-md;
+        &:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+        }
     }
-  }
 
-  &[type="button"], &[type="reset"] {
-    background-color: var(--surface);
-    color: var(--color);
+    &[type="button"], &[type="reset"] {
+        background-color: var(--surface);
+        color: var(--color);
 
-    &:hover {
-      background-color: var(--bg);
-      transform: translateY(-2px);
-      box-shadow: $shadow-md;
+        &:hover {
+            background-color: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+        }
     }
-  }
 
-  &:active {
-    transform: translateY(0);
-  }
+    &:active {
+        transform: translateY(0);
+    }
 }

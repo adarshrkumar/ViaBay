@@ -19,7 +19,37 @@
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
+    :root {
+        --bg: #{$lbg};
+        --bg-secondary: #{$lbg-secondary};
+        --color: #{$lclr};
+        --color-secondary: #{$lclr-secondary};
+        --accent: #{$lacc};
+        --accent-hover: #{$lacc-hover};
+        --border-color: #{$lborder};
+        --surface: #{$lsurface};
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #{$dbg};
+        --bg-secondary: #{$dbg-secondary};
+        --color: #{$dclr};
+        --color-secondary: #{$dclr-secondary};
+        --accent: #{$dacc};
+        --accent-hover: #{$dacc-hover};
+        --border-color: #{$dborder};
+        --surface: #{$dsurface};
+    }
+}
+
+html {
+    min-height: 100%;
+    color-scheme: light dark;
+}
+
+[data-theme="light"] {
     --bg: #{$lbg};
     --bg-secondary: #{$lbg-secondary};
     --color: #{$lclr};
@@ -28,11 +58,9 @@
     --accent-hover: #{$lacc-hover};
     --border-color: #{$lborder};
     --surface: #{$lsurface};
-  }
+    color-scheme: light;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
+[data-theme="dark"] {
     --bg: #{$dbg};
     --bg-secondary: #{$dbg-secondary};
     --color: #{$dclr};
@@ -41,426 +69,398 @@
     --accent-hover: #{$dacc-hover};
     --border-color: #{$dborder};
     --surface: #{$dsurface};
-  }
-}
-
-html {
-  min-height: 100%;
-  color-scheme: light dark;
-}
-
-[data-theme="light"] {
-  --bg: #{$lbg};
-  --bg-secondary: #{$lbg-secondary};
-  --color: #{$lclr};
-  --color-secondary: #{$lclr-secondary};
-  --accent: #{$lacc};
-  --accent-hover: #{$lacc-hover};
-  --border-color: #{$lborder};
-  --surface: #{$lsurface};
-  color-scheme: light;
-}
-[data-theme="dark"] {
-  --bg: #{$dbg};
-  --bg-secondary: #{$dbg-secondary};
-  --color: #{$dclr};
-  --color-secondary: #{$dclr-secondary};
-  --accent: #{$dacc};
-  --accent-hover: #{$dacc-hover};
-  --border-color: #{$dborder};
-  --surface: #{$dsurface};
-  color-scheme: dark;
+    color-scheme: dark;
 }
 
 body {
-  margin: 0;
-  min-height: 100%;
+    margin: 0;
+    min-height: 100%;
 
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 :is(button, input:is([type="button"], [type="submit"])).removeStyles {
-  background: none;
-  color: inherit;
-  border: none;
-  padding: 0;
-  font-family: inherit;
-  cursor: pointer;
-  outline: none;
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
 }
 
 [hidden] {
-  display: none !important;
+    display: none !important;
 }
 
 [onclick] {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .app {
-  position: relative;
-  height: 100dvh;
-  display: grid;
-  grid-template-rows: $hf-size calc(100% - $hf-size*2) $hf-size;
+    position: relative;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: $hf-size calc(100% - $hf-size*2) $hf-size;
 }
 
 .header {
-  padding-inline: $spacing-xl;
-  background-color: var(--surface);
-  border-bottom: $border;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: $shadow-sm;
+    padding-inline: $spacing-xl;
+    background-color: var(--surface);
+    border-bottom: $border;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: $shadow-sm;
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: $spacing-xl;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-xl;
 
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-
-  .title {
-    font-size: 1em;
+    font-size: 1.25rem;
     font-weight: 600;
-    color: var(--color);
-  }
+    letter-spacing: -0.02em;
+
+    .title {
+        font-size: 1em;
+        font-weight: 600;
+        color: var(--color);
+    }
 }
 
 .nav {
-  flex: 1;
-  display: flex;
-  justify-content: right;
-  gap: $spacing-xs;
-  z-index: 2;
+    flex: 1;
+    display: flex;
+    justify-content: right;
+    gap: $spacing-xs;
+    z-index: 2;
 
-  .link {
-    position: relative;
-    display: grid;
-    place-items: center;
-    padding: $spacing-sm $spacing-md;
-    border-radius: $b-r;
-    transition: all $t-time ease;
-    color: var(--color-secondary);
-
-    &:hover {
-      background-color: var(--bg);
-      color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-
-    .icon {
-      height: 1.5rem;
-      aspect-ratio: 1;
-      transition: all $t-time ease;
-    }
-  }
-
-  @media (min-width: 750px) {
-    & {
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 4rem;
-      gap: $spacing-xs;
-      padding-right: $spacing-md;
-
-      .link {
-        min-width: 3.5rem;
-      }
-    }
-  }
-  @media (max-width: 751px) {
-    & {
-      height: 100%;
-      justify-content: space-evenly;
-      gap: 0;
-
-      .link {
-        flex: 1;
-        border-radius: 0;
+    .link {
+        position: relative;
+        display: grid;
+        place-items: center;
+        padding: $spacing-sm $spacing-md;
+        border-radius: $b-r;
+        transition: all $t-time ease;
+        color: var(--color-secondary);
 
         &:hover {
-          background-color: rgba(var(--accent), 0.1);
+            background-color: var(--bg);
+            color: var(--accent);
+            transform: translateY(-2px);
         }
-      }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        .icon {
+            height: 1.5rem;
+            aspect-ratio: 1;
+            transition: all $t-time ease;
+        }
     }
-  }
+
+    @media (min-width: 750px) {
+        & {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 4rem;
+            gap: $spacing-xs;
+            padding-right: $spacing-md;
+
+            .link {
+                min-width: 3.5rem;
+            }
+        }
+    }
+    @media (max-width: 751px) {
+        & {
+            height: 100%;
+            justify-content: space-evenly;
+            gap: 0;
+
+            .link {
+                flex: 1;
+                border-radius: 0;
+
+                &:hover {
+                    background-color: rgba(var(--accent), 0.1);
+                }
+            }
+        }
+    }
 }
 
 .footer {
-  background-color: var(--surface);
-  border-top: $border;
-  box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.05);
+    background-color: var(--surface);
+    border-top: $border;
+    box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.05);
 
-  display: grid;
-  place-items: center;
-  font-size: 0.875rem;
-  color: var(--color-secondary);
+    display: grid;
+    place-items: center;
+    font-size: 0.875rem;
+    color: var(--color-secondary);
 
-  &::after {
-    content: '© 2024' attr(current-year) ' ' attr(site-title);
-    display: inline;
-    text-align: center;
-  }
+    &::after {
+        content: '© 2024' attr(current-year) ' ' attr(site-title);
+        display: inline;
+        text-align: center;
+    }
 }
 
 .main {
-  $p: 2rem;
+    $p: 2rem;
 
-  max-height: 100%;
-  
-  box-sizing: border-box;
-  &:not(.full) {
-    padding: $p;
-  }
+    max-height: 100%;
 
-  width: 100%;
-  // height: 100%;
+    box-sizing: border-box;
+    &:not(.full) {
+        padding: $p;
+    }
 
-  z-index: 1;
+    width: 100%;
+    // height: 100%;
 
-  > * {
-    margin-inline: auto;
-  }
+    z-index: 1;
 
-  :first-child {
-    margin-top: 0;
-  }
-  :last-child {
-    margin-bottom: 0;
-  }
+    > * {
+        margin-inline: auto;
+    }
 
-  *:has(+ small) {
-    margin-bottom: 0;
-  }
+    :first-child {
+        margin-top: 0;
+    }
+    :last-child {
+        margin-bottom: 0;
+    }
+
+    *:has(+ small) {
+        margin-bottom: 0;
+    }
 }
 
 .input, .textarea, .select {
-  position: relative;
-  $p-i: 1rem;
-  padding-inline: $p-i;
+    position: relative;
+    $p-i: 1rem;
+    padding-inline: $p-i;
 
-  width: 100%;
-  &:not(:is(.input-parent, .textarea-parent, .select-parent) > :is(.input, .textarea, .select)) {
-    aspect-ratio: 8 / 1;
-  }
+    width: 100%;
+    &:not(:is(.input-parent, .textarea-parent, .select-parent) > :is(.input, .textarea, .select)) {
+        aspect-ratio: 8 / 1;
+    }
 
-  background-color: var(--accent);
-  color: var(--color);
+    background-color: var(--accent);
+    color: var(--color);
 
-  border-radius: 10px;
-  border: solid $border-size var(--color);
-  outline: none;
+    border-radius: 10px;
+    border: solid $border-size var(--color);
+    outline: none;
 
-  .label {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    font-size: 3;
-    line-height: 0;
-  }
-  &[required] .label .star {
-    color: red;
-  }
-  &.normal {
-    font-size: 4rem;
-    line-height: 1;
-  }
+    .label {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        font-size: 3;
+        line-height: 0;
+    }
+    &[required] .label .star {
+        color: red;
+    }
+    &.normal {
+        font-size: 4rem;
+        line-height: 1;
+    }
 }
 
 .input-parent, .textarea-parent, .select-parent {
-  position: relative;
-  box-sizing: border-box;
+    position: relative;
+    box-sizing: border-box;
 
-  width: 100%;
-  aspect-ratio: 8 / 1;
+    width: 100%;
+    aspect-ratio: 8 / 1;
 
-  background-color: var(--surface);
-  color: var(--color);
-
-  border-radius: $b-r;
-  border: solid $border-size var(--border-color);
-  outline: none;
-  box-shadow: $shadow-sm;
-
-  font-size: 2rem;
-  transition: all $t-time ease;
-
-  z-index: 1;
-
-  &:hover {
-    border-color: var(--accent);
-  }
-
-  &:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-
-  .label {
-    position: absolute;
-    top: 50%;
-
-    display: inline-block;   
-    padding: calc($p-i/2) $p-i;
-
-    color: inherit;
-    border: inherit;
-    /* border-bottom: none; */
-
-    line-height: 1;
-
-    -webkit-user-select: none;
-    user-select: none;
-
-    transform: skewX(#{-1*$skew});
-
-    transition: 
-      padding $t-time ease-in-out, 
-      border $t-time ease-in-out, 
-      background-color $t-time ease-in-out, 
-      transform $t-time ease-in-out, 
-      translate $t-time ease-in-out, 
-      font-size $t-time ease-in-out
-    ;
-
-    > span {
-      display: inline-block;
-      transform: skewX($skew);
-    }
-  }
-
-  &:is(:not([open], :has(:is(input, textarea, select):focus)), :has(.hasInput)) .label {
-    translate: 0 -50%;
-    font-size: inherit;
-    border-color: transparent;
-    cursor: text;
-  }
-
-  &:is([open], :has(:is(input, textarea, select):focus)) {
-    .label {
-      padding-inline: $p-i;
-        
-      background-color: inherit;
-      font-size: 1em;
-
-      translate: $p-i 0;
-      transform: translateY(calc(-125%)) skew(#{-1*$skew});
-      z-index: 2;
-
-      @media (prefers-reduced-motion) {
-        & {
-          display: none;
-          transition: none;
-          transform: none;
-          font-size: 0;
-          z-index: -1;
-        }
-      }
-    }
-  }
-  &:has([required]) .label .star {
-    color: red;
-  }
-  &.normal {
-    font-size: 4rem;
-    line-height: 1;
-  }
-  :is(input, textarea, select) {
-    border-radius: calc($b-r - $border-size);
-    width: calc(calc(100% - $border-size) + $border-size);
-    height: calc(100% - $border-size/2);
-    padding-inline: $p-i;
-    background-color: inherit;
-    border: none;
-    outline: none;
+    background-color: var(--surface);
     color: var(--color);
-    font-size: inherit;
-    font-family: inherit;
 
-    &:is(select) {
-      padding-right: 0;
-      width: calc($s-w + $border-size);
+    border-radius: $b-r;
+    border: solid $border-size var(--border-color);
+    outline: none;
+    box-shadow: $shadow-sm;
+
+    font-size: 2rem;
+    transition: all $t-time ease;
+
+    z-index: 1;
+
+    &:hover {
+        border-color: var(--accent);
     }
-  }
+
+    &:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .label {
+        position: absolute;
+        top: 50%;
+
+        display: inline-block;
+        padding: calc($p-i/2) $p-i;
+
+        color: inherit;
+        border: inherit;
+        /* border-bottom: none; */
+
+        line-height: 1;
+
+        -webkit-user-select: none;
+        user-select: none;
+
+        transform: skewX(#{-1*$skew});
+
+        transition:
+            padding $t-time ease-in-out,
+            border $t-time ease-in-out,
+            background-color $t-time ease-in-out,
+            transform $t-time ease-in-out,
+            translate $t-time ease-in-out,
+            font-size $t-time ease-in-out
+        ;
+
+        > span {
+            display: inline-block;
+            transform: skewX($skew);
+        }
+    }
+
+    &:is(:not([open], :has(:is(input, textarea, select):focus)), :has(.hasInput)) .label {
+        translate: 0 -50%;
+        font-size: inherit;
+        border-color: transparent;
+        cursor: text;
+    }
+
+    &:is([open], :has(:is(input, textarea, select):focus)) {
+        .label {
+            padding-inline: $p-i;
+
+            background-color: inherit;
+            font-size: 1em;
+
+            translate: $p-i 0;
+            transform: translateY(calc(-125%)) skew(#{-1*$skew});
+            z-index: 2;
+
+            @media (prefers-reduced-motion) {
+                & {
+                    display: none;
+                    transition: none;
+                    transform: none;
+                    font-size: 0;
+                    z-index: -1;
+                }
+            }
+        }
+    }
+    &:has([required]) .label .star {
+        color: red;
+    }
+    &.normal {
+        font-size: 4rem;
+        line-height: 1;
+    }
+    :is(input, textarea, select) {
+        border-radius: calc($b-r - $border-size);
+        width: calc(calc(100% - $border-size) + $border-size);
+        height: calc(100% - $border-size/2);
+        padding-inline: $p-i;
+        background-color: inherit;
+        border: none;
+        outline: none;
+        color: var(--color);
+        font-size: inherit;
+        font-family: inherit;
+
+        &:is(select) {
+            padding-right: 0;
+            width: calc($s-w + $border-size);
+        }
+    }
 }
 
 .select {
-  position: relative;
-  &:not(.open) {
-    overflow: hidden;
-    select-options {
-      top: 0 !important;
-      translate: 0 calc((-100%)/var(--amt, 0)*var(--num, 0));
-      select-option:first-child {
-        color: lightgray;
-      }
-    }
-  }
-  &:has(select) {
-    padding-inline: 0;
-  }
-  &:has(select-options) {
-    width: $s-w;
-    padding-inline: 0;
-    cursor: pointer;
-  }
-  &.open {
-    select-options {
-      border: solid $border-size var(--color);
-      translate: #{-1*$border-size} 0;
-      overflow: hidden;
-      select-option {
-        &:first-child:hover {
-          color: var(--color);
+    position: relative;
+    &:not(.open) {
+        overflow: hidden;
+        select-options {
+            top: 0 !important;
+            translate: 0 calc((-100%)/var(--amt, 0)*var(--num, 0));
+            select-option:first-child {
+                color: lightgray;
+            }
         }
-        &:hover {
-          background-color: gray;
+    }
+    &:has(select) {
+        padding-inline: 0;
+    }
+    &:has(select-options) {
+        width: $s-w;
+        padding-inline: 0;
+        cursor: pointer;
+    }
+    &.open {
+        select-options {
+            border: solid $border-size var(--color);
+            translate: #{-1*$border-size} 0;
+            overflow: hidden;
+            select-option {
+                &:first-child:hover {
+                    color: var(--color);
+                }
+                &:hover {
+                    background-color: gray;
+                }
+            }
         }
-      }
     }
-  }
-  select-options {
-    z-index: 2;
-    border-radius: inherit;
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    left: 0;
-    width: 100%;
-    background-color: inherit;
-    color: inherit;
-    display: grid;
-    grid-template-rows: repeat(var(--amt, 0), 1fr);
-    select-option {
-      padding-inline: $p-i;
-      -webkit-user-select: none;
-      user-select: none;
-      cursor: pointer;
-      &[disabled] {
-        color: lightgray;
-      }
+    select-options {
+        z-index: 2;
+        border-radius: inherit;
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        width: 100%;
+        background-color: inherit;
+        color: inherit;
+        display: grid;
+        grid-template-rows: repeat(var(--amt, 0), 1fr);
+        select-option {
+            padding-inline: $p-i;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: pointer;
+            &[disabled] {
+                color: lightgray;
+            }
+        }
     }
-  }
 }
 
 .select select {
-  border: none;
-  color: inherit;
-  background: inherit;
-  position: inherit;
-  &.normal {
-    font-size: inherit;
-    line-height: inherit;
-  }
+    border: none;
+    color: inherit;
+    background: inherit;
+    position: inherit;
+    &.normal {
+        font-size: inherit;
+        line-height: inherit;
+    }
 }
 
 link {
-  cursor: pointer;
+    cursor: pointer;
 }

@@ -1,226 +1,226 @@
 @use "../variables.scss" as *;
 
 .main {
-  .directions-container {
-    --gap: $spacing-lg;
+    .directions-container {
+        --gap: $spacing-lg;
 
-    box-sizing: border-box;
+        box-sizing: border-box;
 
-    width: fit-content;
-    background-color: var(--surface);
+        width: fit-content;
+        background-color: var(--surface);
 
-    border-left: $border;
-    box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.05);
+        border-left: $border;
+        box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.05);
 
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
-
-    .stops-area {
-      [data-theme="dark"] & {
-        --stop-bg: #{$dacc};
-        --stop-text: #{$dclr};
-      }
-
-      @media (prefers-color-scheme: dark) {
-        & {
-          --stop-bg: #{$dacc};
-          --stop-text: #{$dclr};
-        }
-      }
-
-      [data-theme="light"] & {
-        --stop-bg: #{$lacc};
-        --stop-text: #{$lsurface};
-      }
-
-      @media (prefers-color-scheme: light) {
-        & {
-          --stop-bg: #{$lacc};
-          --stop-text: #{$lsurface};
-        }
-      }
-
-      box-sizing: border-box;
-      padding: var(--gap);
-
-      display: grid;
-      gap: var(--gap);
-
-      .stops {
-        width: 100%;
-        display: grid;
+        display: flex;
+        flex-direction: column;
         gap: var(--gap);
 
-        .stop-container {
-          position: relative;
+        .stops-area {
+            [data-theme="dark"] & {
+                --stop-bg: #{$dacc};
+                --stop-text: #{$dclr};
+            }
 
-          min-height: 3rem;
+            @media (prefers-color-scheme: dark) {
+                & {
+                    --stop-bg: #{$dacc};
+                    --stop-text: #{$dclr};
+                }
+            }
 
-          border-radius: $b-r;
-          border: 1px solid var(--border-color);
-          box-shadow: $shadow-sm;
-          transition: all $t-time ease;
+            [data-theme="light"] & {
+                --stop-bg: #{$lacc};
+                --stop-text: #{$lsurface};
+            }
 
-          &:has(.stop:focus-visible) {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-          }
+            @media (prefers-color-scheme: light) {
+                & {
+                    --stop-bg: #{$lacc};
+                    --stop-text: #{$lsurface};
+                }
+            }
 
-          &:hover {
-            box-shadow: $shadow-md;
-          }
-
-          z-index: 1;
-
-          .stop-parent {
-            position: relative;
-
-            height: fit-content;
-            width: 100%;
-
-            background-color: var(--stop-bg, var(--accent));
-            color: var(--stop-text, white);
-
-            border-radius: inherit;
-            overflow: hidden;
+            box-sizing: border-box;
+            padding: var(--gap);
 
             display: grid;
-            grid-template-columns: 1fr 2rem;
-            gap: $spacing-xs;
+            gap: var(--gap);
 
-            .stop {
-              box-sizing: border-box;
-              padding: $spacing-sm $spacing-md;
+            .stops {
+                width: 100%;
+                display: grid;
+                gap: var(--gap);
 
-              height: auto;
-              max-width: 100%;
+                .stop-container {
+                    position: relative;
 
-              background-color: inherit;
-              color: inherit;
+                    min-height: 3rem;
 
-              border: none;
-              outline: none;
-              font-size: 0.9375rem;
-              font-weight: 500;
+                    border-radius: $b-r;
+                    border: 1px solid var(--border-color);
+                    box-shadow: $shadow-sm;
+                    transition: all $t-time ease;
 
-              &::placeholder {
-                color: rgba(255, 255, 255, 0.7);
-              }
+                    &:has(.stop:focus-visible) {
+                        border-color: var(--accent);
+                        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                    }
+
+                    &:hover {
+                        box-shadow: $shadow-md;
+                    }
+
+                    z-index: 1;
+
+                    .stop-parent {
+                        position: relative;
+
+                        height: fit-content;
+                        width: 100%;
+
+                        background-color: var(--stop-bg, var(--accent));
+                        color: var(--stop-text, white);
+
+                        border-radius: inherit;
+                        overflow: hidden;
+
+                        display: grid;
+                        grid-template-columns: 1fr 2rem;
+                        gap: $spacing-xs;
+
+                        .stop {
+                            box-sizing: border-box;
+                            padding: $spacing-sm $spacing-md;
+
+                            height: auto;
+                            max-width: 100%;
+
+                            background-color: inherit;
+                            color: inherit;
+
+                            border: none;
+                            outline: none;
+                            font-size: 0.9375rem;
+                            font-weight: 500;
+
+                            &::placeholder {
+                                color: rgba(255, 255, 255, 0.7);
+                            }
+                        }
+                        .close {
+                            box-sizing: border-box;
+
+                            height: 100%;
+                            aspect-ratio: 1;
+
+                            border-radius: 50%;
+                            transition: all $t-time ease;
+                            display: grid;
+                            place-items: center;
+
+                            &:hover {
+                                background-color: rgba(255, 255, 255, 0.2);
+                            }
+
+                            &:focus-visible {
+                                outline: solid 2px rgba(255, 255, 255, 0.5);
+                            }
+
+                            svg {
+                                height: 1.25rem;
+                                aspect-ratio: 1;
+                                fill: currentColor;
+                            }
+                        }
+                    }
+                    .options {
+                        position: relative;
+                        display: grid;
+                        z-index: 100;
+                        background-color: var(--surface);
+
+                        &:empty {
+                            display: none;
+                        }
+                        &:not(:empty) {
+                            border-top: 1px solid var(--border-color);
+                        }
+
+                        .option {
+                            box-sizing: border-box;
+                            padding: $spacing-sm $spacing-md;
+
+                            color: var(--color);
+                            background-color: var(--surface);
+
+                            text-align: left;
+                            line-height: 1.5;
+                            font-size: 0.9375rem;
+
+                            cursor: pointer;
+                            transition: all $t-time ease;
+
+                            &:hover {
+                                background-color: var(--bg);
+                            }
+
+                            &.lastLoc {
+                                border-top: 1px solid var(--border-color);
+                                font-weight: 600;
+                            }
+                        }
+                    }
+                }
             }
-            .close {
-              box-sizing: border-box;
-
-              height: 100%;
-              aspect-ratio: 1;
-
-              border-radius: 50%;
-              transition: all $t-time ease;
-              display: grid;
-              place-items: center;
-
-              &:hover {
-                background-color: rgba(255, 255, 255, 0.2);
-              }
-
-              &:focus-visible {
-                outline: solid 2px rgba(255, 255, 255, 0.5);
-              }
-
-              svg {
-                height: 1.25rem;
-                aspect-ratio: 1;
-                fill: currentColor;
-              }
+            :is(.stops .stop-container, .stop-toolbar) {
+                width: 100%;
             }
-          }
-          .options {
-            position: relative;
-            display: grid;
-            z-index: 100;
-            background-color: var(--surface);
+            .stop-toolbar {
+                height: 3rem;
+                display: grid;
+                grid-template-columns: 3fr 1fr;
+                gap: var(--gap);
 
-            &:empty {
-              display: none;
+                > button {
+                    border: 1px solid var(--border-color);
+                    border-radius: $b-r;
+                    background-color: var(--accent);
+                    color: white;
+                    font-weight: 600;
+                    font-size: 0.9375rem;
+                    cursor: pointer;
+                    transition: all $t-time ease;
+                    box-shadow: $shadow-sm;
+
+                    &:hover {
+                        background-color: var(--accent-hover);
+                        transform: translateY(-2px);
+                        box-shadow: $shadow-md;
+                    }
+
+                    &:active {
+                        transform: translateY(0);
+                    }
+                }
             }
-            &:not(:empty) {
-              border-top: 1px solid var(--border-color);
-            }
-
-            .option {
-              box-sizing: border-box;
-              padding: $spacing-sm $spacing-md;
-
-              color: var(--color);
-              background-color: var(--surface);
-
-              text-align: left;
-              line-height: 1.5;
-              font-size: 0.9375rem;
-
-              cursor: pointer;
-              transition: all $t-time ease;
-
-              &:hover {
-                background-color: var(--bg);
-              }
-
-              &.lastLoc {
-                border-top: 1px solid var(--border-color);
-                font-weight: 600;
-              }
-            }
-          }
         }
-      }
-      :is(.stops .stop-container, .stop-toolbar) {
-        width: 100%;
-      }
-      .stop-toolbar {
-        height: 3rem;
-        display: grid;
-        grid-template-columns: 3fr 1fr;
-        gap: var(--gap);
 
-        > button {
-          border: 1px solid var(--border-color);
-          border-radius: $b-r;
-          background-color: var(--accent);
-          color: white;
-          font-weight: 600;
-          font-size: 0.9375rem;
-          cursor: pointer;
-          transition: all $t-time ease;
-          box-shadow: $shadow-sm;
-
-          &:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: $shadow-md;
-          }
-
-          &:active {
-            transform: translateY(0);
-          }
+        #directions {
+            flex: 1;
+            width: fit-content;
+            overflow-y: auto;
+            // height: 100%;
+            // width: 100%;
         }
-      }
     }
-
-    #directions {
-      flex: 1;
-      width: fit-content;
-      overflow-y: auto;
-      // height: 100%;
-      // width: 100%;
-    }
-  }
 }
 
 @media (max-width: 915px) {
-  .main {
-    flex-direction: column-reverse;
-    .directions-container {
-      flex: 1;
+    .main {
+        flex-direction: column-reverse;
+        .directions-container {
+            flex: 1;
+        }
     }
-  }
 }
