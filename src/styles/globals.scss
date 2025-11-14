@@ -136,12 +136,15 @@ body {
     display: flex;
     justify-content: right;
     gap: $spacing-xsmall;
-    z-index: 2;
     padding: $spacing-small $spacing-medium;
+    padding-right: $spacing-medium;
 
+    z-index: 2;
 
     .link {
         aspect-ratio: 1;
+
+        height: 100%;
 
         display: grid;
         place-items: center;
@@ -174,12 +177,6 @@ body {
             top: 0;
             right: 0;
             height: 4rem;
-            gap: $spacing-xsmall;
-            padding-right: $spacing-medium;
-
-            .link {
-                min-width: 3.5rem;
-            }
         }
     }
     @media (max-width: 751px) {
