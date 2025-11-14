@@ -36,9 +36,9 @@ function addNotification(notification) {
     nGroup.appendChild(nEle)
 
     nEle.onclick = function(e) {
-      if (!!nContent) {
-        showModal(nTitle, nContent)
-      }
+        if (!!nContent) {
+            showModal(nTitle, nContent)
+        }
     }
 }
 

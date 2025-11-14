@@ -7,7 +7,7 @@ var form = document.querySelector('[role="form"]')
 // document.querySelector('.form').addEventListener('submit', function(e) {e.preventDefault()})
 
 function login() {
-  var username = form.querySelector('#email').value
-  var password = form.querySelector('#password').value
-  setCredentials(username, password, dest)
+    var username = form.querySelector('#email').value
+    var password = form.querySelector('#password').value
+    setCredentials(username, password, dest)
 }
