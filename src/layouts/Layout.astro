@@ -1,17 +1,13 @@
 ---
+const bing_maps_api_key = 'AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS'
+
 import '../styles/globals.scss'
 import '../styles/modal.scss'
+import { Fragment } from 'astro/jsx-runtime'
 
-import Cookies from '../scripts/cookies.astro'
-import Index from '../scripts/index.astro'
-import Authentication from '../scripts/authentication.astro'
-import Request511 from '../scripts/511Request.astro'
-import NotificationManager from '../scripts/notificationManager.astro'
-import Settings from '../scripts/settings.astro'
-import Modal from '../scripts/modal.astro'
-import Select from '../scripts/select.astro'
-import Directions from '../scripts/directions.astro'
-import Notifications from '../scripts/notifications.astro'
+var mainScripts = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
+
+mainScripts = await Promise.all(mainScripts.map(async n => await import(`../scripts/${n}.astro`)))
 
 interface Script {
     name?: string
@@ -80,18 +76,21 @@ var yearStr = year == startingYear ? '' : `-${year}`
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
         {
-            mainScripts.map(function(script: string, i: number) {
-                return <{s.name}></{s.name}>
+            mainScripts.map(function(module: any) {
+                const Component = module.default
+                return <Component />
             })
         }
         {
-            scripts.map(function(s: Script, i: number) {
+            scripts.map(async function(s: Script) {
                 if (s.location === 'head' && s.name) {
-                    return <{s.name}></{s.name}>
+                    const module = await import(`../scripts/${s.name}.astro`)
+                    const Component = module.default
+                    return <Component />
                 }
             })
         }
-        <script src="https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS" async defer is:inline></script>
+        <script src=`https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=${bing_maps_api_key}` async defer is:inline></script>
     </head>
     { /* @ts-ignore */ }
     <body sTitle={sTitle}>
@@ -137,9 +136,11 @@ var yearStr = year == startingYear ? '' : `-${year}`
         <script src="/scripts/modal.js" is:inline></script>
         <script src="/scripts/select.js" is:inline></script>
         {
-            scripts.map(function(s: Script, i: number) {
+            scripts.map(async function(s: Script) {
                 if (s.location !== 'head' && s.name) {
-                    return <{s.name}></{s.name}>
+                    const module = await import(`../scripts/${s.name}.astro`)
+                    const Component = module.default
+                    return <Component />
                 }
             })
         }
