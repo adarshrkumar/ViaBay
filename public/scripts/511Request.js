@@ -31,7 +31,7 @@ function makeRequest(moduleName, params=[], callback, i=0) {
         .then(data => {
             if (typeof data === 'string') {
                 if (
-                    (data.startsWith('{') && data.endsWith('}')) || 
+                    (data.startsWith('{') && data.endsWith('}')) ||
                     (data.startsWith('[') && data.endsWith(']'))
                 ) data = JSON.parse(data)
             }
