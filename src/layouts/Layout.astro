@@ -2,16 +2,27 @@
 import '../styles/globals.scss'
 import '../styles/modal.scss'
 
+interface Script {
+    name?: string
+    location?: string
+}
+
+interface Props {
+    title?: string
+    classItems?: string[]
+    headItems?: any[]
+    scripts?: Script[]
+}
 
 var sTitle = 'TransTrack'
 var mainScripts = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
 
-var { title, classItems, headItems, scripts } = Astro.props
+var { title, classItems: classItemsProp, headItems: headItemsProp, scripts = [] } = Astro.props as Props
 
 var docTitle = ''
 if (
     title === 'Home' || title === '' ||
-    !!title === false || title === null
+    !title
 ) {
     docTitle = sTitle
 }
@@ -19,27 +30,23 @@ else {
     docTitle = `${title} | ${sTitle}`
 }
 
-if (!!classItems === false || classItems === null) {
-    classItems = []
+let classItemsArray = classItemsProp || []
+if (classItemsArray.length < 0) {
+    classItemsArray = []
 }
-if (classItems.length < 0) {
-    classItems = []
-}
-classItems.unshift('page')
-classItems.unshift('main')
+classItemsArray.unshift('page')
+classItemsArray.unshift('main')
 
-classItems = classItems.join(' ')
+const classItems = classItemsArray.join(' ')
 
-if (!!headItems === false || headItems === null) {
-    headItems = []
-}
-if (headItems.length < 0) {
-    headItems = []
+let headItemsArray = headItemsProp || []
+if (headItemsArray.length < 0) {
+    headItemsArray = []
 }
 
-headItems = headItems.join('')
+const headItems = headItemsArray.join('')
 
-if (!!scripts === false || scripts === null) {
+if (!scripts) {
     scripts = []
 }
 if (scripts.length < 0) {
@@ -63,12 +70,12 @@ var yearStr = year == startingYear ? '' : `-${year}`
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
         {
-            mainScripts.map(function(script, i) {
+            mainScripts.map(function(script: string, i: number) {
                 return <script src={`/scripts/${script}.js`} is:inline></script>
             })
         }
         {
-            scripts.map(function(s, i) {
+            scripts.map(function(s: Script, i: number) {
                 if (s.location === 'head' && s.name) {
                     return <script src={`/scripts/${s.name}.js`}></script>
                 }
@@ -76,6 +83,7 @@ var yearStr = year == startingYear ? '' : `-${year}`
         }
         <script src="https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS" async defer is:inline></script>
     </head>
+    { /* @ts-ignore */ }
     <body sTitle={sTitle}>
         <div class="app">
             <header class="header">
@@ -119,7 +127,7 @@ var yearStr = year == startingYear ? '' : `-${year}`
         <script src="/scripts/modal.js" is:inline></script>
         <script src="/scripts/select.js" is:inline></script>
         {
-            scripts.map(function(s, i) {
+            scripts.map(function(s: Script, i: number) {
                 if (s.location !== 'head' && s.name) {
                     return <script src={`/scripts/${s.name}.js`}></script>
                 }
