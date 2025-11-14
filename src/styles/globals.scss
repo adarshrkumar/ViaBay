@@ -441,8 +441,6 @@ body {
     select-option {
       padding-inline: $p-i;
       -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
       user-select: none;
       cursor: pointer;
       &[disabled] {
