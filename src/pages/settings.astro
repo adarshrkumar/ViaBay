@@ -8,24 +8,24 @@ var classItems = ['settings']
 return Astro.redirect('/landing')
 ---
 <Layout title="Settings" classItems={classItems}>
-  <section class="main">
-    <nav class="menu">
-      <setting-option module-name="theme">
-        <label for="theme">Color Theme: </label>
-        <div class="select-parent">
-          <select id="theme">
-            <option value="system">System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
-        </div>
-      </setting-option>
-      <!-- <item>Change Language</item>
-      <item>Account Info</item>
-      <item>Payment Info</item>
-      <item>Notification Settings</item>
-      <item>Privacy Info</item>
-      <item>Your Data</item> -->
-    </nav>
-  </section>
+    <section class="main">
+        <nav class="menu">
+            <setting-option module-name="theme">
+                <label for="theme">Color Theme: </label>
+                <div class="select-parent">
+                    <select id="theme">
+                        <option value="system">System</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </setting-option>
+            <!-- <item>Change Language</item>
+            <item>Account Info</item>
+            <item>Payment Info</item>
+            <item>Notification Settings</item>
+            <item>Privacy Info</item>
+            <item>Your Data</item> -->
+        </nav>
+    </section>
 </Layout>

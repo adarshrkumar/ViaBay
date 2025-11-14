@@ -5,18 +5,18 @@ import Layout from '../layouts/Layout.astro'
 
 var classItems = ['full']
 var scripts = [
-  {
-    name: 'tracker'
-  }
+    {
+        name: 'tracker'
+    }
 ]
 
 if (process.env.NODE_ENV !== 'development' && process.env.VERCEL_ENV !== 'development') {
-  return Astro.redirect('/landing')
+    return Astro.redirect('/landing')
 }
 ---
 <Layout title="Map / Live Tracker" classItems={classItems} scripts={scripts}>
-  <div id="myMap">
-    <nav class="custom-nav"></nav>
-  </div>
-  <div id="hiddenDirections"></div>
+    <div id="myMap">
+        <nav class="custom-nav"></nav>
+    </div>
+    <div id="hiddenDirections"></div>
 </Layout>
