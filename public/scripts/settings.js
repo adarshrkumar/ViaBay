@@ -72,26 +72,26 @@ function setSetting(name, value, type, key) {
     var content = setting.content
     if (!content) {
         switch(type) {
-            case 'object': 
+            case 'object':
                 content = {}
                 break
-            case 'list': 
+            case 'list':
                 content = []
                 break
-            default: 
+            default:
                 content = ''
                 break
         }
     }
 
     switch(type) {
-        case 'object': 
+        case 'object':
             content[key] = value
             break
-        case 'list': 
+        case 'list':
             content.push(value)
             break
-        default: 
+        default:
             content = value
             break
     }
