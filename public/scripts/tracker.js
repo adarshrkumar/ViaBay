@@ -169,7 +169,9 @@ function onMapLoad() {
 GetMap()
 function GetMap() {
     if (document.getElementById('myMap') && Microsoft) {
-        map = new Microsoft.Maps.Map('#myMap');
+        map = new Microsoft.Maps.Map('#myMap', {
+            showLocateMeButton: false
+        });
         infobox = new Microsoft.Maps.Infobox(map.getCenter(), {
             visible: false,
             showCloseButton: true
@@ -184,6 +186,51 @@ function GetMap() {
                 infobox.setOptions({ visible: false });
             }
         });
+
+        // Request user's location and center map
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    var userLocation = new Microsoft.Maps.Location(
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+
+                    // Center map on user's location
+                    map.setView({
+                        center: userLocation,
+                        zoom: 12
+                    });
+
+                    // Add a marker for user's location
+                    var userPin = new Microsoft.Maps.Pushpin(userLocation, {
+                        color: 'green',
+                        title: 'Your Location'
+                    });
+                    map.entities.push(userPin);
+                },
+                function(error) {
+                    console.warn('Geolocation error:', error.message);
+                    // If geolocation fails, default to Bay Area center
+                    map.setView({
+                        center: new Microsoft.Maps.Location(37.7749, -122.4194),
+                        zoom: 10
+                    });
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        } else {
+            console.warn('Geolocation is not supported by this browser');
+            // Default to Bay Area center if geolocation not supported
+            map.setView({
+                center: new Microsoft.Maps.Location(37.7749, -122.4194),
+                zoom: 10
+            });
+        }
 
         if (onMapLoad) onMapLoad()
         positionInterval = setInterval(onMapLoad, 60000)
@@ -346,7 +393,7 @@ function showVehicleInfo(e) {
             title: options.title,
             htmlContent: `<div class="infobox">
                 <button class="infobox-close-btn" onclick="if(window.infobox) window.infobox.setOptions({visible: false});">&times;</button>
-                <span class="title">${options.title.join('<br>')}</span><br><span>${options.description.join('</span><br><span>')}</span><ol class="stops"></ol>
+                <span class="title">${options.title}</span><span>${options.description}</span><ol class="stops"></ol>
             </div>`,
             visible: true
         });
