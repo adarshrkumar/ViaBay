@@ -1,19 +1,19 @@
 var modal = document.querySelector('.modal')
 
 function showModal(title, content) {
-  modal.querySelector('.title').textContent = title
-  modal.querySelector('.message').innerHTML = content
-  modal.showModal();
+    modal.querySelector('.title').textContent = title
+    modal.querySelector('.message').innerHTML = content
+    modal.showModal();
 }
 
 modal.addEventListener('click', function(e) {
-  var isOutside = checkIfOuterModal(e)
-  if (isOutside) {
-    modal.close()
-  }
+    var isOutside = checkIfOuterModal(e)
+    if (isOutside) {
+        modal.close()
+    }
 })
 modal.querySelector('.btn').addEventListener('click', function(e) {
-  modal.close()
+    modal.close()
 })
 
 function checkIfOuterModal(e) {

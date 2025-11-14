@@ -43,7 +43,7 @@ function applySettings() {
         settingEles.forEach(function(s, i) {
             var setting = settings.filter(filterCheck)[0].content
             s.querySelector('select').value = setting
-        })    
+        })
     }
 }
 
