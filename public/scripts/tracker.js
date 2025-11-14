@@ -344,7 +344,10 @@ function showVehicleInfo(e) {
         infobox.setOptions({
             location: e.target.getLocation(),
             title: options.title,
-            htmlContent: `<div class="infobox"><span class="title">${options.title.join('<br>')}</span><br><span>${options.description.join('</span><br><span>')}</span><ol class="stops"></ul></div>`,
+            htmlContent: `<div class="infobox">
+                <button class="infobox-close-btn" onclick="if(window.infobox) window.infobox.setOptions({visible: false});">&times;</button>
+                <span class="title">${options.title.join('<br>')}</span><br><span>${options.description.join('</span><br><span>')}</span><ol class="stops"></ol>
+            </div>`,
             visible: true
         });
     }
