@@ -171,11 +171,20 @@ function GetMap() {
     if (document.getElementById('myMap') && Microsoft) {
         map = new Microsoft.Maps.Map('#myMap');
         infobox = new Microsoft.Maps.Infobox(map.getCenter(), {
-            visible: false
+            visible: false,
+            showCloseButton: true
         });
 
         //Assign the infobox to a map instance.
         infobox.setMap(map);
+
+        // Close infobox when clicking on the map
+        Microsoft.Maps.Events.addHandler(map, 'click', function(e) {
+            if (infobox) {
+                infobox.setOptions({ visible: false });
+            }
+        });
+
         if (onMapLoad) onMapLoad()
         positionInterval = setInterval(onMapLoad, 60000)
     }
