@@ -1,6 +1,6 @@
 @use '../variables.scss' as *;
 
-$padding: 12px;
+$padding: 1.5rem;
 $hf-size: 4rem;
 
 .main {
@@ -13,6 +13,8 @@ $hf-size: 4rem;
     height: 100%;
     position: relative;
     border-radius: 0;
+
+    container-type: size;
 
     .custom-nav {
         --position: 1.5rem;
@@ -53,44 +55,55 @@ $hf-size: 4rem;
     }
 }
 
-:has( > .leaflet-popup-content-wrapper > .leaflet-popup-content > * > .infobox) {
-    $_max: calc(100% - #{$padding*2});
+.leaflet-map-pane {
+    width: fit-content;
+    height: fit-content;
+}
 
+.leaflet-popup,
+.leaflet-popup-pane,
+.leaflet-popup-content-wrapper {
+    position: static;
+    transform: none !important;
+    width: fit-content;
+    height: fit-content;
+}
+
+.leaflet-popup-pane {
+    $_pos: calc(-100% - $padding);
+
+    position: fixed;
+    top: 100cqh;
+    left: 100cqw;
+    translate: $_pos $_pos;
+
+    z-index: 99999999;
+}
+
+.leaflet-popup {
+    .leaflet-popup-tip-container {
+        display: none;
+    }
+}
+
+.leaflet-popup-content-wrapper {
+    position: static;
     top: unset !important;
     left: unset !important;
     bottom: $padding !important;
     right: $padding !important;
 
-    max-height: $_max;
-    max-width: $_max;
-    
-    *:not(.infobox *) {
-        max-height: calc(100dvh - #{$hf-size*2} - 20px)
-    }
-
-    .leaflet-popup.no-title {
-        display: block !important;
-        border: none !important;
-        height: 0;
-
-        .leaflet-popup-tip {
-            display: none;
-            top: unset;
-            left: unset;
-        }
-    }
-}
-
-.leaflet-popup-content-wrapper {
-    position: relative;
-
     box-sizing: border-box;
-    padding: $spacing-large;
+    padding: $padding;
 
     display: flex;
     flex-direction: column;
-    
-    max-width: 750px;
+
+    max-height: 100dvh;
+    max-width: 100dvw;
+
+    min-width: -webkit-fill-available;
+    min-width: fit-content;
 
     background-color: var(--surface);
     color: var(--color);
@@ -103,12 +116,29 @@ $hf-size: 4rem;
 
     overflow: auto;
 
+    .leaflet-popup-content {
+        margin-inline: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .leaflet-popup.no-title {
+        display: block !important;
+        border: none !important;
+
+        .leaflet-popup-tip {
+            display: none;
+            top: unset;
+            left: unset;
+        }
+    }
+
     .infobox-close-btn {
         position: absolute;
         top: 0;
         right: 0;
 
-        padding: $spacing-small;
+        padding: #{$padding / 2};
 
         aspect-ratio: 1;
 

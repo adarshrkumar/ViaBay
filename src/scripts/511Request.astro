@@ -1,5 +1,17 @@
 <script is:inline>
-function makeRequest(moduleName, params = [], callback) {
+// Track delay for rate limiting
+let requestDelay = 0 // milliseconds
+
+// Helper function to wait/delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+async function makeRequest(moduleName, params = [], callback) {
+    // Apply current delay if any
+    if (requestDelay > 0) {
+        console.log(`[Client] Waiting ${requestDelay}ms before request`)
+        await delay(requestDelay)
+    }
+
     // Prepare params for API route
     const paramsString = Array.isArray(params) && params.length > 0
         ? JSON.stringify(params)
@@ -8,32 +20,45 @@ function makeRequest(moduleName, params = [], callback) {
     // Build URL for our API route
     const url = `/api/511?module=${encodeURIComponent(moduleName)}${paramsString ? `&params=${encodeURIComponent(paramsString)}` : ''}`
 
-    console.log('Making 511 API request:', { moduleName, params, url })
+    console.log(`Making 511 API request: ${moduleName}`)
 
-    fetch(url)
-        .then(response => {
-            console.log('511 API response status:', response.status)
-            if (!response.ok) {
-                return response.json().then(data => {
-                    console.error('511 API Error Response:', data)
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${data.error || 'Unknown error'}`)
-                }).catch(err => {
-                    if (err.message.includes('HTTP error!')) throw err
-                    throw new Error(`HTTP error! status: ${response.status}`)
-                })
+    try {
+        const response = await fetch(url)
+        console.log('511 API response status:', response.status)
+
+        // Handle 429 Rate Limit with exponential backoff
+        if (response.status === 429) {
+            if (requestDelay === 0) {
+                requestDelay = 1000 // Start with 1 second
+            } else {
+                requestDelay = Math.min(requestDelay * 2, 32000) // Double up to max 32 seconds
             }
-            return response.json()
-        })
-        .then(data => {
-            if (data.error) {
-                console.error('511 API returned error:', data.error)
-                throw new Error(data.error)
-            }
-            console.log('511 API success:', moduleName, data)
-            callback(data)
-        })
-        .catch(err => {
-            console.error('511 API Error:', err)
-        })
+            console.log(`[Client] Rate limited (429). Increasing delay to ${requestDelay}ms and retrying...`)
+            return await makeRequest(moduleName, params, callback)
+        }
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}))
+            console.error('511 API Error Response:', data)
+            throw new Error(`HTTP error! status: ${response.status}, message: ${data.error || 'Unknown error'}`)
+        }
+
+        const data = await response.json()
+        if (data.error) {
+            console.error('511 API returned error:', data.error)
+            throw new Error(data.error)
+        }
+
+        // Success - reset delay gradually
+        if (requestDelay > 0) {
+            requestDelay = Math.max(requestDelay / 2, 0)
+            console.log(`[Client] Success! Reducing delay to ${requestDelay}ms`)
+        }
+
+        console.log('511 API success:', moduleName, data)
+        callback(data)
+    } catch (err) {
+        console.error('511 API Error:', err)
+    }
 }
 </script>

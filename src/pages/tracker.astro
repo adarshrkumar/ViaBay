@@ -105,8 +105,7 @@ function showNearbyVehicles() {
     })
 
     // Build HTML content
-    var content = '<div class="infobox">'
-    content += '<span class="title">Nearby Vehicles</span>'
+    var content = '<span class="title">Nearby Vehicles</span>'
     content += '<span>Within 1.5 miles of your location</span><br>'
 
     if (nearbyVehicles.length === 0) {
@@ -122,8 +121,6 @@ function showNearbyVehicles() {
         })
         content += '</ol>'
     }
-
-    content += '</div>'
 
     if (currentPopup) {
         currentPopup.remove()
@@ -221,6 +218,35 @@ function onMapLoad() {
                             }
                         }
 
+                        // Check for custom colors based on operator and route
+                        var markerColor = color
+                        var operatorRef = vehicleActivity.OperatorRef
+
+                        // VTA light rail: use lowercase line name without " Line"
+                        if (operatorRef === 'VTA' && vehicleActivity.PublishedLineName && vehicleActivity.PublishedLineName.includes(' Line')) {
+                            var lineName = vehicleActivity.PublishedLineName
+                            markerColor = lineName.replace(' Line', '').toLowerCase()
+                        }
+                        // Caltrain: color based on train number
+                        else if (operatorRef === 'CT' && route) {
+                            var firstDigit = route.charAt(0)
+                            if (firstDigit === '8') {
+                                markerColor = 'tan'
+                            } else if (firstDigit === '5') {
+                                markerColor = 'red'
+                            } else if (firstDigit === '4') {
+                                markerColor = 'aqua'
+                            } else if (firstDigit === '1') {
+                                markerColor = 'lightcoral'
+                            } else {
+                                markerColor = 'gray'
+                            }
+                        }
+                        // Other custom colors (like SF Muni)
+                        else if (operatorRef && customColors[operatorRef] && customColors[operatorRef][route]) {
+                            markerColor = customColors[operatorRef][route]
+                        }
+
                         // Add the marker to the map
                         var pin = aObj.vehicles.pins[vehicleRef]
                         if (pin) {
@@ -229,7 +255,7 @@ function onMapLoad() {
                         else {
                             // Create custom DivIcon for vehicle marker
                             var icon = L.divIcon({
-                                html: `<div style="background-color: ${color}; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;">${route}</div>`,
+                                html: `<div style="background-color: ${markerColor}; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;">${route}</div>`,
                                 className: 'vehicle-marker',
                                 iconSize: [width, 20],
                                 iconAnchor: [width/2, 10]
