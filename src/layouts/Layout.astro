@@ -3,6 +3,9 @@ import '../styles/globals.scss'
 import '../styles/modal.scss'
 import { Fragment } from 'astro/jsx-runtime'
 
+import ModalScript from '../scripts/modal.astro'
+import SelectScript from '../scripts/select.astro'
+
 var mainScripts = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
 
 mainScripts = await Promise.all(mainScripts.map(async n => await import(`../scripts/${n}.astro`)))
@@ -134,8 +137,8 @@ var yearStr = year == startingYear ? '' : `-${year}`
                 </div>
             </content>
         </dialog>
-        <script src="/scripts/modal.js" is:inline></script>
-        <script src="/scripts/select.js" is:inline></script>
+        <ModalScript />
+        <SelectScript />
         {
             scripts.map(async function(s: Script) {
                 if (s.location !== 'head' && s.name) {
@@ -145,6 +148,5 @@ var yearStr = year == startingYear ? '' : `-${year}`
                 }
             })
         }
-        <!-- <script src="/scripts/eruda.js" is:inline></script> -->
     </body>
 </html>
