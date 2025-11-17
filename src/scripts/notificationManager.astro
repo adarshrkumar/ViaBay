@@ -4,9 +4,9 @@ function addNotification(module, name, icon, content, attatchmentInfo) {
     if (!!notificationList === false) notificationList = '[]'
     notificationList = JSON.parse(notificationList)
 
-    var package = packageNotification(module, name, icon, content, attatchmentInfo)
+    var notificationPackage = packageNotification(module, name, icon, content, attatchmentInfo)
 
-    localStorage.setItem(`NOTIFICATIONS://${module}|${name}`, JSON.stringify(package))
+    localStorage.setItem(`NOTIFICATIONS://${module}|${name}`, JSON.stringify(notificationPackage))
 
     notificationList.push(`${module}|${name}`)
     notificationList = JSON.stringify(notificationList)
