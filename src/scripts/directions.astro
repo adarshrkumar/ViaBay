@@ -1,9 +1,7 @@
 <script is:inline>
-var Microsoft = null
-var BingMapsKey = 'AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS'
-var watchID = null
 var map = null
 var onMapLoad = null
+var routingControl = null
 
 function assertError(err, name) {
     err = `${name} Error: ${err}`
@@ -13,9 +11,50 @@ function assertError(err, name) {
 
 GetMap()
 function GetMap() {
-    if (document.getElementById('myMap') && Microsoft) {
-        map = new Microsoft.Maps.Map('#myMap');
-        if (onMapLoad) onMapLoad(map)
+    if (document.getElementById('myMap') && typeof L !== 'undefined') {
+        // Default location (Bay Area)
+        var defaultLocation = [37.7749, -122.4194];
+        var initialZoom = 10;
+        var mapCenter = defaultLocation;
+
+        // Request user's location first
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // Got user location, use it
+                    mapCenter = [position.coords.latitude, position.coords.longitude];
+                    initialZoom = 12;
+                    initializeMap();
+                },
+                function(error) {
+                    console.warn('Geolocation error:', error.message);
+                    // Geolocation failed, use default location
+                    initializeMap();
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        } else {
+            console.warn('Geolocation is not supported by this browser');
+            // Geolocation not supported, use default location
+            initializeMap();
+        }
+
+        function initializeMap() {
+            // Initialize Leaflet map
+            map = L.map('myMap').setView(mapCenter, initialZoom);
+
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            if (onMapLoad) onMapLoad(map)
+        }
     }
     else {
         window.addEventListener('DOMContentLoaded', GetMap)
@@ -28,9 +67,23 @@ var closeButtons = document.querySelectorAll('.close')
 var goBtn = document.querySelector('.calc-route')
 
 var directionsElement = document.querySelector('#directions')
-var directionsManager = false
 
-function addDirections(e) {
+async function geocodeAddress(address) {
+    // Use Nominatim (OpenStreetMap) geocoding service
+    var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+    try {
+        var response = await fetch(url);
+        var data = await response.json();
+        if (data && data.length > 0) {
+            return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+        }
+    } catch (error) {
+        console.error('Geocoding error:', error);
+    }
+    return null;
+}
+
+async function addDirections(e) {
     var places = []
 
     stops.querySelectorAll('.stop').forEach(function(s, i) {
@@ -39,40 +92,53 @@ function addDirections(e) {
         }
     })
 
+    if (places.length < 2) {
+        alert('Please add at least 2 stops');
+        return;
+    }
 
-    // Load the directions module.
-    Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-        if (directionsManager) directionsManager.clearAll()
+    // Remove existing routing control if any
+    if (routingControl) {
+        map.removeControl(routingControl);
+    }
 
-        // Create an instance of the directions manager.
-        directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+    // Geocode all places
+    var waypoints = [];
+    for (var i = 0; i < places.length; i++) {
+        var coords = await geocodeAddress(places[i]);
+        if (coords) {
+            waypoints.push(L.latLng(coords.lat, coords.lng));
+        } else {
+            alert('Could not geocode: ' + places[i]);
+            return;
+        }
+    }
 
-        // // Calculate a date time that is 1 hour from now.
-        var date = new Date();
+    // Create routing control with waypoints
+    if (typeof L.Routing !== 'undefined') {
+        routingControl = L.Routing.control({
+            waypoints: waypoints,
+            routeWhileDragging: false,
+            showAlternatives: false,
+            fitSelectedRoutes: true,
+            lineOptions: {
+                styles: [{color: '#6FA1EC', weight: 4}]
+            }
+        }).addTo(map);
 
-        var month = date.getMonth().toString().length === 1 ? day = `0${date.getMonth()}` : date.getMonth().toString()
-        var day = date.getDate().toString().length === 1 ? day = `0${date.getDate()}` : date.getDate().toString()
-        var year = date.getFullYear()
-
-        // Set Route Mode to transit.
-        directionsManager.setRequestOptions({
-            routeMode: Microsoft.Maps.Directions.RouteMode.transit,
-            dateTime: `${month}/${day}/${year}`,
-            timeType: Microsoft.Maps.Directions.TimeTypes.departure,
+        // Display route in the directions element
+        routingControl.on('routesfound', function(e) {
+            var routes = e.routes;
+            var summary = routes[0].summary;
+            directionsElement.innerHTML = '<div class="route-summary">' +
+                '<h3>Route Summary</h3>' +
+                '<p>Total Distance: ' + (summary.totalDistance / 1609.34).toFixed(2) + ' miles</p>' +
+                '<p>Estimated Time: ' + Math.round(summary.totalTime / 60) + ' minutes</p>' +
+                '</div>';
         });
-
-        // Add waypoints.
-        places.forEach(function(p, i) {
-            var waypoint = new Microsoft.Maps.Directions.Waypoint({ address: p });
-            directionsManager.addWaypoint(waypoint);
-        })
-
-        // Set the element in which the itinerary will be rendered.
-        directionsManager.setRenderOptions({ itineraryContainer: directionsElement });
-
-        // Calculate directions.
-        directionsManager.calculateDirections();
-    });
+    } else {
+        alert('Routing library not loaded. Please refresh the page.');
+    }
 }
 
 document.querySelector('.add-stop').addEventListener('click', function(e) {
@@ -141,7 +207,7 @@ stops.querySelectorAll('.stop').forEach(function(s, i) {
     }
 })
 
-function stopChange(e, i) {
+async function stopChange(e, i) {
     var finalValue = e.target.getAttribute('final-value')
     var searchText = e.target.value
 
@@ -151,46 +217,37 @@ function stopChange(e, i) {
         o.remove()
     })
 
-    if (finalValue !== searchText) {
-        Microsoft.Maps.loadModule('Microsoft.Maps.Search', function () {
-            var searchManager = new Microsoft.Maps.Search.SearchManager(map);
-            var requestOptions = {
-                bounds: map.getBounds(),
-                where: searchText,
-                callback: function (answer, userData) {
-                    // map.setView({ bounds: answer.results[0].bestView });
-                    // map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
-                    var adds = []
-                    answer.results.forEach(function(r, i) {
-                        adds.push(r.address.formattedAddress)
-                    })
+    if (finalValue !== searchText && searchText.length > 2) {
+        // Use Nominatim geocoding service for search
+        var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}&limit=5`;
 
-                    adds.forEach(function(a) {
-                        createOption(a, i, optionsEle)
-                    })
+        try {
+            var response = await fetch(url);
+            var results = await response.json();
 
-                    // createOption(searchText, i, optionsEle, true)
+            results.forEach(function(r) {
+                createOption(r.display_name, i, optionsEle);
+            });
 
-                    function createOption(content, i, optionsEle, lastLoc=false) {
-                        var aEle = document.createElement('button')
-                        aEle.classList.add('option')
-                        aEle.classList.add('removeStyles')
-                        aEle.textContent = content
-                        if (lastLoc) {
-                            aEle.classList.add('lastLoc')
-                            aEle.disabled = true
-                        }
-                        else {
-                            aEle.onclick = function(e) {
-                                selectOption(e, i)
-                            }
-                        }
-                        optionsEle.appendChild(aEle)
+            function createOption(content, i, optionsEle, lastLoc=false) {
+                var aEle = document.createElement('button')
+                aEle.classList.add('option')
+                aEle.classList.add('removeStyles')
+                aEle.textContent = content
+                if (lastLoc) {
+                    aEle.classList.add('lastLoc')
+                    aEle.disabled = true
+                }
+                else {
+                    aEle.onclick = function(e) {
+                        selectOption(e, i)
                     }
                 }
-            };
-            searchManager.geocode(requestOptions);
-        });
+                optionsEle.appendChild(aEle)
+            }
+        } catch (error) {
+            console.error('Geocoding search error:', error);
+        }
     }
 }
 

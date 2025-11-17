@@ -17,8 +17,8 @@ if (process.env.NODE_ENV !== 'development' && process.env.VERCEL_ENV !== 'develo
 </Layout>
 
 <script is:inline>
-var map, infobox, watchId, Microsoft, positionInterval = null
-var BingMapsKey = 'AkMdzF1Q7JCJCXj3415UZvH4JYRCJihZ_W7JEOnpx6eH5Hwtt1qie1LQqIrJ7-jS'
+var map, positionInterval = null
+var currentPopup = null
 
 var agencyIds = []
 var agencies = {}
@@ -106,7 +106,6 @@ function showNearbyVehicles() {
 
     // Build HTML content
     var content = '<div class="infobox">'
-    content += '<button class="infobox-close-btn" onclick="if(window.infobox) window.infobox.setOptions({visible: false});">&times;</button>'
     content += '<span class="title">Nearby Vehicles</span>'
     content += '<span>Within 1.5 miles of your location</span><br>'
 
@@ -126,11 +125,13 @@ function showNearbyVehicles() {
 
     content += '</div>'
 
-    infobox.setOptions({
-        location: userLocation,
-        htmlContent: content,
-        visible: true
-    })
+    if (currentPopup) {
+        currentPopup.remove()
+    }
+    currentPopup = L.popup()
+        .setLatLng([userLocation.lat, userLocation.lng])
+        .setContent(content)
+        .openOn(map)
 }
 
 
@@ -191,12 +192,7 @@ function onMapLoad() {
                     vehicleActivity.i = vI
                     var vehicleRef = vehicleActivity.VehicleRef
                     var vehicleLocation = vehicleActivity.VehicleLocation
-                    vehicleLocation = {
-                        longitude: vehicleLocation.Longitude,
-                        latitude: vehicleLocation.Latitude,
-                        // altitude: 0,
-                        // altitudeReference: -1,
-                    }
+                    var vehicleLatLng = [vehicleLocation.Latitude, vehicleLocation.Longitude]
 
                     switch (vehicleActivity.OperatorRef) {
                         case 'SF':
@@ -225,30 +221,29 @@ function onMapLoad() {
                             }
                         }
 
-                        if (color.toString().startsWith('#') && Microsoft.Maps.Color) {
-                            if (Microsoft.Maps.Color.fromHex) color = Microsoft.Maps.Color.fromHex(color)
-                            else color = 'red'
-                        }
-                        // Add the pushpin to the map
+                        // Add the marker to the map
                         var pin = aObj.vehicles.pins[vehicleRef]
                         if (pin) {
-                            pin.setLocation(vehicleLocation);
+                            pin.setLatLng(vehicleLatLng);
                         }
                         else {
-                            vehicleActivity.infoboxOpen = false
-                            pin = new Microsoft.Maps.Pushpin(vehicleLocation, {
-                                text: route,
-                                color: color,
-                                // icon: `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="20"><rect x="0" y="0" width="100%" height="100%" fill="${color}" /><text x="50%" y="50%" dy="2" textLength="${width-5}" lengthAdjust="spacing" font-family="sans-serif" dominant-baseline="middle" text-anchor="middle">${route}</text></svg>`,
+                            // Create custom DivIcon for vehicle marker
+                            var icon = L.divIcon({
+                                html: `<div style="background-color: ${color}; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;">${route}</div>`,
+                                className: 'vehicle-marker',
+                                iconSize: [width, 20],
+                                iconAnchor: [width/2, 10]
                             });
+
+                            vehicleActivity.infoboxOpen = false
+                            pin = L.marker(vehicleLatLng, { icon: icon });
                             pin.metadata = vehicleActivity;
 
-                            var events = ['click']
-                            events.forEach(function(ev) {
-                                Microsoft.Maps.Events.addHandler(pin, ev, showVehicleInfo);
-                            })
+                            pin.on('click', function(e) {
+                                showVehicleInfo(e, pin);
+                            });
 
-                            map.entities.push(pin);
+                            pin.addTo(map);
                         }
                         aObj.vehicles.pins[vehicleRef] = pin
                     }
@@ -272,58 +267,31 @@ function onMapLoad() {
 
 GetMap()
 function GetMap() {
-    if (document.getElementById('myMap') && Microsoft) {
-        map = new Microsoft.Maps.Map('#myMap', {
-            showLocateMeButton: false
-        });
-        infobox = new Microsoft.Maps.Infobox(map.getCenter(), {
-            visible: false,
-            showCloseButton: true
-        });
+    if (document.getElementById('myMap') && typeof L !== 'undefined') {
+        // Default location (Bay Area)
+        var defaultLocation = [37.7749, -122.4194];
+        var initialZoom = 10;
 
-        //Assign the infobox to a map instance.
-        infobox.setMap(map);
-
-        // Close infobox when clicking on the map
-        Microsoft.Maps.Events.addHandler(map, 'click', function(e) {
-            if (infobox) {
-                infobox.setOptions({ visible: false });
-            }
-        });
-
-        // Request user's location and center map
+        // Request user's location first
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function(position) {
-                    userLocation = new Microsoft.Maps.Location(
-                        position.coords.latitude,
-                        position.coords.longitude
-                    );
+                    // Got user location, use it
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
 
-                    // Center map on user's location
-                    map.setView({
-                        center: userLocation,
-                        zoom: 12
-                    });
+                    // Initialize map with user's location
+                    initializeMap([userLocation.lat, userLocation.lng], 12);
 
-                    // Add a marker for user's location
-                    userPin = new Microsoft.Maps.Pushpin(userLocation, {
-                        color: 'green',
-                        title: 'Your Location'
-                    });
-
-                    // Add click handler to show nearby vehicles
-                    Microsoft.Maps.Events.addHandler(userPin, 'click', showNearbyVehicles);
-
-                    map.entities.push(userPin);
+                    // Add user marker
+                    addUserMarker();
                 },
                 function(error) {
                     console.warn('Geolocation error:', error.message);
-                    // If geolocation fails, default to Bay Area center
-                    map.setView({
-                        center: new Microsoft.Maps.Location(37.7749, -122.4194),
-                        zoom: 10
-                    });
+                    // Geolocation failed, use default location
+                    initializeMap(defaultLocation, initialZoom);
                 },
                 {
                     enableHighAccuracy: true,
@@ -333,15 +301,53 @@ function GetMap() {
             );
         } else {
             console.warn('Geolocation is not supported by this browser');
-            // Default to Bay Area center if geolocation not supported
-            map.setView({
-                center: new Microsoft.Maps.Location(37.7749, -122.4194),
-                zoom: 10
-            });
+            // Geolocation not supported, use default location
+            initializeMap(defaultLocation, initialZoom);
         }
 
-        if (onMapLoad) onMapLoad()
-        positionInterval = setInterval(onMapLoad, 60000)
+        function initializeMap(center, zoom) {
+            // Initialize Leaflet map
+            map = L.map('myMap').setView(center, zoom);
+
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Close popup when clicking on the map
+            map.on('click', function(e) {
+                if (currentPopup) {
+                    currentPopup.remove();
+                }
+            });
+
+            if (onMapLoad) onMapLoad()
+            positionInterval = setInterval(onMapLoad, 60000)
+        }
+
+        function addUserMarker() {
+            if (userLocation) {
+                // Create custom green icon for user location
+                var userIcon = L.divIcon({
+                    html: '<div style="background-color: green; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;"></div>',
+                    className: 'user-marker',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                // Add a marker for user's location
+                userPin = L.marker([userLocation.lat, userLocation.lng], {
+                    icon: userIcon,
+                    title: 'Your Location'
+                });
+
+                // Add click handler to show nearby vehicles
+                userPin.on('click', showNearbyVehicles);
+
+                userPin.addTo(map);
+            }
+        }
     }
     else {
         window.addEventListener('DOMContentLoaded', GetMap)
@@ -349,9 +355,9 @@ function GetMap() {
 }
 
 
-function showVehicleInfo(e) {
-    //Make sure the infobox has metadata to display.
-    var data = e.target.metadata
+function showVehicleInfo(e, pin) {
+    //Make sure the marker has metadata to display.
+    var data = pin.metadata
     if (data) {
         // agencyIds.forEach(function(id, i) {
         //     if (agencies[id]) {
@@ -496,49 +502,24 @@ function showVehicleInfo(e) {
         //     }
         // }
 
-        infobox.setOptions({
-            location: e.target.getLocation(),
-            title: options.title,
-            htmlContent: `<div class="infobox">
-                <button class="infobox-close-btn" onclick="if(window.infobox) window.infobox.setOptions({visible: false});">&times;</button>
-                <span class="title">${options.title}</span><span>${options.description}</span><ol class="stops"></ol>
-            </div>`,
-            visible: true
-        });
+        var popupContent = `<div class="infobox">
+            <span class="title">${options.title}</span><span>${options.description}</span><ol class="stops"></ol>
+        </div>`;
+
+        if (currentPopup) {
+            currentPopup.remove();
+        }
+        currentPopup = L.popup()
+            .setLatLng(pin.getLatLng())
+            .setContent(popupContent)
+            .openOn(map);
     }
 }
 
 function showRoutePath(aId, rId) {
-    // Load the directions module.
-    Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-        if (directionsManager) directionsManager.clearAll()
-
-        // Create an instance of the directions manager.
-        directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-
-        // // Calculate a date time that is 1 hour from now.
-        // Set Route Mode to transit.
-        directionsManager.setRequestOptions({
-            routeMode: Microsoft.Maps.Directions.RouteMode.tranit,
-        });
-
-        // Add waypoints.
-        if (patterns[aId]) {
-            if (patterns[aId][rId]) {
-                patterns[aId][rId].forEach(function(s, i) {
-                    var waypoint = new Microsoft.Maps.Directions.Waypoint({ address: s });
-                    directionsManager.addWaypoint(waypoint);
-                })
-            }
-        }
-
-        // Set the element in which the itinerary will be rendered.
-        directionsManager.setRenderOptions({ itineraryContainer: directionsElement });
-
-        // Calculate directions.
-        directionsManager.calculateDirections();
-        console.log(directionsManager)
-    });
+    // TODO: Implement route path display with Leaflet
+    // This would require using a routing service or drawing polylines
+    console.log('Route path display not yet implemented with Leaflet');
 }
 
 function findUsingValueofKey(arr, key, val) {
