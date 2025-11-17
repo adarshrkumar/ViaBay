@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 @use '../variables.scss' as *;
 
 $padding: 1.5rem;
@@ -138,7 +140,7 @@ $hf-size: 4rem;
         top: 0;
         right: 0;
 
-        padding: #{$padding / 2};
+        padding: math.div($padding, 2);
 
         aspect-ratio: 1;
 
