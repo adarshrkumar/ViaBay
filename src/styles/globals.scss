@@ -109,8 +109,11 @@ body {
     padding-inline: $spacing-xlarge;
     background-color: var(--surface);
     border-bottom: $border;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+
+    $_backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: $_backdrop-filter;
+    backdrop-filter: $_backdrop-filter;
+    
     box-shadow: $shadow-small;
 
     display: flex;
@@ -318,10 +321,11 @@ body {
         border: inherit;
         /* border-bottom: none; */
 
+        $_user-select: none;
         line-height: 1;
 
-        -webkit-user-select: none;
-        user-select: none;
+        -webkit-user-select: $_user-select;
+        user-select: $_user-select;
 
         transform: skewX(#{-1*$skew});
 
@@ -442,9 +446,10 @@ body {
         display: grid;
         grid-template-rows: repeat(var(--amt, 0), 1fr);
         select-option {
+            $_user-select: none;
             padding-inline: $p-i;
-            -webkit-user-select: none;
-            user-select: none;
+            -webkit-user-select: $_user-select;
+            user-select: $_user-select;
             cursor: pointer;
             &[disabled] {
                 color: lightgray;
