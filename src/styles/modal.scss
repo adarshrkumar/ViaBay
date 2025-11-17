@@ -24,8 +24,10 @@
 
     &::backdrop {
         background-color: rgba(0, 0, 0, 0.5);
-        -webkit-backdrop-filter: blur(4px);
-        backdrop-filter: blur(4px);
+
+        $_backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: $_backdrop-filter;
+        backdrop-filter: $_backdrop-filter;
     }
 
     & content {
