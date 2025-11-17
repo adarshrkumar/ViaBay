@@ -8,17 +8,28 @@ function makeRequest(moduleName, params = [], callback) {
     // Build URL for our API route
     const url = `/api/511?module=${encodeURIComponent(moduleName)}${paramsString ? `&params=${encodeURIComponent(paramsString)}` : ''}`
 
+    console.log('Making 511 API request:', { moduleName, params, url })
+
     fetch(url)
         .then(response => {
+            console.log('511 API response status:', response.status)
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
+                return response.json().then(data => {
+                    console.error('511 API Error Response:', data)
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${data.error || 'Unknown error'}`)
+                }).catch(err => {
+                    if (err.message.includes('HTTP error!')) throw err
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                })
             }
             return response.json()
         })
         .then(data => {
             if (data.error) {
+                console.error('511 API returned error:', data.error)
                 throw new Error(data.error)
             }
+            console.log('511 API success:', moduleName, data)
             callback(data)
         })
         .catch(err => {
