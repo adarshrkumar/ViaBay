@@ -53,7 +53,7 @@ $hf-size: 4rem;
     }
 }
 
-:has( > .InfoboxCustom > .infobox-body > * > .infobox) {
+:has( > .leaflet-popup-content-wrapper > .leaflet-popup-content > * > .infobox) {
     $_max: calc(100% - #{$padding*2});
 
     top: unset !important;
@@ -68,12 +68,12 @@ $hf-size: 4rem;
         max-height: calc(100dvh - #{$hf-size*2} - 20px)
     }
 
-    .Infobox.no-title {
+    .leaflet-popup.no-title {
         display: block !important;
         border: none !important;
         height: 0;
 
-        .infobox-stalk {
+        .leaflet-popup-tip {
             display: none;
             top: unset;
             left: unset;
