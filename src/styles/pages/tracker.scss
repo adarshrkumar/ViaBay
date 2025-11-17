@@ -86,6 +86,40 @@ $hf-size: 4rem;
     .leaflet-popup-tip-container {
         display: none;
     }
+
+    .leaflet-popup-close-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        margin: math.div($padding, 4);
+
+        aspect-ratio: 1;
+
+        background: none;
+        color: var(--color);
+
+        border: none;
+        border-radius: 4px;
+
+        font-size: 1.5rem;
+        line-height: 0;
+
+        z-index: 1000;
+
+        cursor: pointer;
+
+        transition: all $transition-time ease;
+
+        &:hover {
+            background-color: var(--bg);
+            color: var(--accent);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+    }
 }
 
 .leaflet-popup-content-wrapper {
@@ -132,40 +166,6 @@ $hf-size: 4rem;
             display: none;
             top: unset;
             left: unset;
-        }
-    }
-
-    .infobox-close-btn {
-        position: absolute;
-        top: 0;
-        right: 0;
-
-        padding: math.div($padding, 2);
-
-        aspect-ratio: 1;
-
-        background: none;
-        color: var(--color);
-
-        border: none;
-        border-radius: 4px;
-
-        font-size: 1.5rem;
-        line-height: 0;
-
-        z-index: 1000;
-
-        cursor: pointer;
-
-        transition: all $transition-time ease;
-
-        &:hover {
-            background-color: var(--bg);
-            color: var(--accent);
-        }
-
-        &:active {
-            transform: scale(0.95);
         }
     }
 
