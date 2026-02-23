@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TransTrack is a Bay Area transit tracking web application built with Astro. It provides real-time vehicle tracking, directions, and transit information using the 511.org API and Leaflet Maps.
+ViaBay is a Bay Area transit tracking web application built with Astro. It provides real-time vehicle tracking, directions, and transit information using the 511.org API and Leaflet Maps.
 
 ## Common Commands
 
