@@ -1,5 +1,5 @@
 <script is:inline>
-    window.addEventListener('DOMContentLoaded', e => {
+    window.addEventListener('DOMContentLoaded', _e => {
         var title = document.title
         if (title.includes(' | ')) {
             title = title.split(' | ')
@@ -9,18 +9,18 @@
         document.querySelector('.header > .title').textContent = title
 
         if (!location.pathname.startsWith('/login')) {
-            document.querySelectorAll('.nav').forEach((n, i) => {
+            document.querySelectorAll('.nav').forEach(n => {
                 n.removeAttribute('hidden')
             })
         }
 
-        document.querySelectorAll('.input-parent, .textarea-parent, .select-parent').forEach((e, i) => {
+        document.querySelectorAll('.input-parent, .textarea-parent, .select-parent').forEach(e => {
             var classes = e.className
             if (classes.includes(' ')) classes = classes.split(' ')
             else classes = [classes]
 
             var element = ''
-            classes.forEach((c, i) => {
+            classes.forEach(c => {
                 if (c.endsWith('-parent')) element = c.slice(0, -7)
             })
 

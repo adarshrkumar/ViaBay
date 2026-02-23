@@ -2,13 +2,13 @@
 var nGroup = document.querySelector('.notifications')
 
 
-function getNotifications(module, title, description, content, attatchmentInfo) {
+function getNotifications(_module, _title, _description, _content, _attatchmentInfo) {
     var notificationList = localStorage.getItem('notifications')
     if (!!notificationList === false) notificationList = []
     notificationList = JSON.parse(notificationList)
 
-    notificationList.forEach((name, i) => {
-        var notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
+    notificationList.forEach(name => {
+        var _notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
         addNotification(notificationList[name])
         notificationList.shift()
         localStorage.removeItem(`NOTIFICATIONS://${name}`)
@@ -36,7 +36,7 @@ function addNotification(notification) {
 
     nGroup.appendChild(nEle)
 
-    nEle.onclick = e => {
+    nEle.onclick = _e => {
         if (!!nContent) {
             showModal(nTitle, nContent)
         }

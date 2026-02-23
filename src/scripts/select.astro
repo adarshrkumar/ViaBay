@@ -1,37 +1,37 @@
 <script is:inline>
-function openSelection(e) {
-    while (!e.className.includes('select') ) e = e.parentNode
-    document.querySelectorAll('.select').forEach((s, i) => {
-        s.classList.remove('open')
-    })
-    e.classList.add('open')
-    e.setAttribute('onclick', 'closeSelection(this)')
-}
+    function openSelection(e) {
+        while (!e.className.includes('select') ) e = e.parentNode
+        document.querySelectorAll('.select').forEach(s => {
+            s.classList.remove('open')
+        })
+        e.classList.add('open')
+        e.setAttribute('onclick', 'closeSelection(this)')
+    }
 
-function closeSelection(e) {
-    while (!e.className.includes('select') ) e = e.parentNode
-    e.classList.remove('open')
-    e.setAttribute('onclick', 'openSelection(this)')
-}
+    function closeSelection(e) {
+        while (!e.className.includes('select') ) e = e.parentNode
+        e.classList.remove('open')
+        e.setAttribute('onclick', 'openSelection(this)')
+    }
 
-if (!!document.querySelector('.select')) {
-    document.querySelectorAll('select-option').forEach((o, i) => {
-        o.onclick = e => {
-            if (!!e.target.getAttribute('disabled') === false) {
-                e.target.parentNode.style.setProperty('--num', i)
-                var type = e.target.dataset.type
-                if (!!type) {
-                    document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => {
-                        s.setAttribute('hidden', '')
-                    })
-                    var selector = document.querySelector(`.select[data-type="fare"][data-for="${type}"]`)
-                    selector.removeAttribute('hidden')
+    if (!!document.querySelector('.select')) {
+        document.querySelectorAll('select-option').forEach((o, i) => {
+            o.onclick = e => {
+                if (!!e.target.getAttribute('disabled') === false) {
+                    e.target.parentNode.style.setProperty('--num', i)
+                    var type = e.target.dataset.type
+                    if (!!type) {
+                        document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => {
+                            s.setAttribute('hidden', '')
+                        })
+                        var selector = document.querySelector(`.select[data-type="fare"][data-for="${type}"]`)
+                        selector.removeAttribute('hidden')
+                    }
                 }
             }
-        }
-    })
-    document.querySelectorAll('select-options').forEach((e, i) => {
-        e.style.setProperty('--amt', e.querySelectorAll('select-option').length)
-    })
-}
+        })
+        document.querySelectorAll('select-options').forEach(e => {
+            e.style.setProperty('--amt', e.querySelectorAll('select-option').length)
+        })
+    }
 </script>

@@ -86,7 +86,7 @@ async function geocodeAddress(address) {
 async function addDirections(e) {
     var places = []
 
-    stops.querySelectorAll('.stop').forEach((s, i) => {
+    stops.querySelectorAll('.stop').forEach(s => {
         if (s.getAttribute('final-value')) {
             places.push(s.getAttribute('final-value'))
         }
@@ -141,7 +141,7 @@ async function addDirections(e) {
     }
 }
 
-document.querySelector('.add-stop').addEventListener('click', e => {
+document.querySelector('.add-stop').addEventListener('click', _e => {
     var stopsAmt = stops.querySelectorAll('.stop').length
 
     var stopContainer = document.createElement('div')
@@ -154,9 +154,9 @@ document.querySelector('.add-stop').addEventListener('click', e => {
     stop.classList.add('stop')
     stop.placeholder = `Stop #${stopsAmt+1}`
     stop.title = `Stop #${stopsAmt+1}`
-    stop.onkeypress = e => {
+    stop.addEventListener('keypress', e => {
         stopChange(e, stopsAmt-1)
-    }
+    })
     stopParent.appendChild(stop)
 
     var closeButton = document.createElement('button')
@@ -186,7 +186,7 @@ document.querySelector('.add-stop').addEventListener('click', e => {
     stops.appendChild(stopContainer)
 })
 
-closeButtons.forEach((b, i) => {
+closeButtons.forEach(b => {
     b.onclick = e => onCloseClick(e)
 })
 

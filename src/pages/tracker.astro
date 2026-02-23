@@ -141,7 +141,7 @@ function onMapLoad() {
 
             agencyIds.push(agency)
 
-            makeRequest('VehicleMonitoring', [['agency', agency.Id]], (vehicleData, i2) => {
+            makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleData => {
                 var vehicleData = vehicleData.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity
                 if (!vehicleData || typeof vehicleData !== 'object') vehicleData = []
 
@@ -342,7 +342,7 @@ function GetMap() {
             }).addTo(map);
 
             // Close popup when clicking on the map
-            map.on('click', e => {
+            map.on('click', _e => {
                 if (currentPopup) {
                     currentPopup.remove();
                 }
@@ -381,7 +381,7 @@ function GetMap() {
 }
 
 
-function showVehicleInfo(e, pin) {
+function showVehicleInfo(_e, pin) {
     //Make sure the marker has metadata to display.
     var data = pin.metadata
     if (data) {
@@ -429,7 +429,7 @@ function showVehicleInfo(e, pin) {
                 stops.push(data.MonitoredCall)
             }
             if (hasCalls) {
-                data.OnwardCalls.OnwardCall.forEach((stop, sI) => {
+                data.OnwardCalls.OnwardCall.forEach(stop => {
                     stops.push(stop)
                 })
             }
@@ -452,7 +452,7 @@ function showVehicleInfo(e, pin) {
             console.log(TimingPointInJourneyPattern)
 
             var liS = []
-            stops.forEach((stop, sI) => {
+            stops.forEach(stop => {
                 callActions(stop)
             })
 

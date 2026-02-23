@@ -2,13 +2,13 @@
 var settingEles = document.querySelectorAll('setting-option')
 var selectEles = document.querySelectorAll('setting-option select')
 
-window.addEventListener('DOMContentLoaded', e => {
+window.addEventListener('DOMContentLoaded', _e => {
     settingEles = document.querySelectorAll('setting-option')
     selectEles = document.querySelectorAll('setting-option select')
 
     applySettings()
     if (location.pathname.startsWith('/settings')) {
-        settingEles.forEach((s, i) => {
+        settingEles.forEach(s => {
             s.querySelector('select').onchange = e => {
                 setSetting(s.getAttribute('module-name'), e.target.value)
             }
@@ -36,12 +36,12 @@ function getSettings() {
 
 function applySettings() {
     var settings = getSettings()
-    settings.forEach((s, i) => {
+    settings.forEach(s => {
         settingFunctions[s.name](s.content)
     })
 
     if (location.pathname.startsWith('/settings') && settings.length > 0) {
-        settingEles.forEach((s, i) => {
+        settingEles.forEach(s => {
             var setting = settings.filter(filterCheck)[0].content
             s.querySelector('select').value = setting
         })

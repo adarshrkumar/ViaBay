@@ -6,9 +6,8 @@ import { Fragment } from 'astro/jsx-runtime'
 import ModalScript from '../scripts/modal.astro'
 import SelectScript from '../scripts/select.astro'
 
-var mainScripts = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
-
-mainScripts = await Promise.all(mainScripts.map(async n => await import(`../scripts/${n}.astro`)))
+var mainScriptNames = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
+var mainScripts = await Promise.all(mainScriptNames.map(async n => await import(`../scripts/${n}.astro`)))
 
 interface Script {
     name?: string
@@ -18,7 +17,7 @@ interface Script {
 interface Props {
     title?: string
     classItems?: string[]
-    headItems?: any[]
+    headItems?: []
     scripts?: Script[]
 }
 
@@ -79,13 +78,13 @@ var yearStr = year == startingYear ? '' : `-${year}`
         <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
         { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
         {
-            mainScripts.map(function(module: any) {
+            mainScripts.map((module) => {
                 const Component = module.default
                 return <Component />
             })
         }
         {
-            scripts.map(async function(s: Script) {
+            scripts.map(async (s: Script) => {
                 if (s.location === 'head' && s.name) {
                     const module = await import(`../scripts/${s.name}.astro`)
                     const Component = module.default
@@ -140,7 +139,7 @@ var yearStr = year == startingYear ? '' : `-${year}`
         <ModalScript />
         <SelectScript />
         {
-            scripts.map(async function(s: Script) {
+            scripts.map(async (s: Script) => {
                 if (s.location !== 'head' && s.name) {
                     const module = await import(`../scripts/${s.name}.astro`)
                     const Component = module.default
