@@ -2,27 +2,27 @@
 var settingEles = document.querySelectorAll('setting-option')
 var selectEles = document.querySelectorAll('setting-option select')
 
-window.addEventListener('DOMContentLoaded', function(e) {
+window.addEventListener('DOMContentLoaded', e => {
     settingEles = document.querySelectorAll('setting-option')
     selectEles = document.querySelectorAll('setting-option select')
 
     applySettings()
     if (location.pathname.startsWith('/settings')) {
-        settingEles.forEach(function(s, i) {
-            s.querySelector('select').onchange = function(e) {
+        settingEles.forEach((s, i) => {
+            s.querySelector('select').onchange = e => {
                 setSetting(s.getAttribute('module-name'), e.target.value)
             }
         })
     }
 })
 
-var setTheme = function(t) {
+var setTheme = t => {
     document.documentElement.setAttribute('data-theme', (t || 'system'))
 }
 var settingsKey = 'settings'
 
 var settingFunctions = {
-    theme: function(theme) {
+    theme: theme => {
         setTheme(theme)
     }
 }
@@ -36,12 +36,12 @@ function getSettings() {
 
 function applySettings() {
     var settings = getSettings()
-    settings.forEach(function(s, i) {
+    settings.forEach((s, i) => {
         settingFunctions[s.name](s.content)
     })
 
     if (location.pathname.startsWith('/settings') && settings.length > 0) {
-        settingEles.forEach(function(s, i) {
+        settingEles.forEach((s, i) => {
             var setting = settings.filter(filterCheck)[0].content
             s.querySelector('select').value = setting
         })

@@ -20,13 +20,13 @@ function GetMap() {
         // Request user's location first
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                function(position) {
+                position => {
                     // Got user location, use it
                     mapCenter = [position.coords.latitude, position.coords.longitude];
                     initialZoom = 12;
                     initializeMap();
                 },
-                function(error) {
+                error => {
                     console.warn('Geolocation error:', error.message);
                     // Geolocation failed, use default location
                     initializeMap();
@@ -86,7 +86,7 @@ async function geocodeAddress(address) {
 async function addDirections(e) {
     var places = []
 
-    stops.querySelectorAll('.stop').forEach(function(s, i) {
+    stops.querySelectorAll('.stop').forEach((s, i) => {
         if (s.getAttribute('final-value')) {
             places.push(s.getAttribute('final-value'))
         }
@@ -127,7 +127,7 @@ async function addDirections(e) {
         }).addTo(map);
 
         // Display route in the directions element
-        routingControl.on('routesfound', function(e) {
+        routingControl.on('routesfound', e => {
             var routes = e.routes;
             var summary = routes[0].summary;
             directionsElement.innerHTML = '<div class="route-summary">' +
@@ -141,7 +141,7 @@ async function addDirections(e) {
     }
 }
 
-document.querySelector('.add-stop').addEventListener('click', function(e) {
+document.querySelector('.add-stop').addEventListener('click', e => {
     var stopsAmt = stops.querySelectorAll('.stop').length
 
     var stopContainer = document.createElement('div')
@@ -154,7 +154,7 @@ document.querySelector('.add-stop').addEventListener('click', function(e) {
     stop.classList.add('stop')
     stop.placeholder = `Stop #${stopsAmt+1}`
     stop.title = `Stop #${stopsAmt+1}`
-    stop.onkeypress = function(e) {
+    stop.onkeypress = e => {
         stopChange(e, stopsAmt-1)
     }
     stopParent.appendChild(stop)
@@ -162,7 +162,7 @@ document.querySelector('.add-stop').addEventListener('click', function(e) {
     var closeButton = document.createElement('button')
     closeButton.classList.add('close')
     closeButton.classList.add('removeStyles')
-    closeButton.onclick = function(e) {
+    closeButton.onclick = e => {
         onCloseClick(e, stopsAmt-1)
     }
 
@@ -186,8 +186,8 @@ document.querySelector('.add-stop').addEventListener('click', function(e) {
     stops.appendChild(stopContainer)
 })
 
-closeButtons.forEach(function(b, i) {
-    b.onclick = onCloseClick
+closeButtons.forEach((b, i) => {
+    b.onclick = e => onCloseClick(e)
 })
 
 function onCloseClick(e) {
@@ -196,13 +196,13 @@ function onCloseClick(e) {
 }
 
 function reorderStops() {
-    stops.querySelectorAll('.stop').forEach(function(s, i) {
+    stops.querySelectorAll('.stop').forEach((s, i) => {
         s.placeholder = `Stop #${i+1}`
     })
 }
 
-stops.querySelectorAll('.stop').forEach(function(s, i) {
-    s.onchange = function(e) {
+stops.querySelectorAll('.stop').forEach((s, i) => {
+    s.onchange = e => {
         stopChange(e, i)
     }
 })
@@ -213,7 +213,7 @@ async function stopChange(e, i) {
 
     var optionsEle = stops.querySelectorAll('.options')[i]
 
-    optionsEle.querySelectorAll('.option').forEach(function(o) {
+    optionsEle.querySelectorAll('.option').forEach(o => {
         o.remove()
     })
 
@@ -225,7 +225,7 @@ async function stopChange(e, i) {
             var response = await fetch(url);
             var results = await response.json();
 
-            results.forEach(function(r) {
+            results.forEach(r => {
                 createOption(r.display_name, i, optionsEle);
             });
 
@@ -239,9 +239,7 @@ async function stopChange(e, i) {
                     aEle.disabled = true
                 }
                 else {
-                    aEle.onclick = function(e) {
-                        selectOption(e, i)
-                    }
+                    aEle.onclick = e => selectOption(e, i)
                 }
                 optionsEle.appendChild(aEle)
             }
@@ -255,7 +253,7 @@ function selectOption(e, i) {
     var place = e.target.textContent
     var optionsEle = stops.querySelectorAll('.options')[i]
 
-    optionsEle.querySelectorAll('.option').forEach(function(o) {
+    optionsEle.querySelectorAll('.option').forEach(o => {
         o.remove()
     })
 

@@ -7,7 +7,7 @@ function getNotifications(module, title, description, content, attatchmentInfo) 
     if (!!notificationList === false) notificationList = []
     notificationList = JSON.parse(notificationList)
 
-    notificationList.forEach(function(name, i) {
+    notificationList.forEach((name, i) => {
         var notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
         addNotification(notificationList[name])
         notificationList.shift()
@@ -36,7 +36,7 @@ function addNotification(notification) {
 
     nGroup.appendChild(nEle)
 
-    nEle.onclick = function(e) {
+    nEle.onclick = e => {
         if (!!nContent) {
             showModal(nTitle, nContent)
         }

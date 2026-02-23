@@ -11,7 +11,7 @@ function getCookie(cname) {
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
     var rValue = ''
-    ca.forEach(function(c, i) {
+    ca.forEach((c, i) => {
         while (c.charAt(0) == ' ') {
             c = c.substring(1);
         }
