@@ -1,14 +1,14 @@
 <script>
-    var map, positionInterval = null
+    var map: L.Map, positionInterval = null
     window.positionInterval = positionInterval
-    var currentPopup = null
+    var currentPopup: L.Popup | null = null
 
-    var agencyIds = []
-    var agencies = {}
-    var allPins = []
+    var agencyIds: {Id: string, Name: string}[] = []
+    var agencies: Record<string, unknown> = {}
+    var allPins: unknown[] = []
     window.allPins = allPins
-    var userPin = null
-    var userLocation = null
+    var userPin: L.Marker | null = null
+    var userLocation: {lat: number, lng: number} | null = null
     // var lines = []
     // var patterns = []
 
@@ -37,7 +37,7 @@
     window.directionsManager = directionsManager
 
     // Calculate distance between two locations in miles using Haversine formula
-    function calculateDistance(lat1, lon1, lat2, lon2) {
+    function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
         var R = 3958.8 // Earth's radius in miles
         var dLat = (lat2 - lat1) * Math.PI / 180
         var dLon = (lon2 - lon1) * Math.PI / 180
@@ -66,8 +66,8 @@
 
                 var vehicleLoc = vehicleActivity.VehicleLocation
                 var distance = calculateDistance(
-                    userLocation.latitude,
-                    userLocation.longitude,
+                    userLocation.lat,
+                    userLocation.lng,
                     vehicleLoc.Latitude,
                     vehicleLoc.Longitude
                 )
@@ -528,15 +528,15 @@
         }
     }
 
-    function showRoutePath(_aId, _rId) {
+    function showRoutePath(_aId: string, _rId: string) {
         // TODO: Implement route path display with Leaflet
         // This would require using a routing service or drawing polylines
         console.log('Route path display not yet implemented with Leaflet');
     }
     window.showRoutePath = showRoutePath
 
-    function findUsingValueofKey(arr, key, val) {
-        var res = arr.filter(item => item[key] === val)
+    function findUsingValueofKey(arr: Record<string, string>[], key: string, val: string) {
+        var res = arr.filter((item: Record<string, string>) => item[key] === val)
         return res
     }
     window.findUsingValueofKey = findUsingValueofKey
