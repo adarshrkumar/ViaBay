@@ -8,7 +8,6 @@
     async function makeRequest(moduleName: string, params: string[][] = [], callback: (data: unknown) => void = () => {}) {
         // Apply current delay if any
         if (requestDelay > 0) {
-            console.log(`[Client] Waiting ${requestDelay}ms before request`)
             await delay(requestDelay)
         }
 
@@ -20,12 +19,8 @@
         // Build URL for our API route
         const url = `/api/511?module=${encodeURIComponent(moduleName)}${paramsString ? `&params=${encodeURIComponent(paramsString)}` : ''}`
 
-        console.log(`Making 511 API request: ${moduleName}`)
-
         try {
             const response = await fetch(url)
-            console.log('511 API response status:', response.status)
-
             // Handle 429 Rate Limit with exponential backoff
             if (response.status === 429) {
                 if (requestDelay === 0) {
@@ -52,10 +47,8 @@
             // Success - reset delay gradually
             if (requestDelay > 0) {
                 requestDelay = Math.max(requestDelay / 2, 0)
-                console.log(`[Client] Success! Reducing delay to ${requestDelay}ms`)
             }
 
-            console.log('511 API success:', moduleName, data)
             callback(data)
         } catch (err) {
             console.error('511 API Error:', err)
