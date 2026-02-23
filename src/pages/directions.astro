@@ -3,7 +3,7 @@ import '../styles/pages/tracker.scss'
 import '../styles/pages/directions.scss'
 
 import Layout from '../layouts/Layout.astro'
-import Directions from '../scripts/directions.astro'
+import DirectionsScript from '../scripts/directions.astro'
 
 var classItems = ['full']
 
@@ -46,4 +46,4 @@ return Astro.redirect('/landing')
     <div id="myMap"></div>
 </Layout>
 
-<Directions />
+<DirectionsScript />
