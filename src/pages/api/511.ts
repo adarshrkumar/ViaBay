@@ -28,11 +28,9 @@ async function make511Request(
     }
 
     let data = await response.json()
-    console.log('[511 API] Response data type:', typeof data, Array.isArray(data) ? 'array' : 'object')
 
     // Handle double-encoded JSON
     if (typeof data === 'string') {
-        console.log('[511 API] Double-encoded JSON detected, parsing...')
         if (
             (data.startsWith('{') && data.endsWith('}')) ||
             (data.startsWith('[') && data.endsWith(']'))
@@ -52,8 +50,6 @@ export const GET: APIRoute = async ({ url, request }) => {
     const moduleName = url.searchParams.get('module')
     const paramsString = url.searchParams.get('params')
 
-    console.log(`[511 API Route] Parsed ${moduleName} params`)
-
     if (!moduleName) {
         console.error('[511 API Route] Missing module parameter')
         return new Response(
@@ -66,7 +62,6 @@ export const GET: APIRoute = async ({ url, request }) => {
     if (paramsString) {
         try {
             params = JSON.parse(paramsString)
-            console.log(`[511 API Route] Parsed params array`)
         } catch (err) {
             console.error('[511 API Route] Invalid params format:', paramsString)
             return new Response(
@@ -78,7 +73,6 @@ export const GET: APIRoute = async ({ url, request }) => {
 
     try {
         const data = await make511Request(moduleName, params)
-        console.log('[511 API Route] Returning success response')
         return new Response(
             JSON.stringify(data),
             {
