@@ -15,4 +15,8 @@ interface Window {
     closeSelection: (e: HTMLElement) => void
     showRoutePath: (aId: unknown, rId: unknown) => void
     findUsingValueofKey: (arr: Record<string, unknown>[], key: string, val: unknown) => Record<string, unknown>[]
+    positionInterval: ReturnType<typeof setInterval> | null
+    allPins: unknown[]
+    directionsElement: Element | null
+    directionsManager: boolean
 }
