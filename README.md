@@ -1,4 +1,4 @@
-# TransTrack
+# ViaBay
 
 A Bay Area transit tracking web application with real-time vehicle locations and directions.
 
