@@ -119,15 +119,15 @@
 
 
     function onMapLoad() {
-        makeRequest('gtfsoperators', [], res => {
-            res.forEach((agency, i) => {
+        window.makeRequest('gtfsoperators', [], res => {
+            res.forEach((agency, i: number) => {
                 var cI = i
                 if (cI >= colors.length) cI = cI - colors.length
                 var color = colors[cI]
 
                 agencyIds.push(agency)
 
-                makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleData => {
+                window.makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleData => {
                     var vehicleData = vehicleData.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity
                     if (!vehicleData || typeof vehicleData !== 'object') vehicleData = []
 
@@ -168,7 +168,7 @@
                         aObj.vehicles.pins[pin.name] = pin.content
                     })
 
-                    vehicleData.forEach((vehicle, vI) => {
+                    vehicleData.forEach((vehicle, vI: number) => {
                         var vehicleActivity = vehicle.MonitoredVehicleJourney
                         vehicleActivity.agency = aName
                         vehicleActivity.aId = agency.Id
@@ -184,7 +184,7 @@
                                     if (publishedLineName.includes(' ')) publishedLineName = publishedLineName.split(' ')
                                     else publishedLineName = [publishedLineName]
 
-                                    publishedLineName.forEach((p, i) => {
+                                    publishedLineName.forEach((p, i: number) => {
                                         publishedLineName[i] = `${p[0]}${p.substring(1).toLowerCase()}`
                                     })
 
@@ -264,11 +264,11 @@
                     agencies[agency.Id] = aObj
                 })
 
-                // makeRequest('lines', [['operator_id', agency.Id]], lS => {
+                // windodw.makeRequest('lines', [['operator_id', agency.Id]], lS => {
                 //     lines[agency.Id] = lS
                 //     patterns[agency.Id] = {}
-                //     lS.forEach((line, lI) => {
-                //         makeRequest('patterns', [['operator_id', agency.Id], ['line_id', line.Id]], pattern => {
+                //     lS.forEach((line, lI: number) => {
+                //         window.makeRequest('patterns', [['operator_id', agency.Id], ['line_id', line.Id]], pattern => {
                 //             patterns[agency.Id][line.Id] = pattern
                 //         })
                 //     })
@@ -279,9 +279,9 @@
 
     GetMap()
     function GetMap() {
-        if (document.getElementById('myMap') && typeof L !== 'undefined') {
+        if (document.getElementById('myMap') && typeof window.L !== 'undefined') {
             // Default location (Bay Area)
-            var defaultLocation = [37.7749, -122.4194];
+            var defaultLocation: [number, number] = [37.7749, -122.4194];
             var initialZoom = 10;
 
             // Request user's location first
@@ -317,12 +317,12 @@
                 initializeMap(defaultLocation, initialZoom);
             }
 
-            function initializeMap(center, zoom) {
+            function initializeMap(center: [number, number], zoom: number) {
                 // Initialize Leaflet map
-                map = L.map('myMap').setView(center, zoom);
+                map = window.L.map('myMap').setView(center, zoom);
 
                 // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
-                L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
+                window.L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
                     attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
                     maxZoom: 19
                 }).addTo(map);
@@ -341,7 +341,7 @@
             function addUserMarker() {
                 if (userLocation) {
                     // Create custom green icon for user location
-                    var userIcon = L.divIcon({
+                    var userIcon = window.L.divIcon({
                         html: '<div style="background-color: green; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;"></div>',
                         className: 'user-marker',
                         iconSize: [20, 20],
@@ -349,7 +349,7 @@
                     });
 
                     // Add a marker for user's location
-                    userPin = L.marker([userLocation.lat, userLocation.lng], {
+                    userPin = window.L.marker([userLocation.lat, userLocation.lng], {
                         icon: userIcon,
                         title: 'Your Location'
                     });
@@ -371,49 +371,61 @@
         //Make sure the marker has metadata to display.
         var data = pin.metadata
         if (data) {
-            // agencyIds.forEach((id, i) => {
-            //     if (agencies[id]) {
-            //         agencies[id].vehicles.pins.forEach((p, pI) => {
-            //             agencies[id].vehicles.pins[pI].metadata.infoboxOpen = false
-            //         })
-            //     }
-            // })
-
-            // Set the infobox options with the metadata of the pushpin.
             var isSmallScreen = window.matchMedia('(max-width: 915px)').matches
             if (isSmallScreen) {
 
             }
 
-            // agencies[data.aId].vehicles.pins[data.i].metadata.infoboxOpen = true
+            data.LineName = data.PublishedLineName
+            if (data.PublishedLineName) {
+                if (data.LineName.includes('\\\\')) data.LineName = data.LineName.split('\\\\').join('/')
+                if (data.LineName.includes(' / ')) data.LineName = data.LineName.split(' / ').join('/')
+                if (data.LineName.includes('/')) data.LineName = data.LineName.split('/').join(' - ')
+                if (data.LineName.includes('  ')) data.LineName = data.LineName.split('  ').join(' ')
+            }
 
-            // console.log(data)
+            var titleHtml = `${data.agency}<br>${data.LineRef}: ${data.LineName || ''}`
+            var descriptionHtml = [
+                `Direction: ${data.DirectionRef ? data.DirectionRef : 'Unknown Direction'}`,
+                `Origin: ${data.OriginName ? data.OriginName : 'No Origin or Unknown'}`,
+                `Destination: ${data.DestinationName ? data.DestinationName : 'No Destination or Unknown'}`,
+                `Congestion: ${data.InCongestion ? 'Congested' : 'Not Congested or Unknown'}`,
+                `Occupancy: ${data.Occupancy ? data.Occupancy : 'Unknown'}`,
+                `Vehicle ID: ${data.VehicleRef ? data.VehicleRef : 'Unknown'}`
+            ].join('<br>')
 
-            makeRequest('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
+            function buildPopupContent(stopsHtml) {
+                return `<div class="infobox">
+                    <span class="title">${titleHtml}</span><span>${descriptionHtml}</span><ol class="stops">${stopsHtml}</ol>
+                </div>`
+            }
+
+            if (currentPopup) {
+                currentPopup.remove()
+            }
+            currentPopup = L.popup()
+                .setLatLng(pin.getLatLng())
+                .setContent(buildPopupContent('<li>Loading stops...</li>'))
+                .openOn(map)
+
+            window.makeRequest('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
                 var journeyPatterns = res.journeyPatterns
-                var pattern = journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
-                if (Array.isArray(pattern) || typeof pattern === 'object') {
-                    if (pattern.length > 0) {
-                        pattern = pattern[0]
-                    }
+                var pattern = null
+                if (journeyPatterns) {
+                    var filtered = journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
+                    if (filtered.length > 0) pattern = filtered[0]
                 }
-                else pattern = []
 
-                var PointsInSequence = pattern.PointsInSequence
-                var TimingPointInJourneyPattern = PointsInSequence.TimingPointInJourneyPattern
-                var stopNames = []
-                TimingPointInJourneyPattern.forEach(t => {
-                    stopNames.push(t.Name)
-                })
+                var TimingPointInJourneyPattern = []
+                if (pattern && pattern.PointsInSequence && pattern.PointsInSequence.TimingPointInJourneyPattern) {
+                    TimingPointInJourneyPattern = [...pattern.PointsInSequence.TimingPointInJourneyPattern]
+                }
 
                 var hasMCall = data.MonitoredCall ? true : false
                 var hasCalls = data.OnwardCalls ? (data.OnwardCalls.OnwardCall ? (data.OnwardCalls.OnwardCall.length > 0 ? true : false) : false) : false
 
                 var stops = []
-
-                if (hasMCall) {
-                    stops.push(data.MonitoredCall)
-                }
+                if (hasMCall) stops.push(data.MonitoredCall)
                 if (hasCalls) {
                     data.OnwardCalls.OnwardCall.forEach(stop => {
                         stops.push(stop)
@@ -422,121 +434,56 @@
 
                 stops.forEach(stop => {
                     var items = TimingPointInJourneyPattern.filter(t => t.Name === stop.StopPointName)
-                    if (items) {
-                        if (items.length > 0) {
-                            if (items.length > 1) {
-                                items.forEach(i => {
-                                    TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(i), 1)
-                                })
-                            }
-                            else {
-                                TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(items[0]), 1)
-                            }
+                    if (items && items.length > 0) {
+                        if (items.length > 1) {
+                            items.forEach(i => {
+                                TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(i), 1)
+                            })
+                        } else {
+                            TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(items[0]), 1)
                         }
                     }
                 })
-                console.log(TimingPointInJourneyPattern)
 
-                var liS = []
+                var stopsHtml = ''
                 stops.forEach(stop => {
-                    callActions(stop)
-                })
-
-                function callActions(stop) {
                     var eDate = new Date(stop.ExpectedArrivalTime)
                     var aDate = new Date(stop.AimedArrivalTime)
-                    var eTime = eDate.getHours()*60*60+eDate.getMinutes()*60+eDate.getSeconds()
-                    var aTime = aDate.getHours()*60*60+aDate.getMinutes()*60+aDate.getSeconds()
+                    var eTime = eDate.getHours()*60*60 + eDate.getMinutes()*60 + eDate.getSeconds()
+                    var aTime = aDate.getHours()*60*60 + aDate.getMinutes()*60 + aDate.getSeconds()
 
-                    var stopTime = `${eDate.getHours()}:${eDate.getMinutes().toString().length < 2 ? `0${eDate.getMinutes()}` : eDate.getMinutes()}`
+                    var stopTime = `${eDate.getHours()}:${eDate.getMinutes().toString().padStart(2, '0')}`
 
-                    var isLate = eTime > aTime ? true : false
-                    var isEarly = eTime < aTime ? true : false
-                    var isOnTime = eTime === aTime ? true : false
+                    var isLate = eTime > aTime
+                    var isEarly = eTime < aTime
+                    var isOnTime = eTime === aTime
 
                     var earlyLateText = ''
                     if (isLate) earlyLateText = `${Math.ceil((eTime-aTime)/60)} Minutes Late`
                     if (isEarly) earlyLateText = `${Math.ceil((aTime-eTime)/60)} Minutes Early`
-                    if (isOnTime) earlyLateText = `On Time`
+                    if (isOnTime) earlyLateText = 'On Time'
 
                     var color = isLate ? 'red' : (isEarly ? 'green' : (isOnTime ? 'blue' : 'black'))
 
-                    var li = document.createElement('li')
-                    li.classList.add('stop')
-                    li.style.color = color
-                    li.textContent = `${stop.StopPointName} (${stop.StopPointRef}): ${stopTime} (${earlyLateText})`
+                    stopsHtml += `<li class="stop" style="color: ${color}">${stop.StopPointName} (${stop.StopPointRef}): ${stopTime} (${earlyLateText})</li>`
+                })
 
-                    liS.push(li)
-                }
+                if (!stopsHtml) stopsHtml = '<li>No stop information available</li>'
 
+                if (currentPopup) currentPopup.setContent(buildPopupContent(stopsHtml))
             })
-
-            data.LineName = data.PublishedLineName
-            if (data.PublishedLineName) {
-                if (data.LineName.includes('\\\\')) data.LineName = data.LineName.split('\\\\').join('/')
-                    if (data.LineName.includes(' / ')) data.LineName = data.LineName.split(' / ').join('/')
-                    if (data.LineName.includes('/')) data.LineName = data.LineName.split('/').join(' - ')
-                    if (data.LineName.includes('  ')) data.LineName = data.LineName.split('  ').join(' ')
-                }
-
-            var options = {
-                title: [
-                    `${data.agency}`,
-                    `${data.LineRef}: ${data.LineName}`
-                ],
-                description: [
-                    `Direction: ${data.DirectionRef ? data.DirectionRef : 'Unknown Direction'}`,
-                    `Origin: ${data.OriginName ? data.OriginName : 'No Origin or Unknown'}`,
-                    `Destination: ${data.DestinationName ? data.DestinationName : 'No Destination or Unknown'}`,
-                    `Congestion: ${data.InCongestion ? 'Congested' : 'Not Congested or Unknown'}`,
-                    `Occupancy: ${data.Occupancy ? data.Occupancy : 'Unknown'}`,
-                    `Vehicle ID: ${data.VehicleRef ? data.VehicleRef : 'Unknown'}`
-                ]
-            }
-
-            console.log(data.aId)
-            // var agePatterns = patterns[data.aId]
-            // if (agePatterns) {
-            //     var routePatterns = agePatterns[data.LineRef]
-            //     console.log(routePatterns)
-            //     if (routePatterns) {
-            //         var journeyPatterns = routePatterns.journeyPatterns
-            //         if (journeyPatterns) {
-            //             var journeyPattern = journeyPatterns
-            //                 .filter(item => item['Name'] === data.PublishedLineName)
-            //                 // .filter(item => item['DirectionRef'] === data.DirectionRef)
-            //             console.log(journeyPattern)
-            //             if (journeyPattern.PointsInSequence) {
-            //                 var PointsInSequence = journeyPattern.PointsInSequence
-            //                 console.log(PointsInSequence)
-            //             }
-            //         }
-            //     }
-            // }
-
-            var popupContent = `<div class="infobox">
-                <span class="title">${options.title}</span><span>${options.description}</span><ol class="stops"></ol>
-            </div>`;
-
-            if (currentPopup) {
-                currentPopup.remove();
-            }
-            currentPopup = L.popup()
-                .setLatLng(pin.getLatLng())
-                .setContent(popupContent)
-                .openOn(map);
         }
     }
 
-    function showRoutePath(_aId: string, _rId: string) {
+    function showRoutePath(_aId: unknown, _rId: unknown) {
         // TODO: Implement route path display with Leaflet
         // This would require using a routing service or drawing polylines
         console.log('Route path display not yet implemented with Leaflet');
     }
     window.showRoutePath = showRoutePath
 
-    function findUsingValueofKey(arr: Record<string, string>[], key: string, val: string) {
-        var res = arr.filter((item: Record<string, string>) => item[key] === val)
+    function findUsingValueofKey(arr: Record<string, unknown>[], key: string, val: unknown) {
+        var res = arr.filter((item: Record<string, unknown>) => item[key] === val)
         return res
     }
     window.findUsingValueofKey = findUsingValueofKey
