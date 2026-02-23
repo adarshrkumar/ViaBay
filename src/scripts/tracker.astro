@@ -57,7 +57,7 @@
     }
 
     var colors = ['#0000FF','#FFA500','#6A4A3A','#800080','#800000','#40E0D0','#FF00FF','#000035','#FF6347','#FA8072','#808000','#7F00FF','#73BF00','#CD7F32','#8A2BE2','#3CB371','#2E8B57','#D2691E','#4682B4','#FF4500','#8B008B','#556B2F', '#8B4513', '#00CED1', '#483D8B', '#8B0000', '#9932CC', '#556B2F', '#2E8B57', '#6B8E23', '#9932CC', '#FF6347', '#20B2AA']
-    var customColors = {
+    var customColors: Record<string, Record<string, string>> = {
         SF: {
             E: 'beige',
             F: 'pink',
@@ -165,7 +165,8 @@
 
 
     function onMapLoad() {
-        window.makeRequest('gtfsoperators', [], res => {
+        window.makeRequest('gtfsoperators', [], unknownRes => {
+            var res = unknownRes as {Id: string, Name: string}[]
             res.forEach((agency, i: number) => {
                 var cI = i
                 if (cI >= colors.length) cI = cI - colors.length
@@ -174,8 +175,7 @@
                 agencyIds.push(agency)
 
                 window.makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleResult => {
-                    var vehicleData = vehicleResult.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity
-                    if (!vehicleData || typeof vehicleData !== 'object') vehicleData = []
+                    var vehicleData: {MonitoredVehicleJourney: VehicleData}[] = (vehicleResult as any)?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery?.VehicleActivity ?? []
 
                     var aName = agency.Name
                     switch (aName) {
@@ -208,7 +208,7 @@
 
                     vehicleData.forEach(vehicle => {
                         var vehicleRef = vehicle.MonitoredVehicleJourney.VehicleRef
-                        var existingPin = aObj.vehicles.pins[vehicleRef]
+                        var existingPin = aObj!.vehicles.pins[vehicleRef]
                         if (existingPin) {
                             goodPins.push({
                                 name: vehicleRef,
@@ -218,7 +218,7 @@
                     })
                     aObj.vehicles.pins = {}
                     goodPins.forEach(pin => {
-                        aObj.vehicles.pins[pin.name] = pin.content
+                        aObj!.vehicles.pins[pin.name] = pin.content
                     })
 
                     vehicleData.forEach((vehicle, _vI: number) => {
@@ -286,7 +286,7 @@
                             }
 
                             // Add the marker to the map
-                            var pin = aObj.vehicles.pins[vehicleRef]
+                            var pin = aObj!.vehicles.pins[vehicleRef]
                             if (pin) {
                                 pin.setLatLng(vehicleLatLng);
                             }
@@ -310,7 +310,7 @@
                                 newPin.addTo(map);
                                 pin = newPin;
                             }
-                            aObj.vehicles.pins[vehicleRef] = pin
+                            aObj!.vehicles.pins[vehicleRef] = pin
                         }
                     })
 
