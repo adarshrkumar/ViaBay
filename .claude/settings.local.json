@@ -6,7 +6,8 @@
       "Bash(cd \"H:\\\\Code\\\\GitHub\\\\TransTrack\" && npx astro check 2>&1)",
       "Bash(cd \"H:\\\\Code\\\\GitHub\\\\TransTrack\" && npm i @astrojs/check typescript 2>&1)",
       "Bash(cd \"H:/Code/GitHub/TransTrack\" && npx astro check 2>&1)",
-      "Bash(cd \"H:/Code/GitHub/TransTrack\" && npm install --save-dev @types/leaflet @types/leaflet-routing-machine 2>&1)"
+      "Bash(cd \"H:/Code/GitHub/TransTrack\" && npm install --save-dev @types/leaflet @types/leaflet-routing-machine 2>&1)",
+      "Bash(cd /h/Code/GitHub/TransTrack && npx astro check 2>&1)"
     ],
     "deny": [],
     "ask": []
