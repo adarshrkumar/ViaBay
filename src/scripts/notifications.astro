@@ -7,7 +7,7 @@
         notificationList = JSON.parse(notificationList)
 
         notificationList.forEach(name => {
-            var _notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
+            var notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
             addNotification(notificationList[name])
             notificationList.shift()
             localStorage.removeItem(`NOTIFICATIONS://${name}`)
