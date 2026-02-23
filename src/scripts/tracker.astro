@@ -4,13 +4,57 @@
     var currentPopup: L.Popup | null = null
 
     var agencyIds: {Id: string, Name: string}[] = []
-    var agencies: Record<string, unknown> = {}
+    var agencies: Record<string, AgencyObj | undefined> = {}
     var allPins: unknown[] = []
     window.allPins = allPins
     var userPin: L.Marker | null = null
     var userLocation: {lat: number, lng: number} | null = null
     // var lines = []
     // var patterns = []
+
+    type StopCall = {
+        StopPointName: string
+        StopPointRef: string
+        ExpectedArrivalTime: string
+        AimedArrivalTime: string
+    }
+
+    type VehicleData = {
+        agency: string
+        aId: string
+        LineRef: string
+        PublishedLineName?: string
+        LineName?: string
+        DirectionRef?: string
+        OriginName?: string
+        DestinationName?: string
+        InCongestion?: boolean
+        Occupancy?: string
+        OperatorRef?: string
+        infoboxOpen?: boolean
+        VehicleRef: string
+        VehicleLocation: { Latitude: number, Longitude: number }
+        MonitoredCall?: StopCall
+        OnwardCalls?: { OnwardCall: StopCall[] }
+    }
+
+    type VehicleMarker = L.Marker & { metadata: VehicleData }
+
+    type AgencyObj = {
+        id: string
+        name: string
+        vehicles: {
+            data: { MonitoredVehicleJourney: VehicleData }[]
+            pins: Record<string, VehicleMarker | undefined>
+        }
+    }
+
+    type TimingPoint = { Name: string }
+
+    type JourneyPattern = {
+        DirectionRef: string
+        PointsInSequence?: { TimingPointInJourneyPattern: TimingPoint[] }
+    }
 
     var colors = ['#0000FF','#FFA500','#6A4A3A','#800080','#800000','#40E0D0','#FF00FF','#000035','#FF6347','#FA8072','#808000','#7F00FF','#73BF00','#CD7F32','#8A2BE2','#3CB371','#2E8B57','#D2691E','#4682B4','#FF4500','#8B008B','#556B2F', '#8B4513', '#00CED1', '#483D8B', '#8B0000', '#9932CC', '#556B2F', '#2E8B57', '#6B8E23', '#9932CC', '#FF6347', '#20B2AA']
     var customColors = {
@@ -52,22 +96,24 @@
     function showNearbyVehicles() {
         if (!userLocation) return
 
-        var nearbyVehicles = []
+        var loc = userLocation
+        var nearbyVehicles: {distance: number, agency: string, route: string, lineName: string, destination: string, vehicleRef: string}[] = []
         var maxDistance = 1.5 // 1.5 mile radius
 
         // Search through all agencies and their vehicles
         agencyIds.forEach(agency => {
-            var aObj = agencies[agency.Id]
+            var aObj = agencies[agency.Id] as AgencyObj | undefined
             if (!aObj || !aObj.vehicles || !aObj.vehicles.data) return
 
+            var aName = aObj.name
             aObj.vehicles.data.forEach(vehicle => {
                 var vehicleActivity = vehicle.MonitoredVehicleJourney
                 if (!vehicleActivity || !vehicleActivity.VehicleLocation) return
 
                 var vehicleLoc = vehicleActivity.VehicleLocation
                 var distance = calculateDistance(
-                    userLocation.lat,
-                    userLocation.lng,
+                    loc.lat,
+                    loc.lng,
                     vehicleLoc.Latitude,
                     vehicleLoc.Longitude
                 )
@@ -75,7 +121,7 @@
                 if (distance <= maxDistance) {
                     nearbyVehicles.push({
                         distance: distance,
-                        agency: aObj.name,
+                        agency: aName,
                         route: vehicleActivity.LineRef,
                         lineName: vehicleActivity.PublishedLineName || vehicleActivity.LineRef,
                         destination: vehicleActivity.DestinationName || 'Unknown',
@@ -111,7 +157,7 @@
         if (currentPopup) {
             currentPopup.remove()
         }
-        currentPopup = L.popup()
+        currentPopup = window.L.popup()
             .setLatLng([userLocation.lat, userLocation.lng])
             .setContent(content)
             .openOn(map)
@@ -127,14 +173,20 @@
 
                 agencyIds.push(agency)
 
-                window.makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleData => {
-                    var vehicleData = vehicleData.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity
+                window.makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleResult => {
+                    var vehicleData = vehicleResult.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity
                     if (!vehicleData || typeof vehicleData !== 'object') vehicleData = []
 
                     var aName = agency.Name
                     switch (aName) {
-                        case 'VTA': aName = 'Valley Transportation Authority (VTA)'
-                        case 'AC TRANSIT': aName = 'AC Transit'
+                        case 'VTA': {
+                            aName = 'Valley Transportation Authority (VTA)'
+                            break
+                        }
+                        case 'AC TRANSIT': {
+                            aName = 'AC Transit'
+                            break
+                        }
                     }
 
                     var aObj = agencies[agency.Id]
@@ -152,14 +204,15 @@
                         aObj.vehicles.data = vehicleData
                     }
 
-                    var goodPins = []
+                    var goodPins: { name: string, content: VehicleMarker }[] = []
 
                     vehicleData.forEach(vehicle => {
                         var vehicleRef = vehicle.MonitoredVehicleJourney.VehicleRef
-                        if (aObj.vehicles.pins[vehicleRef]) {
+                        var existingPin = aObj.vehicles.pins[vehicleRef]
+                        if (existingPin) {
                             goodPins.push({
                                 name: vehicleRef,
-                                content: aObj.vehicles.pins[vehicleRef]
+                                content: existingPin
                             })
                         }
                     })
@@ -168,28 +221,27 @@
                         aObj.vehicles.pins[pin.name] = pin.content
                     })
 
-                    vehicleData.forEach((vehicle, vI: number) => {
+                    vehicleData.forEach((vehicle, _vI: number) => {
                         var vehicleActivity = vehicle.MonitoredVehicleJourney
                         vehicleActivity.agency = aName
                         vehicleActivity.aId = agency.Id
-                        vehicleActivity.i = vI
                         var vehicleRef = vehicleActivity.VehicleRef
                         var vehicleLocation = vehicleActivity.VehicleLocation
-                        var vehicleLatLng = [vehicleLocation.Latitude, vehicleLocation.Longitude]
+                        var vehicleLatLng: [number, number] = [vehicleLocation.Latitude, vehicleLocation.Longitude]
 
                         switch (vehicleActivity.OperatorRef) {
                             case 'SF':
                                 var publishedLineName = vehicleActivity.PublishedLineName
                                 if (publishedLineName) {
-                                    if (publishedLineName.includes(' ')) publishedLineName = publishedLineName.split(' ')
-                                    else publishedLineName = [publishedLineName]
+                                    var parts: string[]
+                                    if (publishedLineName.includes(' ')) parts = publishedLineName.split(' ')
+                                    else parts = [publishedLineName]
 
-                                    publishedLineName.forEach((p, i: number) => {
-                                        publishedLineName[i] = `${p[0]}${p.substring(1).toLowerCase()}`
+                                    parts.forEach((p, i: number) => {
+                                        parts[i] = `${p[0]}${p.substring(1).toLowerCase()}`
                                     })
 
-                                    publishedLineName = publishedLineName.join(' ')
-                                    vehicleActivity.PublishedLineName = publishedLineName
+                                    vehicleActivity.PublishedLineName = parts.join(' ')
                                 }
                         }
 
@@ -240,7 +292,7 @@
                             }
                             else {
                                 // Create custom DivIcon for vehicle marker
-                                var icon = L.divIcon({
+                                var icon = window.L.divIcon({
                                     html: `<div style="background-color: ${markerColor}; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;">${route}</div>`,
                                     className: 'vehicle-marker',
                                     iconSize: [width, 20],
@@ -248,14 +300,15 @@
                                 });
 
                                 vehicleActivity.infoboxOpen = false
-                                pin = L.marker(vehicleLatLng, { icon: icon });
-                                pin.metadata = vehicleActivity;
+                                var newPin = window.L.marker(vehicleLatLng, { icon: icon }) as VehicleMarker;
+                                newPin.metadata = vehicleActivity;
 
-                                pin.on('click', e => {
-                                    showVehicleInfo(e, pin);
+                                newPin.on('click', e => {
+                                    showVehicleInfo(e, newPin);
                                 });
 
-                                pin.addTo(map);
+                                newPin.addTo(map);
+                                pin = newPin;
                             }
                             aObj.vehicles.pins[vehicleRef] = pin
                         }
@@ -367,7 +420,7 @@
     }
 
 
-    function showVehicleInfo(_e, pin) {
+    function showVehicleInfo(_e: L.LeafletMouseEvent, pin: VehicleMarker) {
         //Make sure the marker has metadata to display.
         var data = pin.metadata
         if (data) {
@@ -377,7 +430,7 @@
             }
 
             data.LineName = data.PublishedLineName
-            if (data.PublishedLineName) {
+            if (data.LineName) {
                 if (data.LineName.includes('\\\\')) data.LineName = data.LineName.split('\\\\').join('/')
                 if (data.LineName.includes(' / ')) data.LineName = data.LineName.split(' / ').join('/')
                 if (data.LineName.includes('/')) data.LineName = data.LineName.split('/').join(' - ')
@@ -394,7 +447,7 @@
                 `Vehicle ID: ${data.VehicleRef ? data.VehicleRef : 'Unknown'}`
             ].join('<br>')
 
-            function buildPopupContent(stopsHtml) {
+            function buildPopupContent(stopsHtml: string) {
                 return `<div class="infobox">
                     <span class="title">${titleHtml}</span><span>${descriptionHtml}</span><ol class="stops">${stopsHtml}</ol>
                 </div>`
@@ -403,30 +456,28 @@
             if (currentPopup) {
                 currentPopup.remove()
             }
-            currentPopup = L.popup()
+            currentPopup = window.L.popup()
                 .setLatLng(pin.getLatLng())
                 .setContent(buildPopupContent('<li>Loading stops...</li>'))
                 .openOn(map)
 
             window.makeRequest('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
-                var journeyPatterns = res.journeyPatterns
-                var pattern = null
+                var typedRes = res as { journeyPatterns?: JourneyPattern[] }
+                var journeyPatterns = typedRes.journeyPatterns
+                var pattern: JourneyPattern | null = null
                 if (journeyPatterns) {
                     var filtered = journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
                     if (filtered.length > 0) pattern = filtered[0]
                 }
 
-                var TimingPointInJourneyPattern = []
+                var TimingPointInJourneyPattern: TimingPoint[] = []
                 if (pattern && pattern.PointsInSequence && pattern.PointsInSequence.TimingPointInJourneyPattern) {
                     TimingPointInJourneyPattern = [...pattern.PointsInSequence.TimingPointInJourneyPattern]
                 }
 
-                var hasMCall = data.MonitoredCall ? true : false
-                var hasCalls = data.OnwardCalls ? (data.OnwardCalls.OnwardCall ? (data.OnwardCalls.OnwardCall.length > 0 ? true : false) : false) : false
-
-                var stops = []
-                if (hasMCall) stops.push(data.MonitoredCall)
-                if (hasCalls) {
+                var stops: StopCall[] = []
+                if (data.MonitoredCall) stops.push(data.MonitoredCall)
+                if (data.OnwardCalls && data.OnwardCalls.OnwardCall && data.OnwardCalls.OnwardCall.length > 0) {
                     data.OnwardCalls.OnwardCall.forEach(stop => {
                         stops.push(stop)
                     })
@@ -449,18 +500,18 @@
                 stops.forEach(stop => {
                     var eDate = new Date(stop.ExpectedArrivalTime)
                     var aDate = new Date(stop.AimedArrivalTime)
-                    var eTime = eDate.getHours()*60*60 + eDate.getMinutes()*60 + eDate.getSeconds()
-                    var aTime = aDate.getHours()*60*60 + aDate.getMinutes()*60 + aDate.getSeconds()
+                    var eTime = eDate.getTime()
+                    var aTime = aDate.getTime()
 
-                    var stopTime = `${eDate.getHours()}:${eDate.getMinutes().toString().padStart(2, '0')}`
+                    var stopTime = `${eDate.getHours().toString().padStart(2, '0')}:${eDate.getMinutes().toString().padStart(2, '0')}`
 
                     var isLate = eTime > aTime
                     var isEarly = eTime < aTime
                     var isOnTime = eTime === aTime
 
                     var earlyLateText = ''
-                    if (isLate) earlyLateText = `${Math.ceil((eTime-aTime)/60)} Minutes Late`
-                    if (isEarly) earlyLateText = `${Math.ceil((aTime-eTime)/60)} Minutes Early`
+                    if (isLate) earlyLateText = `${Math.ceil((eTime-aTime)/60000)} Minutes Late`
+                    if (isEarly) earlyLateText = `${Math.ceil((aTime-eTime)/60000)} Minutes Early`
                     if (isOnTime) earlyLateText = 'On Time'
 
                     var color = isLate ? 'red' : (isEarly ? 'green' : (isOnTime ? 'blue' : 'black'))
