@@ -1,24 +1,23 @@
 <script>
     var nGroup = document.querySelector('.notifications')
 
-    function getNotifications(_module, _title, _description, _content, _attatchmentInfo) {
+    function getNotifications(_module: unknown, _title: unknown, _description: unknown, _content: unknown, _attatchmentInfo: unknown) {
         var notificationList = localStorage.getItem('notifications')
-        if (!!notificationList === false) notificationList = []
-        notificationList = JSON.parse(notificationList)
+        var notificationObject = JSON.parse(notificationList || '')
 
-        notificationList.forEach(name => {
+        notificationObject?.forEach((name: number) => {
             // var notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
-            addNotification(notificationList[name])
-            notificationList.shift()
+            addNotification(notificationObject[name])
+            notificationObject?.shift()
             localStorage.removeItem(`NOTIFICATIONS://${name}`)
         })
 
-        notificationList = JSON.stringify(notificationList)
+        notificationList = JSON.stringify(notificationObject)
         localStorage.setItem('notifications', notificationList)
     }
     window.getNotifications = getNotifications
 
-    function addNotification(notification) {
+    function addNotification(notification: { icon: string, title: string, content: string }) {
         var nIcon = notification.icon
         var nTitle = notification.title
         var nContent = notification.content
@@ -34,11 +33,11 @@
         nEleContent.textContent = nTitle
         nEle.appendChild(nEleContent)
 
-        nGroup.appendChild(nEle)
+        nGroup?.appendChild(nEle)
 
         nEle.onclick = _e => {
             if (!!nContent) {
-                showModal(nTitle, nContent)
+                window.showModal(nTitle, nContent)
             }
         }
     }

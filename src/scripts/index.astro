@@ -2,11 +2,16 @@
     window.addEventListener('DOMContentLoaded', _e => {
         var title = document.title
         if (title.includes(' | ')) {
-            title = title.split(' | ')
-            title.pop()
-            title = title.join(' | ')
+            var splitTitle = []
+            splitTitle = title.split(' | ')
+            splitTitle.pop()
+            title = splitTitle.join(' | ')
         }
-        document.querySelector('.header > .title').textContent = title
+
+        const titleEl = document.querySelector('.header > .title')
+        if (titleEl) {
+            titleEl.textContent = title
+        }
 
         if (!location.pathname.startsWith('/login')) {
             document.querySelectorAll('.nav').forEach(n => {
@@ -16,17 +21,18 @@
 
         document.querySelectorAll('.input-parent, .textarea-parent, .select-parent').forEach(e => {
             var classes = e.className
-            if (classes.includes(' ')) classes = classes.split(' ')
-            else classes = [classes]
+            var splitClasses = []
+            if (classes.includes(' ')) splitClasses = classes.split(' ')
+            else splitClasses = [classes]
 
             var element = ''
-            classes.forEach(c => {
+            splitClasses.forEach(c => {
                 if (c.endsWith('-parent')) element = c.slice(0, -7)
             })
 
-            checkIfValue(e.querySelector(element))
-            e.onkeyup = event => {
-                checkIfValue(event.target)
+            checkIfValue(e.querySelector(element) || document.documentElement);
+            (e as HTMLInputElement).onkeyup = event => {
+                checkIfValue((event.target as HTMLElement) || document.documentElement)
             }
         })
 
@@ -36,10 +42,10 @@
     checkHFHeight()
     function checkHFHeight() {
         if (document.querySelector('.header')) {
-            document.documentElement.style.setProperty('--h-height', `${document.querySelector('.header').clientHeight}px`)
+            document.documentElement.style.setProperty('--h-height', `${document.querySelector('.header')?.clientHeight}px`)
         }
         if (document.querySelector('.footer')) {
-            document.documentElement.style.setProperty('--f-height', `${document.querySelector('.footer').clientHeight}px`)
+            document.documentElement.style.setProperty('--f-height', `${document.querySelector('.footer')?.clientHeight}px`)
         }
         if ((!document.querySelector('.header') || !document.querySelector('.footer')) && cI < 5) {
             setTimeout(checkHFHeight, 5000)
@@ -48,17 +54,17 @@
     }
     window.addEventListener('resize', checkHFHeight)
 
-    function checkIfValue(element) {
-        if (element.value) element.parentNode.setAttribute('open', '')
-        else element.parentNode.removeAttribute('open')
+    function checkIfValue(element: HTMLElement) {
+        if ((element as HTMLInputElement).value) (element.parentNode as HTMLElement)?.setAttribute('open', '')
+        else (element.parentNode as HTMLElement)?.removeAttribute('open')
     }
 
-    function goToPage(name) {
+    function goToPage(name: string) {
         location.href = `/${name}`
     }
     window.goToPage = goToPage
 
-    function assertError(err, name) {
+    function assertError(err: unknown, name: string) {
         var aErr = `${name} Error: ${err}`
         var cErr = `Error with ${name}: ${err}`
         alert(aErr)
