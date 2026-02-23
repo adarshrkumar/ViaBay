@@ -547,9 +547,11 @@ function showRoutePath(aId, rId) {
     // This would require using a routing service or drawing polylines
     console.log('Route path display not yet implemented with Leaflet');
 }
+window.showRoutePath = showRoutePath
 
 function findUsingValueofKey(arr, key, val) {
     var res = arr.filter(item => item[key] === val)
     return res
 }
+window.findUsingValueofKey = findUsingValueofKey
 </script>

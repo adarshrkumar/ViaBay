@@ -56,6 +56,7 @@
     function goToPage(name) {
         location.href = `/${name}`
     }
+    window.goToPage = goToPage
 
     function assertError(err, name) {
         var aErr = `${name} Error: ${err}`
@@ -63,4 +64,5 @@
         alert(aErr)
         console.error(cErr)
     }
+    window.assertError = assertError
 </script>

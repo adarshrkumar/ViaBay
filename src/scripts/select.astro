@@ -7,12 +7,14 @@
         e.classList.add('open')
         e.setAttribute('onclick', 'closeSelection(this)')
     }
+    window.openSelection = openSelection
 
     function closeSelection(e) {
         while (!e.className.includes('select') ) e = e.parentNode
         e.classList.remove('open')
         e.setAttribute('onclick', 'openSelection(this)')
     }
+    window.closeSelection = closeSelection
 
     if (!!document.querySelector('.select')) {
         document.querySelectorAll('select-option').forEach((o, i) => {

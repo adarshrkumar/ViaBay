@@ -1,266 +1,267 @@
 <script is:inline>
-var map = null
-var onMapLoad = null
-var routingControl = null
+    var map = null
+    var onMapLoad = null
+    var routingControl = null
 
-function assertError(err, name) {
-    err = `${name} Error: ${err}`
-    alert(err)
-    console.error(err)
-}
-
-GetMap()
-function GetMap() {
-    if (document.getElementById('myMap') && typeof L !== 'undefined') {
-        // Default location (Bay Area)
-        var defaultLocation = [37.7749, -122.4194];
-        var initialZoom = 10;
-        var mapCenter = defaultLocation;
-
-        // Request user's location first
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    // Got user location, use it
-                    mapCenter = [position.coords.latitude, position.coords.longitude];
-                    initialZoom = 12;
-                    initializeMap();
-                },
-                error => {
-                    console.warn('Geolocation error:', error.message);
-                    // Geolocation failed, use default location
-                    initializeMap();
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0
-                }
-            );
-        } else {
-            console.warn('Geolocation is not supported by this browser');
-            // Geolocation not supported, use default location
-            initializeMap();
-        }
-
-        function initializeMap() {
-            // Initialize Leaflet map
-            map = L.map('myMap').setView(mapCenter, initialZoom);
-
-            // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
-            L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
-                attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
-                maxZoom: 19
-            }).addTo(map);
-
-            if (onMapLoad) onMapLoad(map)
-        }
+    function assertError(err, name) {
+        err = `${name} Error: ${err}`
+        alert(err)
+        console.error(err)
     }
-    else {
-        window.addEventListener('DOMContentLoaded', GetMap)
-    }
-}
+    window.assertError = assertError
 
-var stopsArea = document.querySelector('.stops-area')
-var stops = stopsArea.querySelector('.stops')
-var closeButtons = document.querySelectorAll('.close')
-var goBtn = document.querySelector('.calc-route')
+    GetMap()
+    function GetMap() {
+        if (document.getElementById('myMap') && typeof L !== 'undefined') {
+            // Default location (Bay Area)
+            var defaultLocation = [37.7749, -122.4194];
+            var initialZoom = 10;
+            var mapCenter = defaultLocation;
 
-var directionsElement = document.querySelector('#directions')
-
-async function geocodeAddress(address) {
-    // Use Nominatim (OpenStreetMap) geocoding service
-    var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-    try {
-        var response = await fetch(url);
-        var data = await response.json();
-        if (data && data.length > 0) {
-            return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-        }
-    } catch (error) {
-        console.error('Geocoding error:', error);
-    }
-    return null;
-}
-
-async function addDirections(e) {
-    var places = []
-
-    stops.querySelectorAll('.stop').forEach(s => {
-        if (s.getAttribute('final-value')) {
-            places.push(s.getAttribute('final-value'))
-        }
-    })
-
-    if (places.length < 2) {
-        alert('Please add at least 2 stops');
-        return;
-    }
-
-    // Remove existing routing control if any
-    if (routingControl) {
-        map.removeControl(routingControl);
-    }
-
-    // Geocode all places
-    var waypoints = [];
-    for (var i = 0; i < places.length; i++) {
-        var coords = await geocodeAddress(places[i]);
-        if (coords) {
-            waypoints.push(L.latLng(coords.lat, coords.lng));
-        } else {
-            alert('Could not geocode: ' + places[i]);
-            return;
-        }
-    }
-
-    // Create routing control with waypoints
-    if (typeof L.Routing !== 'undefined') {
-        routingControl = L.Routing.control({
-            waypoints: waypoints,
-            routeWhileDragging: false,
-            showAlternatives: false,
-            fitSelectedRoutes: true,
-            lineOptions: {
-                styles: [{color: '#6FA1EC', weight: 4}]
+            // Request user's location first
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        // Got user location, use it
+                        mapCenter = [position.coords.latitude, position.coords.longitude];
+                        initialZoom = 12;
+                        initializeMap();
+                    },
+                    error => {
+                        console.warn('Geolocation error:', error.message);
+                        // Geolocation failed, use default location
+                        initializeMap();
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                console.warn('Geolocation is not supported by this browser');
+                // Geolocation not supported, use default location
+                initializeMap();
             }
-        }).addTo(map);
 
-        // Display route in the directions element
-        routingControl.on('routesfound', e => {
-            var routes = e.routes;
-            var summary = routes[0].summary;
-            directionsElement.innerHTML = '<div class="route-summary">' +
-                '<h3>Route Summary</h3>' +
-                '<p>Total Distance: ' + (summary.totalDistance / 1609.34).toFixed(2) + ' miles</p>' +
-                '<p>Estimated Time: ' + Math.round(summary.totalTime / 60) + ' minutes</p>' +
-                '</div>';
-        });
-    } else {
-        alert('Routing library not loaded. Please refresh the page.');
-    }
-}
+            function initializeMap() {
+                // Initialize Leaflet map
+                map = L.map('myMap').setView(mapCenter, initialZoom);
 
-document.querySelector('.add-stop').addEventListener('click', _e => {
-    var stopsAmt = stops.querySelectorAll('.stop').length
+                // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
+                L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
+                    attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
+                    maxZoom: 19
+                }).addTo(map);
 
-    var stopContainer = document.createElement('div')
-    stopContainer.classList.add('stop-container')
-
-    var stopParent = document.createElement('div')
-    stopParent.classList.add('stop-parent')
-
-    var stop = document.createElement('input')
-    stop.classList.add('stop')
-    stop.placeholder = `Stop #${stopsAmt+1}`
-    stop.title = `Stop #${stopsAmt+1}`
-    stop.addEventListener('keypress', e => {
-        stopChange(e, stopsAmt-1)
-    })
-    stopParent.appendChild(stop)
-
-    var closeButton = document.createElement('button')
-    closeButton.classList.add('close')
-    closeButton.classList.add('removeStyles')
-    closeButton.onclick = e => {
-        onCloseClick(e, stopsAmt-1)
+                if (onMapLoad) onMapLoad(map)
+            }
+        }
+        else {
+            window.addEventListener('DOMContentLoaded', GetMap)
+        }
     }
 
-    var closeIcon = document.createElement('svg')
-    closeIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    closeIcon.setAttribute('viewBox', '0 -960 960 960')
+    var stopsArea = document.querySelector('.stops-area')
+    var stops = stopsArea.querySelector('.stops')
+    var closeButtons = document.querySelectorAll('.close')
+    var goBtn = document.querySelector('.calc-route')
 
-    var closePath = document.createElement('path')
-    closePath.setAttribute('d', 'm256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z')
-    closeIcon.appendChild(closePath)
+    var directionsElement = document.querySelector('#directions')
 
-    closeButton.appendChild(closeIcon)
-
-    stopParent.appendChild(closeButton)
-    stopContainer.appendChild(stopParent)
-
-    var options = document.createElement('div')
-    options.classList.add('options')
-    stopContainer.appendChild(options)
-
-    stops.appendChild(stopContainer)
-})
-
-closeButtons.forEach(b => {
-    b.onclick = e => onCloseClick(e)
-})
-
-function onCloseClick(e) {
-    e.target.parentNode.parentNode.parentNode.remove();
-    reorderStops()
-}
-
-function reorderStops() {
-    stops.querySelectorAll('.stop').forEach((s, i) => {
-        s.placeholder = `Stop #${i+1}`
-    })
-}
-
-stops.querySelectorAll('.stop').forEach((s, i) => {
-    s.onchange = e => {
-        stopChange(e, i)
-    }
-})
-
-async function stopChange(e, i) {
-    var finalValue = e.target.getAttribute('final-value')
-    var searchText = e.target.value
-
-    var optionsEle = stops.querySelectorAll('.options')[i]
-
-    optionsEle.querySelectorAll('.option').forEach(o => {
-        o.remove()
-    })
-
-    if (finalValue !== searchText && searchText.length > 2) {
-        // Use Nominatim geocoding service for search
-        var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}&limit=5`;
-
+    async function geocodeAddress(address) {
+        // Use Nominatim (OpenStreetMap) geocoding service
+        var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
         try {
             var response = await fetch(url);
-            var results = await response.json();
-
-            results.forEach(r => {
-                createOption(r.display_name, i, optionsEle);
-            });
-
-            function createOption(content, i, optionsEle, lastLoc=false) {
-                var aEle = document.createElement('button')
-                aEle.classList.add('option')
-                aEle.classList.add('removeStyles')
-                aEle.textContent = content
-                if (lastLoc) {
-                    aEle.classList.add('lastLoc')
-                    aEle.disabled = true
-                }
-                else {
-                    aEle.onclick = e => selectOption(e, i)
-                }
-                optionsEle.appendChild(aEle)
+            var data = await response.json();
+            if (data && data.length > 0) {
+                return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
             }
         } catch (error) {
-            console.error('Geocoding search error:', error);
+            console.error('Geocoding error:', error);
+        }
+        return null;
+    }
+
+    async function addDirections(e) {
+        var places = []
+
+        stops.querySelectorAll('.stop').forEach(s => {
+            if (s.getAttribute('final-value')) {
+                places.push(s.getAttribute('final-value'))
+            }
+        })
+
+        if (places.length < 2) {
+            alert('Please add at least 2 stops');
+            return;
+        }
+
+        // Remove existing routing control if any
+        if (routingControl) {
+            map.removeControl(routingControl);
+        }
+
+        // Geocode all places
+        var waypoints = [];
+        for (var i = 0; i < places.length; i++) {
+            var coords = await geocodeAddress(places[i]);
+            if (coords) {
+                waypoints.push(L.latLng(coords.lat, coords.lng));
+            } else {
+                alert('Could not geocode: ' + places[i]);
+                return;
+            }
+        }
+
+        // Create routing control with waypoints
+        if (typeof L.Routing !== 'undefined') {
+            routingControl = L.Routing.control({
+                waypoints: waypoints,
+                routeWhileDragging: false,
+                showAlternatives: false,
+                fitSelectedRoutes: true,
+                lineOptions: {
+                    styles: [{color: '#6FA1EC', weight: 4}]
+                }
+            }).addTo(map);
+
+            // Display route in the directions element
+            routingControl.on('routesfound', e => {
+                var routes = e.routes;
+                var summary = routes[0].summary;
+                directionsElement.innerHTML = '<div class="route-summary">' +
+                    '<h3>Route Summary</h3>' +
+                    '<p>Total Distance: ' + (summary.totalDistance / 1609.34).toFixed(2) + ' miles</p>' +
+                    '<p>Estimated Time: ' + Math.round(summary.totalTime / 60) + ' minutes</p>' +
+                    '</div>';
+            });
+        } else {
+            alert('Routing library not loaded. Please refresh the page.');
         }
     }
-}
 
-function selectOption(e, i) {
-    var place = e.target.textContent
-    var optionsEle = stops.querySelectorAll('.options')[i]
+    document.querySelector('.add-stop').addEventListener('click', _e => {
+        var stopsAmt = stops.querySelectorAll('.stop').length
 
-    optionsEle.querySelectorAll('.option').forEach(o => {
-        o.remove()
+        var stopContainer = document.createElement('div')
+        stopContainer.classList.add('stop-container')
+
+        var stopParent = document.createElement('div')
+        stopParent.classList.add('stop-parent')
+
+        var stop = document.createElement('input')
+        stop.classList.add('stop')
+        stop.placeholder = `Stop #${stopsAmt+1}`
+        stop.title = `Stop #${stopsAmt+1}`
+        stop.addEventListener('keypress', e => {
+            stopChange(e, stopsAmt-1)
+        })
+        stopParent.appendChild(stop)
+
+        var closeButton = document.createElement('button')
+        closeButton.classList.add('close')
+        closeButton.classList.add('removeStyles')
+        closeButton.onclick = e => {
+            onCloseClick(e, stopsAmt-1)
+        }
+
+        var closeIcon = document.createElement('svg')
+        closeIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        closeIcon.setAttribute('viewBox', '0 -960 960 960')
+
+        var closePath = document.createElement('path')
+        closePath.setAttribute('d', 'm256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z')
+        closeIcon.appendChild(closePath)
+
+        closeButton.appendChild(closeIcon)
+
+        stopParent.appendChild(closeButton)
+        stopContainer.appendChild(stopParent)
+
+        var options = document.createElement('div')
+        options.classList.add('options')
+        stopContainer.appendChild(options)
+
+        stops.appendChild(stopContainer)
     })
 
-    var stop = stops.querySelectorAll('.stop')[i]
-    stop.setAttribute('final-value', place)
-    stop.value = place
-}
+    closeButtons.forEach(b => {
+        b.onclick = e => onCloseClick(e)
+    })
 
-goBtn.addEventListener('click', addDirections)
+    function onCloseClick(e) {
+        e.target.parentNode.parentNode.parentNode.remove();
+        reorderStops()
+    }
+
+    function reorderStops() {
+        stops.querySelectorAll('.stop').forEach((s, i) => {
+            s.placeholder = `Stop #${i+1}`
+        })
+    }
+
+    stops.querySelectorAll('.stop').forEach((s, i) => {
+        s.onchange = e => {
+            stopChange(e, i)
+        }
+    })
+
+    async function stopChange(e, i) {
+        var finalValue = e.target.getAttribute('final-value')
+        var searchText = e.target.value
+
+        var optionsEle = stops.querySelectorAll('.options')[i]
+
+        optionsEle.querySelectorAll('.option').forEach(o => {
+            o.remove()
+        })
+
+        if (finalValue !== searchText && searchText.length > 2) {
+            // Use Nominatim geocoding service for search
+            var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}&limit=5`;
+
+            try {
+                var response = await fetch(url);
+                var results = await response.json();
+
+                results.forEach(r => {
+                    createOption(r.display_name, i, optionsEle);
+                });
+
+                function createOption(content, i, optionsEle, lastLoc=false) {
+                    var aEle = document.createElement('button')
+                    aEle.classList.add('option')
+                    aEle.classList.add('removeStyles')
+                    aEle.textContent = content
+                    if (lastLoc) {
+                        aEle.classList.add('lastLoc')
+                        aEle.disabled = true
+                    }
+                    else {
+                        aEle.onclick = e => selectOption(e, i)
+                    }
+                    optionsEle.appendChild(aEle)
+                }
+            } catch (error) {
+                console.error('Geocoding search error:', error);
+            }
+        }
+    }
+
+    function selectOption(e, i) {
+        var place = e.target.textContent
+        var optionsEle = stops.querySelectorAll('.options')[i]
+
+        optionsEle.querySelectorAll('.option').forEach(o => {
+            o.remove()
+        })
+
+        var stop = stops.querySelectorAll('.stop')[i]
+        stop.setAttribute('final-value', place)
+        stop.value = place
+    }
+
+    goBtn.addEventListener('click', addDirections)
 </script>

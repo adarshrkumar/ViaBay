@@ -5,6 +5,7 @@
         let expires = "expires="+ d.toUTCString();
         document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
+    window.setCookie = setCookie
 
     function getCookie(cname) {
         let name = cname + "=";
@@ -21,4 +22,5 @@
         })
         return rValue;
     }
+    window.getCookie = getCookie
 </script>

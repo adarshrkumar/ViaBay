@@ -1,30 +1,31 @@
 <script is:inline>
-var modal = document.querySelector('.modal')
+    var modal = document.querySelector('.modal')
 
-function showModal(title, content) {
-    modal.querySelector('.title').textContent = title
-    modal.querySelector('.message').innerHTML = content
-    modal.showModal();
-}
-
-modal.addEventListener('click', e => {
-    var isOutside = checkIfOuterModal(e)
-    if (isOutside) {
-        modal.close()
+    function showModal(title, content) {
+        modal.querySelector('.title').textContent = title
+        modal.querySelector('.message').innerHTML = content
+        modal.showModal();
     }
-})
-modal.querySelector('.btn').addEventListener('click', _e => {
-    modal.close()
-})
+    window.showModal = showModal
 
-function checkIfOuterModal(e) {
-    const dimensions = modal.getBoundingClientRect()
-    if (
-        e.clientX < dimensions.left ||
-        e.clientX > dimensions.right ||
-        e.clientY < dimensions.top ||
-        e.clientY > dimensions.bottom
-    ) return true
-    else return false
-}
+    modal.addEventListener('click', e => {
+        var isOutside = checkIfOuterModal(e)
+        if (isOutside) {
+            modal.close()
+        }
+    })
+    modal.querySelector('.btn').addEventListener('click', _e => {
+        modal.close()
+    })
+
+    function checkIfOuterModal(e) {
+        const dimensions = modal.getBoundingClientRect()
+        if (
+            e.clientX < dimensions.left ||
+            e.clientX > dimensions.right ||
+            e.clientY < dimensions.top ||
+            e.clientY > dimensions.bottom
+        ) return true
+        else return false
+    }
 </script>

@@ -1,45 +1,45 @@
 <script is:inline>
-var nGroup = document.querySelector('.notifications')
+    var nGroup = document.querySelector('.notifications')
 
+    function getNotifications(_module, _title, _description, _content, _attatchmentInfo) {
+        var notificationList = localStorage.getItem('notifications')
+        if (!!notificationList === false) notificationList = []
+        notificationList = JSON.parse(notificationList)
 
-function getNotifications(_module, _title, _description, _content, _attatchmentInfo) {
-    var notificationList = localStorage.getItem('notifications')
-    if (!!notificationList === false) notificationList = []
-    notificationList = JSON.parse(notificationList)
+        notificationList.forEach(name => {
+            var _notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
+            addNotification(notificationList[name])
+            notificationList.shift()
+            localStorage.removeItem(`NOTIFICATIONS://${name}`)
+        })
 
-    notificationList.forEach(name => {
-        var _notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
-        addNotification(notificationList[name])
-        notificationList.shift()
-        localStorage.removeItem(`NOTIFICATIONS://${name}`)
-    })
+        notificationList = JSON.stringify(notificationList)
+        localStorage.setItem('notifications', notificationList)
+    }
+    window.getNotifications = getNotifications
 
-    notificationList = JSON.stringify(notificationList)
-    localStorage.setItem('notifications', notificationList)
-}
+    function addNotification(notification) {
+        var nIcon = notification.icon
+        var nTitle = notification.title
+        var nContent = notification.content
 
-function addNotification(notification) {
-    var nIcon = notification.icon
-    var nTitle = notification.title
-    var nContent = notification.content
+        var nEle = document.createElement('item')
 
-    var nEle = document.createElement('item')
+        var nEleIcon = document.createElement('img')
+        nEleIcon.classList.add('icon')
+        nEleIcon.src = `/icons/${nIcon}.svg`
+        nEle.appendChild(nEleIcon)
 
-    var nEleIcon = document.createElement('img')
-    nEleIcon.classList.add('icon')
-    nEleIcon.src = `/icons/${nIcon}.svg`
-    nEle.appendChild(nEleIcon)
+        var nEleContent = document.createElement('item-content')
+        nEleContent.textContent = nTitle
+        nEle.appendChild(nEleContent)
 
-    var nEleContent = document.createElement('item-content')
-    nEleContent.textContent = nTitle
-    nEle.appendChild(nEleContent)
+        nGroup.appendChild(nEle)
 
-    nGroup.appendChild(nEle)
-
-    nEle.onclick = _e => {
-        if (!!nContent) {
-            showModal(nTitle, nContent)
+        nEle.onclick = _e => {
+            if (!!nContent) {
+                showModal(nTitle, nContent)
+            }
         }
     }
-}
 </script>

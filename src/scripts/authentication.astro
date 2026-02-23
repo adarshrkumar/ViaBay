@@ -16,6 +16,7 @@
         if (u && p) return true
         return false
     }
+    window.checkAuthentication = checkAuthentication
 
     function setCredentials(username, password, dest) {
         authentication = JSON.stringify({
@@ -25,4 +26,5 @@
         localStorage.setItem('auth', authentication)
         location.href = dest
     }
+    window.setCredentials = setCredentials
 </script>

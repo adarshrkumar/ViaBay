@@ -12,6 +12,7 @@
         notificationList = JSON.stringify(notificationList)
         localStorage.setItem('notifications', notificationList)
     }
+    window.addNotification = addNotification
 
     function packageNotification(module, name, icon, content, attatchmentInfo) {
         var res = {}
