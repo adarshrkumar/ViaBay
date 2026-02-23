@@ -48,6 +48,7 @@ npm run preview
 ### Key Technical Components
 
 **511.org API Integration** - Two-tier architecture:
+
 - **Server-side** (`src/pages/api/511.ts`):
   - Vercel serverless API route with `prerender: false`
   - 9 API keys with automatic rotation and rate limit handling
@@ -61,6 +62,7 @@ npm run preview
   - Endpoints used: `gtfsoperators`, `VehicleMonitoring`
 
 **Map System** (Leaflet-based):
+
 - **Leaflet** Maps integration (v1.9.4) with routing plugin
 - CDN-loaded scripts in Layout.astro (unpkg.com)
 - Real-time vehicle tracking with markers and popups
@@ -68,16 +70,19 @@ npm run preview
 - Leaflet Routing Machine for directions functionality
 
 **Transit Fare Data** (`public/data/price.json`):
+
 - Structured by agency ID with route-specific or zone-based pricing
 - Format: `{agency: {id, name, routes: {route: price} OR zones: {zone: price}}}`
 
 **Script Loading Pattern** (`src/layouts/Layout.astro`):
+
 - **Main scripts** auto-loaded on every page: `cookies`, `index`, `authentication`, `511Request`, `notificationManager`, `settings`
 - Loaded as `.astro` components from `src/scripts/` (not `public/scripts/`)
 - All scripts use `is:inline` attribute to prevent Astro processing
 - Page-specific scripts via `scripts` prop: `[{name: 'tracker', location: 'head'|undefined}]`
 
 **Settings System** (`public/scripts/settings.js`):
+
 - LocalStorage-based with key `'settings'`
 - Current features: theme switching (system/light/dark)
 - Pattern: `setSetting(name, value, type, key)` + `applySettings()`
@@ -132,5 +137,6 @@ npm run preview
 - **prettier-plugin-astro** ^0.12.0 - Code formatting
 
 External APIs:
+
 - 511.org Transit API (Bay Area transit data)
 - Bing Maps API (mapping and directions)
