@@ -3,7 +3,8 @@
     "allow": [
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
-      "Bash(cd \"H:\\\\Code\\\\GitHub\\\\TransTrack\" && npx astro check 2>&1)"
+      "Bash(cd \"H:\\\\Code\\\\GitHub\\\\TransTrack\" && npx astro check 2>&1)",
+      "Bash(cd \"H:\\\\Code\\\\GitHub\\\\TransTrack\" && npm i @astrojs/check typescript 2>&1)"
     ],
     "deny": [],
     "ask": []
