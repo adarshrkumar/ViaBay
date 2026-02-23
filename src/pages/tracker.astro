@@ -6,9 +6,6 @@ import TrackerScript from '../scripts/tracker.astro'
 
 var classItems = ['full']
 
-if (process.env.NODE_ENV !== 'development' && process.env.VERCEL_ENV !== 'development') {
-    return Astro.redirect('/landing')
-}
 ---
 <Layout title="Map / Live Tracker" classItems={classItems}>
     <div id="myMap">
