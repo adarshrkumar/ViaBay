@@ -7,7 +7,7 @@ import type CookiesScript from '../scripts/cookies.astro'
 
 type ScriptFactory = typeof CookiesScript
 
-var mainScriptNames = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
+var mainScriptNames = ['cookies', 'index', 'authentication', '511-request', 'notification-manager', 'settings']
 var mainScripts = await Promise.all(
     mainScriptNames.map(async n => ((await import(`../scripts/${n}.astro`)) as { default: ScriptFactory }).default)
 )

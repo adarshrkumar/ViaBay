@@ -1,4 +1,4 @@
-<script is:inline>
+<script>
     var authentication = localStorage.getItem('auth')
 
     authentication = authentication ? JSON.parse(authentication) : {}
@@ -12,13 +12,13 @@
     // if (!isAuthenticated && !pathname.startsWith('/login')) location.href = '/login'
     // /* else */if (/* isAuthenticated && */pathname === '/') location.href = '/tracker'
 
-    function checkAuthentication(u, p) {
+    function checkAuthentication(u: string, p: string) {
         if (u && p) return true
         return false
     }
     window.checkAuthentication = checkAuthentication
 
-    function setCredentials(username, password, dest) {
+    function setCredentials(username: string, password: string, dest: string) {
         authentication = JSON.stringify({
             username: username,
             password: btoa(password),

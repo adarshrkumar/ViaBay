@@ -1,21 +1,19 @@
-<script is:inline>
-    function addNotification(module, name, icon, content, attatchmentInfo) {
-        var notificationList = localStorage.getItem('notifications')
-        if (!!notificationList === false) notificationList = '[]'
-        notificationList = JSON.parse(notificationList)
+<script>
+    function addNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: unknown) {
+        var notificationList = localStorage.getItem('notifications') ?? '[]'
+        var notificationArray: string[] = JSON.parse(notificationList)
 
         var notificationPackage = packageNotification(module, name, icon, content, attatchmentInfo)
 
         localStorage.setItem(`NOTIFICATIONS://${module}|${name}`, JSON.stringify(notificationPackage))
 
-        notificationList.push(`${module}|${name}`)
-        notificationList = JSON.stringify(notificationList)
-        localStorage.setItem('notifications', notificationList)
+        notificationArray.push(`${module}|${name}`)
+        localStorage.setItem('notifications', JSON.stringify(notificationArray))
     }
     window.addNotification = addNotification
 
-    function packageNotification(module, name, icon, content, attatchmentInfo) {
-        var res = {}
+    function packageNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: unknown) {
+        var res: Record<string, unknown> = {}
 
         if (module) res.module = module
         if (name) res.name = name

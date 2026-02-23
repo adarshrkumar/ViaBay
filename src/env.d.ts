@@ -19,4 +19,5 @@ interface Window {
     allPins: unknown[]
     directionsElement: Element | null
     directionsManager: boolean
+    login: () => void
 }

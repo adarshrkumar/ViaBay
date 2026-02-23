@@ -22,6 +22,9 @@ npm run build
 
 # Preview production build locally
 npm run preview
+
+# Type-check all Astro and TypeScript files
+npx astro check
 ```
 
 ## Architecture
@@ -30,17 +33,20 @@ npm run preview
 
 - **Astro 5.x** with **Vercel adapter** - SSR-enabled with server API routes
 - **Pages**: `src/pages/*.astro` - File-based routing
-- **API Routes**: `src/pages/api/*.ts` - Server-side endpoints (SSR, `prerender: false`)
+- **API Routes**: `src/pages/api/*.ts` - Server-side endpoints (`prerender: false`)
 - **Layout**: `src/layouts/Layout.astro` - Single shared layout component
 - **Styling**: SCSS in `src/styles/` with `globals.scss` as the base
-- **Client Scripts**: `.astro` script components in `src/scripts/` (inline scripts)
+- **Client Scripts**: `src/scripts/*.astro` - All `<script is:inline>` components
+- **Type declarations**: `src/env.d.ts` - Global `Window` interface augmentations
 - **Deployment**: Configured for Vercel (`output: 'server'` in `astro.config.mjs`)
 
 ### Application Flow
 
 1. **Landing/Login**: `/` redirects to `/tracker`, which redirects to `/landing`
+
 2. **Main Routes**:
-   - `/tracker` - Live vehicle tracking map
+
+   - `/tracker` - Live vehicle tracking map (dev-only; redirects to `/landing` in production)
    - `/directions` - Multi-stop route planning
    - `/settings` - Theme and app settings
    - `/notifications`, `/book`, `/more` - Additional features
@@ -50,38 +56,32 @@ npm run preview
 **511.org API Integration** - Two-tier architecture:
 
 - **Server-side** (`src/pages/api/511.ts`):
-  - Vercel serverless API route with `prerender: false`
-  - 9 API keys with automatic rotation and rate limit handling
-  - Exponential backoff for 429 responses (1s → 32s max)
-  - In-memory key usage tracking with retry logic
-  - Handles double-encoded JSON responses
-  - Returns standard JSON responses to client
-- **Client-side** (`src/scripts/511Request.astro`):
+  - Single API key; handles double-encoded JSON responses
+  - Returns standard JSON to client
+- **Client-side** (`src/scripts/511-request.astro`):
   - `makeRequest(moduleName, params, callback)` - Fetches from `/api/511`
-  - Sends params as JSON-encoded URL parameter
-  - Endpoints used: `gtfsoperators`, `VehicleMonitoring`
+  - Exponential backoff for 429 rate-limit responses (1s → 32s max)
 
 **Map System** (Leaflet-based):
 
-- **Leaflet** Maps integration (v1.9.4) with routing plugin
-- CDN-loaded scripts in Layout.astro (unpkg.com)
-- Real-time vehicle tracking with markers and popups
-- Custom color coding per agency and route (SF Muni has special line colors)
-- Leaflet Routing Machine for directions functionality
-
-**Transit Fare Data** (`public/data/price.json`):
-
-- Structured by agency ID with route-specific or zone-based pricing
-- Format: `{agency: {id, name, routes: {route: price} OR zones: {zone: price}}}`
+- Leaflet 1.9.4 + Leaflet Routing Machine loaded from CDN in `Layout.astro`
+- Nominatim (OpenStreetMap) for geocoding in directions
+- Real-time vehicle tracking with custom `L.divIcon` markers, color-coded per agency/route
+- SF Muni lines have custom colors defined in `customColors` in `src/scripts/tracker.astro`
 
 **Script Loading Pattern** (`src/layouts/Layout.astro`):
 
-- **Main scripts** auto-loaded on every page: `cookies`, `index`, `authentication`, `511Request`, `notificationManager`, `settings`
-- Loaded as `.astro` components from `src/scripts/` (not `public/scripts/`)
-- All scripts use `is:inline` attribute to prevent Astro processing
-- Page-specific scripts via `scripts` prop: `[{name: 'tracker', location: 'head'|undefined}]`
+- **Main scripts** dynamically imported and rendered on every page: `cookies`, `index`, `authentication`, `511-request`, `notification-manager`, `settings`
+- **Page-specific scripts** are imported statically at the top of each page `.astro` file and rendered as `<ComponentName />` after the `<Layout>` block (see `tracker.astro` / `directions.astro`)
+- All scripts use `<script is:inline>` — Astro does not process or bundle them
+- `modal.astro` and `select.astro` are additionally imported directly in Layout
 
-**Settings System** (`public/scripts/settings.js`):
+**Global Functions / Window Augmentation**:
+
+- Functions meant to be called across scripts are assigned to `window` immediately after their definition (e.g. `window.makeRequest = makeRequest`)
+- All `window.*` properties are declared in `src/env.d.ts` under `interface Window`
+
+**Settings System** (`src/scripts/settings.astro`):
 
 - LocalStorage-based with key `'settings'`
 - Current features: theme switching (system/light/dark)
@@ -90,53 +90,54 @@ npm run preview
 ### State Management
 
 - **No framework**: Pure JavaScript with DOM manipulation
-- **Client-side only**: No server rendering for dynamic content
-- **LocalStorage**: Settings persistence
-- **Global variables**: Agency data, map instances, vehicle pins
+- **LocalStorage**: Settings and auth persistence
+- **Global variables**: Agency data, map instance, vehicle pins — shared via `window.*`
 
 ### Styling
 
-- SCSS with theme support via `data-theme` attribute
-- CSS custom properties for dynamic values (header/footer height)
+- SCSS with theme support via `data-theme` attribute on `<html>`
+- CSS custom properties for dynamic values (`--h-height`, `--f-height`)
 - Page-specific styles in `src/styles/pages/`
-- Component-agnostic: primarily class-based styling
 
 ## Important Patterns
 
 ### Adding a New Page
 
 1. Create `src/pages/pagename.astro`
-2. Import Layout and define props (title, classItems, scripts)
+2. Import `Layout` and any page-specific script component from `src/scripts/`
 3. Add page-specific styles to `src/styles/pages/pagename.scss`
-4. Create client script at `public/scripts/pagename.js` if needed
-5. Add navigation link to Layout.astro footer nav
+4. Create the client script at `src/scripts/pagename.astro` using `<script is:inline>`
+5. Assign any functions that need to be globally accessible to `window` and declare them in `src/env.d.ts`
+6. Add navigation link to the `<footer>` nav in `Layout.astro`
 
-### API Key Management
+### TypeScript
 
-- 511.org API keys are in `511Request.js` with rotation logic
-- Bing Maps key is in `Layout.astro:74` and `tracker.js:2`
-- Keys are currently committed (not production-safe)
+- Strict mode (`noImplicitAny`) is enabled
+- `src/env.d.ts` extends the global `Window` interface for all `window.*` assignments
+- `tsconfig.json` sets `lib: ["ES2022", "DOM", "DOM.Iterable"]`
+- Run `npx astro check` to validate
 
 ### Working with the Map
 
-- Map instance stored in global `map` variable
-- `Microsoft.Maps` namespace from Bing Maps SDK
-- `GetMap()` callback function initializes map
-- Directions via `Microsoft.Maps.loadModule('Microsoft.Maps.Directions')`
+- Map instance in global `map` variable (also on `window.map` via Leaflet)
+- `GetMap()` initialises the Leaflet map and calls `onMapLoad()` once ready
+- `positionInterval` refreshes vehicle data every 60 seconds
 
 ### Theme/Settings Changes
 
-- Modify `settingFunctions` object in `settings.js`
+- Modify `settingFunctions` object in `src/scripts/settings.astro`
 - Theme applied via `document.documentElement.setAttribute('data-theme', value)`
 - Settings stored as array: `[{name: 'theme', content: 'dark'}]`
 
 ## Dependencies
 
-- **astro** ^3.6.4 - Core framework
-- **sass** ^1.69.5 - SCSS compilation
-- **prettier-plugin-astro** ^0.12.0 - Code formatting
+- **astro** ^5.x — Core framework
+- **@astrojs/vercel** — Vercel SSR adapter
+- **sass** — SCSS compilation
+- **typescript** / **@astrojs/check** — Type checking
+- **leaflet** + **leaflet-routing-machine** — Mapping (also loaded via CDN in Layout)
 
 External APIs:
 
 - 511.org Transit API (Bay Area transit data)
-- Bing Maps API (mapping and directions)
+- Nominatim / OpenStreetMap (geocoding for directions)

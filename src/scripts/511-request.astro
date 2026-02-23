@@ -1,11 +1,11 @@
-<script is:inline>
+<script>
     // Track delay for rate limiting
     let requestDelay = 0 // milliseconds
 
     // Helper function to wait/delay
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-    async function makeRequest(moduleName, params = [], callback) {
+    async function makeRequest(moduleName: string, params: string[][] = [], callback: (data: unknown) => void = () => {}) {
         // Apply current delay if any
         if (requestDelay > 0) {
             console.log(`[Client] Waiting ${requestDelay}ms before request`)

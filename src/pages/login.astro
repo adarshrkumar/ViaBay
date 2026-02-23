@@ -26,18 +26,19 @@ import Layout from '../layouts/Layout.astro'
     </div>
 </Layout>
 
-<script is:inline>
+<script>
     var queryString = window.location.search;
     var urlParms = new URLSearchParams(queryString);
-    var dest = !!urlParms.get('dest') ? urlParms.get('dest') : '/tracker';
+    var dest = urlParms.get('dest') ?? '/tracker';
 
-    var form = document.querySelector('[role="form"]')
+    var form = document.querySelector('[role="form"]')!
 
     // document.querySelector('.form').addEventListener('submit', e => {e.preventDefault()})
 
     function login() {
-        var username = form.querySelector('#email').value
-        var password = form.querySelector('#password').value
-        setCredentials(username, password, dest)
+        var username = form.querySelector<HTMLInputElement>('#email')!.value
+        var password = form.querySelector<HTMLInputElement>('#password')!.value
+        window.setCredentials(username, password, dest)
     }
+    window.login = login
 </script>

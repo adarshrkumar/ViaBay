@@ -1,24 +1,24 @@
-<script is:inline>
-    var modal = document.querySelector('.modal')
+<script>
+    var modal = document.querySelector<HTMLDialogElement>('.modal')!
 
-    function showModal(title, content) {
-        modal.querySelector('.title').textContent = title
-        modal.querySelector('.message').innerHTML = content
+    function showModal(title: string, content: string) {
+        modal.querySelector('.title')!.textContent = title
+        modal.querySelector<HTMLElement>('.message')!.innerHTML = content
         modal.showModal();
     }
     window.showModal = showModal
 
-    modal.addEventListener('click', e => {
+    modal.addEventListener('click', (e: MouseEvent) => {
         var isOutside = checkIfOuterModal(e)
         if (isOutside) {
             modal.close()
         }
     })
-    modal.querySelector('.btn').addEventListener('click', _e => {
+    modal.querySelector('.btn')!.addEventListener('click', _e => {
         modal.close()
     })
 
-    function checkIfOuterModal(e) {
+    function checkIfOuterModal(e: MouseEvent) {
         const dimensions = modal.getBoundingClientRect()
         if (
             e.clientX < dimensions.left ||
