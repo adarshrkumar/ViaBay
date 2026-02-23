@@ -1,543 +1,543 @@
 <script is:inline>
-var map, positionInterval = null
-window.positionInterval = positionInterval
-var currentPopup = null
+    var map, positionInterval = null
+    window.positionInterval = positionInterval
+    var currentPopup = null
 
-var agencyIds = []
-var agencies = {}
-var allPins = []
-window.allPins = allPins
-var userPin = null
-var userLocation = null
-// var lines = []
-// var patterns = []
+    var agencyIds = []
+    var agencies = {}
+    var allPins = []
+    window.allPins = allPins
+    var userPin = null
+    var userLocation = null
+    // var lines = []
+    // var patterns = []
 
-var colors = ['#0000FF','#FFA500','#6A4A3A','#800080','#800000','#40E0D0','#FF00FF','#000035','#FF6347','#FA8072','#808000','#7F00FF','#73BF00','#CD7F32','#8A2BE2','#3CB371','#2E8B57','#D2691E','#4682B4','#FF4500','#8B008B','#556B2F', '#8B4513', '#00CED1', '#483D8B', '#8B0000', '#9932CC', '#556B2F', '#2E8B57', '#6B8E23', '#9932CC', '#FF6347', '#20B2AA']
-var customColors = {
-    SF: {
-        E: 'beige',
-        F: 'pink',
-        J: 'orange',
-        K: 'lightblue',
-        L: 'purple',
-        M: 'green',
-        N: 'blue',
-        S: 'yellow',
-        T: 'red',
-        C: 'brown',
-        CA: 'brown',
-        PM: 'brown',
-        PH: 'brown',
-    }
-}
-
-var directionsElement = document.querySelector('#hiddenDirections')
-window.directionsElement = directionsElement
-var directionsManager = false
-window.directionsManager = directionsManager
-
-// Calculate distance between two locations in miles using Haversine formula
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    var R = 3958.8 // Earth's radius in miles
-    var dLat = (lat2 - lat1) * Math.PI / 180
-    var dLon = (lon2 - lon1) * Math.PI / 180
-    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2)
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    return R * c
-}
-
-// Show nearby vehicles when user clicks their location pin
-function showNearbyVehicles() {
-    if (!userLocation) return
-
-    var nearbyVehicles = []
-    var maxDistance = 1.5 // 1.5 mile radius
-
-    // Search through all agencies and their vehicles
-    agencyIds.forEach(agency => {
-        var aObj = agencies[agency.Id]
-        if (!aObj || !aObj.vehicles || !aObj.vehicles.data) return
-
-        aObj.vehicles.data.forEach(vehicle => {
-            var vehicleActivity = vehicle.MonitoredVehicleJourney
-            if (!vehicleActivity || !vehicleActivity.VehicleLocation) return
-
-            var vehicleLoc = vehicleActivity.VehicleLocation
-            var distance = calculateDistance(
-                userLocation.latitude,
-                userLocation.longitude,
-                vehicleLoc.Latitude,
-                vehicleLoc.Longitude
-            )
-
-            if (distance <= maxDistance) {
-                nearbyVehicles.push({
-                    distance: distance,
-                    agency: aObj.name,
-                    route: vehicleActivity.LineRef,
-                    lineName: vehicleActivity.PublishedLineName || vehicleActivity.LineRef,
-                    destination: vehicleActivity.DestinationName || 'Unknown',
-                    vehicleRef: vehicleActivity.VehicleRef
-                })
-            }
-        })
-    })
-
-    // Sort by distance
-    nearbyVehicles.sort((a, b) => {
-        return a.distance - b.distance
-    })
-
-    // Build HTML content
-    var content = '<span class="title">Nearby Vehicles</span>'
-    content += '<span>Within 1.5 miles of your location</span><br>'
-
-    if (nearbyVehicles.length === 0) {
-        content += '<span>No vehicles nearby</span>'
-    } else {
-        content += '<ol class="stops">'
-        nearbyVehicles.forEach(v => {
-            content += '<li class="stop">'
-            content += '<strong>' + v.route + '</strong> - ' + v.lineName + '<br>'
-            content += 'To: ' + v.destination + '<br>'
-            content += 'Distance: ' + v.distance.toFixed(2) + ' mi'
-            content += '</li>'
-        })
-        content += '</ol>'
+    var colors = ['#0000FF','#FFA500','#6A4A3A','#800080','#800000','#40E0D0','#FF00FF','#000035','#FF6347','#FA8072','#808000','#7F00FF','#73BF00','#CD7F32','#8A2BE2','#3CB371','#2E8B57','#D2691E','#4682B4','#FF4500','#8B008B','#556B2F', '#8B4513', '#00CED1', '#483D8B', '#8B0000', '#9932CC', '#556B2F', '#2E8B57', '#6B8E23', '#9932CC', '#FF6347', '#20B2AA']
+    var customColors = {
+        SF: {
+            E: 'beige',
+            F: 'pink',
+            J: 'orange',
+            K: 'lightblue',
+            L: 'purple',
+            M: 'green',
+            N: 'blue',
+            S: 'yellow',
+            T: 'red',
+            C: 'brown',
+            CA: 'brown',
+            PM: 'brown',
+            PH: 'brown',
+        }
     }
 
-    if (currentPopup) {
-        currentPopup.remove()
+    var directionsElement = document.querySelector('#hiddenDirections')
+    window.directionsElement = directionsElement
+    var directionsManager = false
+    window.directionsManager = directionsManager
+
+    // Calculate distance between two locations in miles using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        var R = 3958.8 // Earth's radius in miles
+        var dLat = (lat2 - lat1) * Math.PI / 180
+        var dLon = (lon2 - lon1) * Math.PI / 180
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return R * c
     }
-    currentPopup = L.popup()
-        .setLatLng([userLocation.lat, userLocation.lng])
-        .setContent(content)
-        .openOn(map)
-}
 
+    // Show nearby vehicles when user clicks their location pin
+    function showNearbyVehicles() {
+        if (!userLocation) return
 
-function onMapLoad() {
-    makeRequest('gtfsoperators', [], res => {
-        res.forEach((agency, i) => {
-            var cI = i
-            if (cI >= colors.length) cI = cI - colors.length
-            var color = colors[cI]
+        var nearbyVehicles = []
+        var maxDistance = 1.5 // 1.5 mile radius
 
-            agencyIds.push(agency)
+        // Search through all agencies and their vehicles
+        agencyIds.forEach(agency => {
+            var aObj = agencies[agency.Id]
+            if (!aObj || !aObj.vehicles || !aObj.vehicles.data) return
 
-            makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleData => {
-                var vehicleData = vehicleData.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity
-                if (!vehicleData || typeof vehicleData !== 'object') vehicleData = []
+            aObj.vehicles.data.forEach(vehicle => {
+                var vehicleActivity = vehicle.MonitoredVehicleJourney
+                if (!vehicleActivity || !vehicleActivity.VehicleLocation) return
 
-                var aName = agency.Name
-                switch (aName) {
-                    case 'VTA': aName = 'Valley Transportation Authority (VTA)'
-                    case 'AC TRANSIT': aName = 'AC Transit'
+                var vehicleLoc = vehicleActivity.VehicleLocation
+                var distance = calculateDistance(
+                    userLocation.latitude,
+                    userLocation.longitude,
+                    vehicleLoc.Latitude,
+                    vehicleLoc.Longitude
+                )
+
+                if (distance <= maxDistance) {
+                    nearbyVehicles.push({
+                        distance: distance,
+                        agency: aObj.name,
+                        route: vehicleActivity.LineRef,
+                        lineName: vehicleActivity.PublishedLineName || vehicleActivity.LineRef,
+                        destination: vehicleActivity.DestinationName || 'Unknown',
+                        vehicleRef: vehicleActivity.VehicleRef
+                    })
                 }
-
-                var aObj = agencies[agency.Id]
-                if (!aObj) {
-                    aObj = {
-                        id: agency.Id,
-                        name: aName,
-                        vehicles: {
-                            data: vehicleData,
-                            pins: {},
-                        },
-                    }
-                }
-                else {
-                    aObj.vehicles.data = vehicleData
-                }
-
-                var goodPins = []
-
-                vehicleData.forEach(vehicle => {
-                    var vehicleRef = vehicle.MonitoredVehicleJourney.VehicleRef
-                    if (aObj.vehicles.pins[vehicleRef]) {
-                        goodPins.push({
-                            name: vehicleRef,
-                            content: aObj.vehicles.pins[vehicleRef]
-                        })
-                    }
-                })
-                aObj.vehicles.pins = {}
-                goodPins.forEach(pin => {
-                    aObj.vehicles.pins[pin.name] = pin.content
-                })
-
-                vehicleData.forEach((vehicle, vI) => {
-                    var vehicleActivity = vehicle.MonitoredVehicleJourney
-                    vehicleActivity.agency = aName
-                    vehicleActivity.aId = agency.Id
-                    vehicleActivity.i = vI
-                    var vehicleRef = vehicleActivity.VehicleRef
-                    var vehicleLocation = vehicleActivity.VehicleLocation
-                    var vehicleLatLng = [vehicleLocation.Latitude, vehicleLocation.Longitude]
-
-                    switch (vehicleActivity.OperatorRef) {
-                        case 'SF':
-                            var publishedLineName = vehicleActivity.PublishedLineName
-                            if (publishedLineName) {
-                                if (publishedLineName.includes(' ')) publishedLineName = publishedLineName.split(' ')
-                                else publishedLineName = [publishedLineName]
-
-                                publishedLineName.forEach((p, i) => {
-                                    publishedLineName[i] = `${p[0]}${p.substring(1).toLowerCase()}`
-                                })
-
-                                publishedLineName = publishedLineName.join(' ')
-                                vehicleActivity.PublishedLineName = publishedLineName
-                            }
-                    }
-
-                    var route = vehicleActivity.LineRef
-                    if (route) {
-
-                        var width = 30
-                        if (route.length > 3) {
-                            var exces = route.length-3
-                            for (let i3 = 0; i3 < exces; i3++) {
-                                width += 5
-                            }
-                        }
-
-                        // Check for custom colors based on operator and route
-                        var markerColor = color
-                        var operatorRef = vehicleActivity.OperatorRef
-
-                        // VTA light rail: use lowercase line name without " Line"
-                        if (operatorRef === 'VTA' && vehicleActivity.PublishedLineName && vehicleActivity.PublishedLineName.includes(' Line')) {
-                            var lineName = vehicleActivity.PublishedLineName
-                            markerColor = lineName.replace(' Line', '').toLowerCase()
-                        }
-                        // Caltrain: color based on train number
-                        else if (operatorRef === 'CT' && route) {
-                            var firstDigit = route.charAt(0)
-                            if (firstDigit === '8') {
-                                markerColor = 'tan'
-                            } else if (firstDigit === '5') {
-                                markerColor = 'red'
-                            } else if (firstDigit === '4') {
-                                markerColor = 'aqua'
-                            } else if (firstDigit === '1') {
-                                markerColor = 'lightcoral'
-                            } else {
-                                markerColor = 'gray'
-                            }
-                        }
-                        // Other custom colors (like SF Muni)
-                        else if (operatorRef && customColors[operatorRef] && customColors[operatorRef][route]) {
-                            markerColor = customColors[operatorRef][route]
-                        }
-
-                        // Add the marker to the map
-                        var pin = aObj.vehicles.pins[vehicleRef]
-                        if (pin) {
-                            pin.setLatLng(vehicleLatLng);
-                        }
-                        else {
-                            // Create custom DivIcon for vehicle marker
-                            var icon = L.divIcon({
-                                html: `<div style="background-color: ${markerColor}; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;">${route}</div>`,
-                                className: 'vehicle-marker',
-                                iconSize: [width, 20],
-                                iconAnchor: [width/2, 10]
-                            });
-
-                            vehicleActivity.infoboxOpen = false
-                            pin = L.marker(vehicleLatLng, { icon: icon });
-                            pin.metadata = vehicleActivity;
-
-                            pin.on('click', e => {
-                                showVehicleInfo(e, pin);
-                            });
-
-                            pin.addTo(map);
-                        }
-                        aObj.vehicles.pins[vehicleRef] = pin
-                    }
-                })
-
-                agencies[agency.Id] = aObj
             })
-
-            // makeRequest('lines', [['operator_id', agency.Id]], lS => {
-            //     lines[agency.Id] = lS
-            //     patterns[agency.Id] = {}
-            //     lS.forEach((line, lI) => {
-            //         makeRequest('patterns', [['operator_id', agency.Id], ['line_id', line.Id]], pattern => {
-            //             patterns[agency.Id][line.Id] = pattern
-            //         })
-            //     })
-            // })
         })
-    })
-}
 
-GetMap()
-function GetMap() {
-    if (document.getElementById('myMap') && typeof L !== 'undefined') {
-        // Default location (Bay Area)
-        var defaultLocation = [37.7749, -122.4194];
-        var initialZoom = 10;
+        // Sort by distance
+        nearbyVehicles.sort((a, b) => {
+            return a.distance - b.distance
+        })
 
-        // Request user's location first
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    // Got user location, use it
-                    userLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
+        // Build HTML content
+        var content = '<span class="title">Nearby Vehicles</span>'
+        content += '<span>Within 1.5 miles of your location</span><br>'
 
-                    // Initialize map with user's location
-                    initializeMap([userLocation.lat, userLocation.lng], 12);
-
-                    // Add user marker
-                    addUserMarker();
-                },
-                error => {
-                    console.warn('Geolocation error:', error.message);
-                    // Geolocation failed, use default location
-                    initializeMap(defaultLocation, initialZoom);
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0
-                }
-            );
+        if (nearbyVehicles.length === 0) {
+            content += '<span>No vehicles nearby</span>'
         } else {
-            console.warn('Geolocation is not supported by this browser');
-            // Geolocation not supported, use default location
-            initializeMap(defaultLocation, initialZoom);
-        }
-
-        function initializeMap(center, zoom) {
-            // Initialize Leaflet map
-            map = L.map('myMap').setView(center, zoom);
-
-            // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
-            L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
-                attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
-                maxZoom: 19
-            }).addTo(map);
-
-            // Close popup when clicking on the map
-            map.on('click', _e => {
-                if (currentPopup) {
-                    currentPopup.remove();
-                }
-            });
-
-            if (onMapLoad) onMapLoad()
-            positionInterval = setInterval(onMapLoad, 60000)
-        }
-
-        function addUserMarker() {
-            if (userLocation) {
-                // Create custom green icon for user location
-                var userIcon = L.divIcon({
-                    html: '<div style="background-color: green; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;"></div>',
-                    className: 'user-marker',
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
-                });
-
-                // Add a marker for user's location
-                userPin = L.marker([userLocation.lat, userLocation.lng], {
-                    icon: userIcon,
-                    title: 'Your Location'
-                });
-
-                // Add click handler to show nearby vehicles
-                userPin.on('click', showNearbyVehicles);
-
-                userPin.addTo(map);
-            }
-        }
-    }
-    else {
-        window.addEventListener('DOMContentLoaded', GetMap)
-    }
-}
-
-
-function showVehicleInfo(_e, pin) {
-    //Make sure the marker has metadata to display.
-    var data = pin.metadata
-    if (data) {
-        // agencyIds.forEach((id, i) => {
-        //     if (agencies[id]) {
-        //         agencies[id].vehicles.pins.forEach((p, pI) => {
-        //             agencies[id].vehicles.pins[pI].metadata.infoboxOpen = false
-        //         })
-        //     }
-        // })
-
-        // Set the infobox options with the metadata of the pushpin.
-        var isSmallScreen = window.matchMedia('(max-width: 915px)').matches
-        if (isSmallScreen) {
-
-        }
-
-        // agencies[data.aId].vehicles.pins[data.i].metadata.infoboxOpen = true
-
-        // console.log(data)
-
-        makeRequest('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
-            var journeyPatterns = res.journeyPatterns
-            var pattern = journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
-            if (Array.isArray(pattern) || typeof pattern === 'object') {
-                if (pattern.length > 0) {
-                    pattern = pattern[0]
-                }
-            }
-            else pattern = []
-
-            var PointsInSequence = pattern.PointsInSequence
-            var TimingPointInJourneyPattern = PointsInSequence.TimingPointInJourneyPattern
-            var stopNames = []
-            TimingPointInJourneyPattern.forEach(t => {
-                stopNames.push(t.Name)
+            content += '<ol class="stops">'
+            nearbyVehicles.forEach(v => {
+                content += '<li class="stop">'
+                content += '<strong>' + v.route + '</strong> - ' + v.lineName + '<br>'
+                content += 'To: ' + v.destination + '<br>'
+                content += 'Distance: ' + v.distance.toFixed(2) + ' mi'
+                content += '</li>'
             })
-
-            var hasMCall = data.MonitoredCall ? true : false
-            var hasCalls = data.OnwardCalls ? (data.OnwardCalls.OnwardCall ? (data.OnwardCalls.OnwardCall.length > 0 ? true : false) : false) : false
-
-            var stops = []
-
-            if (hasMCall) {
-                stops.push(data.MonitoredCall)
-            }
-            if (hasCalls) {
-                data.OnwardCalls.OnwardCall.forEach(stop => {
-                    stops.push(stop)
-                })
-            }
-
-            stops.forEach(stop => {
-                var items = TimingPointInJourneyPattern.filter(t => t.Name === stop.StopPointName)
-                if (items) {
-                    if (items.length > 0) {
-                        if (items.length > 1) {
-                            items.forEach(i => {
-                                TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(i), 1)
-                            })
-                        }
-                        else {
-                            TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(items[0]), 1)
-                        }
-                    }
-                }
-            })
-            console.log(TimingPointInJourneyPattern)
-
-            var liS = []
-            stops.forEach(stop => {
-                callActions(stop)
-            })
-
-            function callActions(stop) {
-                var eDate = new Date(stop.ExpectedArrivalTime)
-                var aDate = new Date(stop.AimedArrivalTime)
-                var eTime = eDate.getHours()*60*60+eDate.getMinutes()*60+eDate.getSeconds()
-                var aTime = aDate.getHours()*60*60+aDate.getMinutes()*60+aDate.getSeconds()
-
-                var stopTime = `${eDate.getHours()}:${eDate.getMinutes().toString().length < 2 ? `0${eDate.getMinutes()}` : eDate.getMinutes()}`
-
-                var isLate = eTime > aTime ? true : false
-                var isEarly = eTime < aTime ? true : false
-                var isOnTime = eTime === aTime ? true : false
-
-                var earlyLateText = ''
-                if (isLate) earlyLateText = `${Math.ceil((eTime-aTime)/60)} Minutes Late`
-                if (isEarly) earlyLateText = `${Math.ceil((aTime-eTime)/60)} Minutes Early`
-                if (isOnTime) earlyLateText = `On Time`
-
-                var color = isLate ? 'red' : (isEarly ? 'green' : (isOnTime ? 'blue' : 'black'))
-
-                var li = document.createElement('li')
-                li.classList.add('stop')
-                li.style.color = color
-                li.textContent = `${stop.StopPointName} (${stop.StopPointRef}): ${stopTime} (${earlyLateText})`
-
-                liS.push(li)
-            }
-
-        })
-
-        data.LineName = data.PublishedLineName
-        if (data.PublishedLineName) {
-            if (data.LineName.includes('\\\\')) data.LineName = data.LineName.split('\\\\').join('/')
-                if (data.LineName.includes(' / ')) data.LineName = data.LineName.split(' / ').join('/')
-                if (data.LineName.includes('/')) data.LineName = data.LineName.split('/').join(' - ')
-                if (data.LineName.includes('  ')) data.LineName = data.LineName.split('  ').join(' ')
-            }
-
-        var options = {
-            title: [
-                `${data.agency}`,
-                `${data.LineRef}: ${data.LineName}`
-            ],
-            description: [
-                `Direction: ${data.DirectionRef ? data.DirectionRef : 'Unknown Direction'}`,
-                `Origin: ${data.OriginName ? data.OriginName : 'No Origin or Unknown'}`,
-                `Destination: ${data.DestinationName ? data.DestinationName : 'No Destination or Unknown'}`,
-                `Congestion: ${data.InCongestion ? 'Congested' : 'Not Congested or Unknown'}`,
-                `Occupancy: ${data.Occupancy ? data.Occupancy : 'Unknown'}`,
-                `Vehicle ID: ${data.VehicleRef ? data.VehicleRef : 'Unknown'}`
-            ]
+            content += '</ol>'
         }
-
-        console.log(data.aId)
-        // var agePatterns = patterns[data.aId]
-        // if (agePatterns) {
-        //     var routePatterns = agePatterns[data.LineRef]
-        //     console.log(routePatterns)
-        //     if (routePatterns) {
-        //         var journeyPatterns = routePatterns.journeyPatterns
-        //         if (journeyPatterns) {
-        //             var journeyPattern = journeyPatterns
-        //                 .filter(item => item['Name'] === data.PublishedLineName)
-        //                 // .filter(item => item['DirectionRef'] === data.DirectionRef)
-        //             console.log(journeyPattern)
-        //             if (journeyPattern.PointsInSequence) {
-        //                 var PointsInSequence = journeyPattern.PointsInSequence
-        //                 console.log(PointsInSequence)
-        //             }
-        //         }
-        //     }
-        // }
-
-        var popupContent = `<div class="infobox">
-            <span class="title">${options.title}</span><span>${options.description}</span><ol class="stops"></ol>
-        </div>`;
 
         if (currentPopup) {
-            currentPopup.remove();
+            currentPopup.remove()
         }
         currentPopup = L.popup()
-            .setLatLng(pin.getLatLng())
-            .setContent(popupContent)
-            .openOn(map);
+            .setLatLng([userLocation.lat, userLocation.lng])
+            .setContent(content)
+            .openOn(map)
     }
-}
 
-function showRoutePath(_aId, _rId) {
-    // TODO: Implement route path display with Leaflet
-    // This would require using a routing service or drawing polylines
-    console.log('Route path display not yet implemented with Leaflet');
-}
-window.showRoutePath = showRoutePath
 
-function findUsingValueofKey(arr, key, val) {
-    var res = arr.filter(item => item[key] === val)
-    return res
-}
-window.findUsingValueofKey = findUsingValueofKey
+    function onMapLoad() {
+        makeRequest('gtfsoperators', [], res => {
+            res.forEach((agency, i) => {
+                var cI = i
+                if (cI >= colors.length) cI = cI - colors.length
+                var color = colors[cI]
+
+                agencyIds.push(agency)
+
+                makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleData => {
+                    var vehicleData = vehicleData.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity
+                    if (!vehicleData || typeof vehicleData !== 'object') vehicleData = []
+
+                    var aName = agency.Name
+                    switch (aName) {
+                        case 'VTA': aName = 'Valley Transportation Authority (VTA)'
+                        case 'AC TRANSIT': aName = 'AC Transit'
+                    }
+
+                    var aObj = agencies[agency.Id]
+                    if (!aObj) {
+                        aObj = {
+                            id: agency.Id,
+                            name: aName,
+                            vehicles: {
+                                data: vehicleData,
+                                pins: {},
+                            },
+                        }
+                    }
+                    else {
+                        aObj.vehicles.data = vehicleData
+                    }
+
+                    var goodPins = []
+
+                    vehicleData.forEach(vehicle => {
+                        var vehicleRef = vehicle.MonitoredVehicleJourney.VehicleRef
+                        if (aObj.vehicles.pins[vehicleRef]) {
+                            goodPins.push({
+                                name: vehicleRef,
+                                content: aObj.vehicles.pins[vehicleRef]
+                            })
+                        }
+                    })
+                    aObj.vehicles.pins = {}
+                    goodPins.forEach(pin => {
+                        aObj.vehicles.pins[pin.name] = pin.content
+                    })
+
+                    vehicleData.forEach((vehicle, vI) => {
+                        var vehicleActivity = vehicle.MonitoredVehicleJourney
+                        vehicleActivity.agency = aName
+                        vehicleActivity.aId = agency.Id
+                        vehicleActivity.i = vI
+                        var vehicleRef = vehicleActivity.VehicleRef
+                        var vehicleLocation = vehicleActivity.VehicleLocation
+                        var vehicleLatLng = [vehicleLocation.Latitude, vehicleLocation.Longitude]
+
+                        switch (vehicleActivity.OperatorRef) {
+                            case 'SF':
+                                var publishedLineName = vehicleActivity.PublishedLineName
+                                if (publishedLineName) {
+                                    if (publishedLineName.includes(' ')) publishedLineName = publishedLineName.split(' ')
+                                    else publishedLineName = [publishedLineName]
+
+                                    publishedLineName.forEach((p, i) => {
+                                        publishedLineName[i] = `${p[0]}${p.substring(1).toLowerCase()}`
+                                    })
+
+                                    publishedLineName = publishedLineName.join(' ')
+                                    vehicleActivity.PublishedLineName = publishedLineName
+                                }
+                        }
+
+                        var route = vehicleActivity.LineRef
+                        if (route) {
+
+                            var width = 30
+                            if (route.length > 3) {
+                                var exces = route.length-3
+                                for (let i3 = 0; i3 < exces; i3++) {
+                                    width += 5
+                                }
+                            }
+
+                            // Check for custom colors based on operator and route
+                            var markerColor = color
+                            var operatorRef = vehicleActivity.OperatorRef
+
+                            // VTA light rail: use lowercase line name without " Line"
+                            if (operatorRef === 'VTA' && vehicleActivity.PublishedLineName && vehicleActivity.PublishedLineName.includes(' Line')) {
+                                var lineName = vehicleActivity.PublishedLineName
+                                markerColor = lineName.replace(' Line', '').toLowerCase()
+                            }
+                            // Caltrain: color based on train number
+                            else if (operatorRef === 'CT' && route) {
+                                var firstDigit = route.charAt(0)
+                                if (firstDigit === '8') {
+                                    markerColor = 'tan'
+                                } else if (firstDigit === '5') {
+                                    markerColor = 'red'
+                                } else if (firstDigit === '4') {
+                                    markerColor = 'aqua'
+                                } else if (firstDigit === '1') {
+                                    markerColor = 'lightcoral'
+                                } else {
+                                    markerColor = 'gray'
+                                }
+                            }
+                            // Other custom colors (like SF Muni)
+                            else if (operatorRef && customColors[operatorRef] && customColors[operatorRef][route]) {
+                                markerColor = customColors[operatorRef][route]
+                            }
+
+                            // Add the marker to the map
+                            var pin = aObj.vehicles.pins[vehicleRef]
+                            if (pin) {
+                                pin.setLatLng(vehicleLatLng);
+                            }
+                            else {
+                                // Create custom DivIcon for vehicle marker
+                                var icon = L.divIcon({
+                                    html: `<div style="background-color: ${markerColor}; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;">${route}</div>`,
+                                    className: 'vehicle-marker',
+                                    iconSize: [width, 20],
+                                    iconAnchor: [width/2, 10]
+                                });
+
+                                vehicleActivity.infoboxOpen = false
+                                pin = L.marker(vehicleLatLng, { icon: icon });
+                                pin.metadata = vehicleActivity;
+
+                                pin.on('click', e => {
+                                    showVehicleInfo(e, pin);
+                                });
+
+                                pin.addTo(map);
+                            }
+                            aObj.vehicles.pins[vehicleRef] = pin
+                        }
+                    })
+
+                    agencies[agency.Id] = aObj
+                })
+
+                // makeRequest('lines', [['operator_id', agency.Id]], lS => {
+                //     lines[agency.Id] = lS
+                //     patterns[agency.Id] = {}
+                //     lS.forEach((line, lI) => {
+                //         makeRequest('patterns', [['operator_id', agency.Id], ['line_id', line.Id]], pattern => {
+                //             patterns[agency.Id][line.Id] = pattern
+                //         })
+                //     })
+                // })
+            })
+        })
+    }
+
+    GetMap()
+    function GetMap() {
+        if (document.getElementById('myMap') && typeof L !== 'undefined') {
+            // Default location (Bay Area)
+            var defaultLocation = [37.7749, -122.4194];
+            var initialZoom = 10;
+
+            // Request user's location first
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        // Got user location, use it
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+
+                        // Initialize map with user's location
+                        initializeMap([userLocation.lat, userLocation.lng], 12);
+
+                        // Add user marker
+                        addUserMarker();
+                    },
+                    error => {
+                        console.warn('Geolocation error:', error.message);
+                        // Geolocation failed, use default location
+                        initializeMap(defaultLocation, initialZoom);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                console.warn('Geolocation is not supported by this browser');
+                // Geolocation not supported, use default location
+                initializeMap(defaultLocation, initialZoom);
+            }
+
+            function initializeMap(center, zoom) {
+                // Initialize Leaflet map
+                map = L.map('myMap').setView(center, zoom);
+
+                // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
+                L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
+                    attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
+                    maxZoom: 19
+                }).addTo(map);
+
+                // Close popup when clicking on the map
+                map.on('click', _e => {
+                    if (currentPopup) {
+                        currentPopup.remove();
+                    }
+                });
+
+                if (onMapLoad) onMapLoad()
+                positionInterval = setInterval(onMapLoad, 60000)
+            }
+
+            function addUserMarker() {
+                if (userLocation) {
+                    // Create custom green icon for user location
+                    var userIcon = L.divIcon({
+                        html: '<div style="background-color: green; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;"></div>',
+                        className: 'user-marker',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+
+                    // Add a marker for user's location
+                    userPin = L.marker([userLocation.lat, userLocation.lng], {
+                        icon: userIcon,
+                        title: 'Your Location'
+                    });
+
+                    // Add click handler to show nearby vehicles
+                    userPin.on('click', showNearbyVehicles);
+
+                    userPin.addTo(map);
+                }
+            }
+        }
+        else {
+            window.addEventListener('DOMContentLoaded', GetMap)
+        }
+    }
+
+
+    function showVehicleInfo(_e, pin) {
+        //Make sure the marker has metadata to display.
+        var data = pin.metadata
+        if (data) {
+            // agencyIds.forEach((id, i) => {
+            //     if (agencies[id]) {
+            //         agencies[id].vehicles.pins.forEach((p, pI) => {
+            //             agencies[id].vehicles.pins[pI].metadata.infoboxOpen = false
+            //         })
+            //     }
+            // })
+
+            // Set the infobox options with the metadata of the pushpin.
+            var isSmallScreen = window.matchMedia('(max-width: 915px)').matches
+            if (isSmallScreen) {
+
+            }
+
+            // agencies[data.aId].vehicles.pins[data.i].metadata.infoboxOpen = true
+
+            // console.log(data)
+
+            makeRequest('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
+                var journeyPatterns = res.journeyPatterns
+                var pattern = journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
+                if (Array.isArray(pattern) || typeof pattern === 'object') {
+                    if (pattern.length > 0) {
+                        pattern = pattern[0]
+                    }
+                }
+                else pattern = []
+
+                var PointsInSequence = pattern.PointsInSequence
+                var TimingPointInJourneyPattern = PointsInSequence.TimingPointInJourneyPattern
+                var stopNames = []
+                TimingPointInJourneyPattern.forEach(t => {
+                    stopNames.push(t.Name)
+                })
+
+                var hasMCall = data.MonitoredCall ? true : false
+                var hasCalls = data.OnwardCalls ? (data.OnwardCalls.OnwardCall ? (data.OnwardCalls.OnwardCall.length > 0 ? true : false) : false) : false
+
+                var stops = []
+
+                if (hasMCall) {
+                    stops.push(data.MonitoredCall)
+                }
+                if (hasCalls) {
+                    data.OnwardCalls.OnwardCall.forEach(stop => {
+                        stops.push(stop)
+                    })
+                }
+
+                stops.forEach(stop => {
+                    var items = TimingPointInJourneyPattern.filter(t => t.Name === stop.StopPointName)
+                    if (items) {
+                        if (items.length > 0) {
+                            if (items.length > 1) {
+                                items.forEach(i => {
+                                    TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(i), 1)
+                                })
+                            }
+                            else {
+                                TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(items[0]), 1)
+                            }
+                        }
+                    }
+                })
+                console.log(TimingPointInJourneyPattern)
+
+                var liS = []
+                stops.forEach(stop => {
+                    callActions(stop)
+                })
+
+                function callActions(stop) {
+                    var eDate = new Date(stop.ExpectedArrivalTime)
+                    var aDate = new Date(stop.AimedArrivalTime)
+                    var eTime = eDate.getHours()*60*60+eDate.getMinutes()*60+eDate.getSeconds()
+                    var aTime = aDate.getHours()*60*60+aDate.getMinutes()*60+aDate.getSeconds()
+
+                    var stopTime = `${eDate.getHours()}:${eDate.getMinutes().toString().length < 2 ? `0${eDate.getMinutes()}` : eDate.getMinutes()}`
+
+                    var isLate = eTime > aTime ? true : false
+                    var isEarly = eTime < aTime ? true : false
+                    var isOnTime = eTime === aTime ? true : false
+
+                    var earlyLateText = ''
+                    if (isLate) earlyLateText = `${Math.ceil((eTime-aTime)/60)} Minutes Late`
+                    if (isEarly) earlyLateText = `${Math.ceil((aTime-eTime)/60)} Minutes Early`
+                    if (isOnTime) earlyLateText = `On Time`
+
+                    var color = isLate ? 'red' : (isEarly ? 'green' : (isOnTime ? 'blue' : 'black'))
+
+                    var li = document.createElement('li')
+                    li.classList.add('stop')
+                    li.style.color = color
+                    li.textContent = `${stop.StopPointName} (${stop.StopPointRef}): ${stopTime} (${earlyLateText})`
+
+                    liS.push(li)
+                }
+
+            })
+
+            data.LineName = data.PublishedLineName
+            if (data.PublishedLineName) {
+                if (data.LineName.includes('\\\\')) data.LineName = data.LineName.split('\\\\').join('/')
+                    if (data.LineName.includes(' / ')) data.LineName = data.LineName.split(' / ').join('/')
+                    if (data.LineName.includes('/')) data.LineName = data.LineName.split('/').join(' - ')
+                    if (data.LineName.includes('  ')) data.LineName = data.LineName.split('  ').join(' ')
+                }
+
+            var options = {
+                title: [
+                    `${data.agency}`,
+                    `${data.LineRef}: ${data.LineName}`
+                ],
+                description: [
+                    `Direction: ${data.DirectionRef ? data.DirectionRef : 'Unknown Direction'}`,
+                    `Origin: ${data.OriginName ? data.OriginName : 'No Origin or Unknown'}`,
+                    `Destination: ${data.DestinationName ? data.DestinationName : 'No Destination or Unknown'}`,
+                    `Congestion: ${data.InCongestion ? 'Congested' : 'Not Congested or Unknown'}`,
+                    `Occupancy: ${data.Occupancy ? data.Occupancy : 'Unknown'}`,
+                    `Vehicle ID: ${data.VehicleRef ? data.VehicleRef : 'Unknown'}`
+                ]
+            }
+
+            console.log(data.aId)
+            // var agePatterns = patterns[data.aId]
+            // if (agePatterns) {
+            //     var routePatterns = agePatterns[data.LineRef]
+            //     console.log(routePatterns)
+            //     if (routePatterns) {
+            //         var journeyPatterns = routePatterns.journeyPatterns
+            //         if (journeyPatterns) {
+            //             var journeyPattern = journeyPatterns
+            //                 .filter(item => item['Name'] === data.PublishedLineName)
+            //                 // .filter(item => item['DirectionRef'] === data.DirectionRef)
+            //             console.log(journeyPattern)
+            //             if (journeyPattern.PointsInSequence) {
+            //                 var PointsInSequence = journeyPattern.PointsInSequence
+            //                 console.log(PointsInSequence)
+            //             }
+            //         }
+            //     }
+            // }
+
+            var popupContent = `<div class="infobox">
+                <span class="title">${options.title}</span><span>${options.description}</span><ol class="stops"></ol>
+            </div>`;
+
+            if (currentPopup) {
+                currentPopup.remove();
+            }
+            currentPopup = L.popup()
+                .setLatLng(pin.getLatLng())
+                .setContent(popupContent)
+                .openOn(map);
+        }
+    }
+
+    function showRoutePath(_aId, _rId) {
+        // TODO: Implement route path display with Leaflet
+        // This would require using a routing service or drawing polylines
+        console.log('Route path display not yet implemented with Leaflet');
+    }
+    window.showRoutePath = showRoutePath
+
+    function findUsingValueofKey(arr, key, val) {
+        var res = arr.filter(item => item[key] === val)
+        return res
+    }
+    window.findUsingValueofKey = findUsingValueofKey
 </script>

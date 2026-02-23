@@ -1,29 +1,26 @@
 ---
 import '../styles/globals.scss'
 import '../styles/modal.scss'
-import { Fragment } from 'astro/jsx-runtime'
-
 import ModalScript from '../scripts/modal.astro'
 import SelectScript from '../scripts/select.astro'
+import type CookiesScript from '../scripts/cookies.astro'
+
+type ScriptFactory = typeof CookiesScript
 
 var mainScriptNames = ['cookies', 'index', 'authentication', '511Request', 'notificationManager', 'settings']
-var mainScripts = await Promise.all(mainScriptNames.map(async n => await import(`../scripts/${n}.astro`)))
-
-interface Script {
-    name?: string
-    location?: string
-}
+var mainScripts = await Promise.all(
+    mainScriptNames.map(async n => ((await import(`../scripts/${n}.astro`)) as { default: ScriptFactory }).default)
+)
 
 interface Props {
     title?: string
     classItems?: string[]
     headItems?: []
-    scripts?: Script[]
 }
 
 var sTitle = 'TransTrack'
 
-var { title, classItems: classItemsProp, headItems: headItemsProp, scripts = [] } = Astro.props as Props
+var { title, classItems: classItemsProp, headItems: headItemsProp } = Astro.props as Props
 
 var docTitle = ''
 if (
@@ -52,13 +49,6 @@ if (headItemsArray.length < 0) {
 
 const headItems = headItemsArray.join('')
 
-if (!scripts) {
-    scripts = []
-}
-if (scripts.length < 0) {
-    scripts = []
-}
-
 var d = new Date()
 var year = d.getFullYear()
 var startingYear = 2024
@@ -78,18 +68,8 @@ var yearStr = year == startingYear ? '' : `-${year}`
         <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
         { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
         {
-            mainScripts.map((module) => {
-                const Component = module.default
-                return <Component />
-            })
-        }
-        {
-            scripts.map(async (s: Script) => {
-                if (s.location === 'head' && s.name) {
-                    const module = await import(`../scripts/${s.name}.astro`)
-                    const Component = module.default
-                    return <Component />
-                }
+            mainScripts.map((Module) => {
+                return <Module />
             })
         }
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" is:inline></script>
@@ -138,14 +118,5 @@ var yearStr = year == startingYear ? '' : `-${year}`
         </dialog>
         <ModalScript />
         <SelectScript />
-        {
-            scripts.map(async (s: Script) => {
-                if (s.location !== 'head' && s.name) {
-                    const module = await import(`../scripts/${s.name}.astro`)
-                    const Component = module.default
-                    return <Component />
-                }
-            })
-        }
     </body>
 </html>

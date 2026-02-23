@@ -1,19 +1,16 @@
 ---
 import '../styles/menu.scss'
 import '../styles/pages/notifications.scss'
+import NotificationsScript from '../scripts/notifications.astro'
 
 import Layout from '../layouts/Layout.astro'
 
-var scripts = [
-    {
-        name: 'notifications'
-    }
-]
-
 return Astro.redirect('/landing')
 ---
-<Layout title="Notifications" scripts={scripts}>
+<Layout title="Notifications">
     <section class="main">
         <div class="notifications"></div>
     </section>
 </Layout>
+
+<NotificationsScript />

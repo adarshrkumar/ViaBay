@@ -4,7 +4,6 @@ dist/
 .astro/
 
 # dependencies
-node_modules
 node_modules/
 
 # logs
@@ -23,5 +22,3 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
-
-/CLAUDE*.md
