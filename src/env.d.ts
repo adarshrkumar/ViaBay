@@ -20,4 +20,5 @@ interface Window {
     directionsElement: Element | null
     directionsManager: boolean
     login: () => void
+    onMapLoad: ((map: L.Map) => void) | null
 }

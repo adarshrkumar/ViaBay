@@ -1,6 +1,6 @@
 <script>
-    function openSelection(e) {
-        while (!e.className.includes('select') ) e = e.parentNode
+    function openSelection(e: HTMLElement) {
+        while (!e.className.includes('select') && e.parentNode) e = e.parentNode as HTMLElement
         document.querySelectorAll('.select').forEach(s => {
             s.classList.remove('open')
         })
@@ -9,8 +9,8 @@
     }
     window.openSelection = openSelection
 
-    function closeSelection(e) {
-        while (!e.className.includes('select') ) e = e.parentNode
+    function closeSelection(e: HTMLElement) {
+        while (!e.className.includes('select')) e = e.parentNode as HTMLElement
         e.classList.remove('open')
         e.setAttribute('onclick', 'openSelection(this)')
     }
@@ -18,22 +18,22 @@
 
     if (!!document.querySelector('.select')) {
         document.querySelectorAll('select-option').forEach((o, i) => {
-            o.onclick = e => {
-                if (!!e.target.getAttribute('disabled') === false) {
-                    e.target.parentNode.style.setProperty('--num', i)
-                    var type = e.target.dataset.type
+            (o as HTMLSelectElement).onclick = e => {
+                if (!!(e.target as HTMLElement)?.getAttribute('disabled') === false) {
+                    ((e.target as HTMLElement)?.parentNode as HTMLElement)?.style.setProperty('--num', i.toString())
+                    var type = (e.target as HTMLElement)?.dataset.type
                     if (!!type) {
                         document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => {
                             s.setAttribute('hidden', '')
                         })
                         var selector = document.querySelector(`.select[data-type="fare"][data-for="${type}"]`)
-                        selector.removeAttribute('hidden')
+                        selector?.removeAttribute('hidden')
                     }
                 }
             }
         })
         document.querySelectorAll('select-options').forEach(e => {
-            e.style.setProperty('--amt', e.querySelectorAll('select-option').length)
+            (e as HTMLElement).style.setProperty('--amt', e.querySelectorAll('select-option').length.toString())
         })
     }
 </script>

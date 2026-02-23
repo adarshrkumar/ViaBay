@@ -9,29 +9,34 @@
         applySettings()
         if (location.pathname.startsWith('/settings')) {
             settingEles.forEach(s => {
-                s.querySelector('select').onchange = e => {
-                    setSetting(s.getAttribute('module-name'), e.target.value)
+                const sel = s.querySelector('select')
+                if (sel) {
+                    sel.onchange = e => {
+                        setSetting(s.getAttribute('module-name')!, (e.target as HTMLSelectElement).value)
+                    }
                 }
             })
         }
     })
 
-    var setTheme = t => {
+    var setTheme = (t: string) => {
         document.documentElement.setAttribute('data-theme', (t || 'system'))
     }
     var settingsKey = 'settings'
 
-    var settingFunctions = {
-        theme: theme => {
+    type Setting = { name: string; content?: any }
+    type SettingFunctions = { [key: string]: (value: any) => void }
+
+    var settingFunctions: SettingFunctions = {
+        theme: (theme: string) => {
             setTheme(theme)
         }
     }
     applySettings()
 
-    function getSettings() {
-        var settings = localStorage.getItem(settingsKey) || '[]'
-        settings = JSON.parse(settings)
-        return settings
+    function getSettings(): Setting[] {
+        var raw = localStorage.getItem(settingsKey) || '[]'
+        return JSON.parse(raw) as Setting[]
     }
 
     function applySettings() {
@@ -43,25 +48,28 @@
         if (location.pathname.startsWith('/settings') && settings.length > 0) {
             settingEles.forEach(s => {
                 var setting = settings.filter(filterCheck)[0].content
-                s.querySelector('select').value = setting
+                const sel = s.querySelector('select')
+                if (sel) {
+                    sel.value = setting
+                }
             })
         }
     }
 
-    function filterCheck(setting) {
+    function filterCheck(setting: Setting) {
         return setting.name === 'theme'
     }
 
-    function setSetting(name, value, type, key) {
+    function setSetting(name: string, value: string, type?: string, key?: string) {
         var settings = getSettings()
         console.log(settings)
 
-        var item = ''
+        var item: Setting | undefined
         if (settings.length > 0) {
             item = settings.filter(filterCheck)[0]
         }
 
-        var index = settings.indexOf(item)
+        var index = item ? settings.indexOf(item) : -1
 
         if (index < 0 || settings.length < 1) {
             var settingsLength = settings.length
@@ -70,7 +78,7 @@
         }
 
         var setting = settings[index]
-        var content = setting.content
+        var content: any = setting.content
         if (!content) {
             switch(type) {
                 case 'object':
@@ -87,7 +95,7 @@
 
         switch(type) {
             case 'object':
-                content[key] = value
+                if (key !== undefined) content[key] = value
                 break
             case 'list':
                 content.push(value)
@@ -99,8 +107,7 @@
 
         setting.content = content
         settings[index] = setting
-        settings = JSON.stringify(settings)
-        localStorage.setItem(settingsKey, settings)
+        localStorage.setItem(settingsKey, JSON.stringify(settings))
 
         settingFunctions[setting.name](setting.content)
     }

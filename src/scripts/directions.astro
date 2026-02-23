@@ -1,9 +1,12 @@
 <script>
-    var map = null
-    var onMapLoad = null
-    var routingControl = null
+    interface NominatimResult { display_name: string; lat: string; lon: string; }
+    interface RoutingResultEvent { routes: Array<{ summary: { totalDistance: number; totalTime: number } }>; }
+    interface RoutingControl extends L.Control { on(type: string, fn: (event: RoutingResultEvent) => void): this; }
 
-    function assertError(err, name) {
+    var map: L.Map | null = null
+    var routingControl: RoutingControl | null = null
+
+    function assertError(err: unknown, name: string) {
         err = `${name} Error: ${err}`
         alert(err)
         console.error(err)
@@ -12,18 +15,18 @@
 
     GetMap()
     function GetMap() {
-        if (document.getElementById('myMap') && typeof L !== 'undefined') {
+        if (document.getElementById('myMap') && typeof window.L !== 'undefined') {
             // Default location (Bay Area)
-            var defaultLocation = [37.7749, -122.4194];
+            var defaultLocation: [number, number] = [37.7749, -122.4194];
             var initialZoom = 10;
-            var mapCenter = defaultLocation;
+            var mapCenter: [number, number] = defaultLocation;
 
             // Request user's location first
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     position => {
                         // Got user location, use it
-                        mapCenter = [position.coords.latitude, position.coords.longitude];
+                        mapCenter = [position.coords.latitude, position.coords.longitude] as [number, number];
                         initialZoom = 12;
                         initializeMap();
                     },
@@ -46,15 +49,15 @@
 
             function initializeMap() {
                 // Initialize Leaflet map
-                map = L.map('myMap').setView(mapCenter, initialZoom);
+                map = window.L.map('myMap').setView(mapCenter, initialZoom);
 
                 // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
-                L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
+                window.L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
                     attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
                     maxZoom: 19
-                }).addTo(map);
+                }).addTo(map!);
 
-                if (onMapLoad) onMapLoad(map)
+                if (window.onMapLoad) window.onMapLoad(map!)
             }
         }
         else {
@@ -63,13 +66,13 @@
     }
 
     var stopsArea = document.querySelector('.stops-area')
-    var stops = stopsArea.querySelector('.stops')
+    var stops = stopsArea?.querySelector('.stops')
     var closeButtons = document.querySelectorAll('.close')
     var goBtn = document.querySelector('.calc-route')
 
     var directionsElement = document.querySelector('#directions')
 
-    async function geocodeAddress(address) {
+    async function geocodeAddress(address: string) {
         // Use Nominatim (OpenStreetMap) geocoding service
         var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
         try {
@@ -84,12 +87,12 @@
         return null;
     }
 
-    async function addDirections(_e) {
-        var places = []
+    async function addDirections(_e: Event) {
+        var places: string[] = []
 
-        stops.querySelectorAll('.stop').forEach(s => {
+        stops?.querySelectorAll('.stop').forEach(s => {
             if (s.getAttribute('final-value')) {
-                places.push(s.getAttribute('final-value'))
+                places.push(s.getAttribute('final-value')!)
             }
         })
 
@@ -100,7 +103,7 @@
 
         // Remove existing routing control if any
         if (routingControl) {
-            map.removeControl(routingControl);
+            map?.removeControl(routingControl);
         }
 
         // Geocode all places
@@ -108,7 +111,7 @@
         for (var i = 0; i < places.length; i++) {
             var coords = await geocodeAddress(places[i]);
             if (coords) {
-                waypoints.push(L.latLng(coords.lat, coords.lng));
+                waypoints.push(window.L.latLng(coords.lat, coords.lng));
             } else {
                 alert('Could not geocode: ' + places[i]);
                 return;
@@ -116,34 +119,36 @@
         }
 
         // Create routing control with waypoints
-        if (typeof L.Routing !== 'undefined') {
-            routingControl = L.Routing.control({
+        if (typeof window.L.Routing !== 'undefined') {
+            routingControl = (window.L.Routing.control({
                 waypoints: waypoints,
                 routeWhileDragging: false,
                 showAlternatives: false,
                 fitSelectedRoutes: true,
                 lineOptions: {
-                    styles: [{color: '#6FA1EC', weight: 4}]
+                    styles: [{color: '#6FA1EC', weight: 4}],
+                    extendToWaypoints: true,
+                    missingRouteTolerance: 0
                 }
-            }).addTo(map);
+            }).addTo(map!) as unknown) as RoutingControl;
 
             // Display route in the directions element
-            routingControl.on('routesfound', e => {
+            routingControl.on('routesfound', (e: RoutingResultEvent) => {
                 var routes = e.routes;
                 var summary = routes[0].summary;
-                directionsElement.innerHTML = '<div class="route-summary">' +
+                directionsElement && (directionsElement.innerHTML = '<div class="route-summary">' +
                     '<h3>Route Summary</h3>' +
                     '<p>Total Distance: ' + (summary.totalDistance / 1609.34).toFixed(2) + ' miles</p>' +
                     '<p>Estimated Time: ' + Math.round(summary.totalTime / 60) + ' minutes</p>' +
-                    '</div>';
+                    '</div>');
             });
         } else {
             alert('Routing library not loaded. Please refresh the page.');
         }
     }
 
-    document.querySelector('.add-stop').addEventListener('click', _e => {
-        var stopsAmt = stops.querySelectorAll('.stop').length
+    document.querySelector('.add-stop')?.addEventListener('click', _e => {
+        var stopsAmt = stops?.querySelectorAll('.stop').length ?? 0
 
         var stopContainer = document.createElement('div')
         stopContainer.classList.add('stop-container')
@@ -156,7 +161,7 @@
         stop.placeholder = `Stop #${stopsAmt+1}`
         stop.title = `Stop #${stopsAmt+1}`
         stop.addEventListener('keypress', e => {
-            stopChange(e, stopsAmt-1)
+            stopChange(e as Event, stopsAmt-1)
         })
         stopParent.appendChild(stop)
 
@@ -164,7 +169,7 @@
         closeButton.classList.add('close')
         closeButton.classList.add('removeStyles')
         closeButton.onclick = e => {
-            onCloseClick(e, stopsAmt-1)
+            onCloseClick(e)
         }
 
         var closeIcon = document.createElement('svg')
@@ -184,37 +189,37 @@
         options.classList.add('options')
         stopContainer.appendChild(options)
 
-        stops.appendChild(stopContainer)
+        stops?.appendChild(stopContainer)
     })
 
     closeButtons.forEach(b => {
-        b.onclick = e => onCloseClick(e)
+        (b as HTMLButtonElement).onclick = (e: Event) => onCloseClick(e)
     })
 
-    function onCloseClick(e) {
-        e.target.parentNode.parentNode.parentNode.remove();
+    function onCloseClick(e: Event) {
+        ((e.target as HTMLElement)?.parentNode?.parentNode?.parentNode as HTMLElement)?.remove();
         reorderStops()
     }
 
     function reorderStops() {
-        stops.querySelectorAll('.stop').forEach((s, i) => {
-            s.placeholder = `Stop #${i+1}`
+        stops?.querySelectorAll('.stop').forEach((s, i) => {
+            (s as HTMLInputElement).placeholder = `Stop #${i+1}`
         })
     }
 
-    stops.querySelectorAll('.stop').forEach((s, i) => {
-        s.onchange = e => {
+    stops?.querySelectorAll('.stop').forEach((s, i) => {
+        (s as HTMLInputElement).onchange = e => {
             stopChange(e, i)
         }
     })
 
-    async function stopChange(e, i) {
-        var finalValue = e.target.getAttribute('final-value')
-        var searchText = e.target.value
+    async function stopChange(e: Event, i: number) {
+        var finalValue = (e.target as HTMLInputElement).getAttribute('final-value')
+        var searchText = (e.target as HTMLInputElement).value
 
-        var optionsEle = stops.querySelectorAll('.options')[i]
+        var optionsEle = stops?.querySelectorAll('.options')[i]
 
-        optionsEle.querySelectorAll('.option').forEach(o => {
+        optionsEle?.querySelectorAll('.option').forEach(o => {
             o.remove()
         })
 
@@ -224,13 +229,13 @@
 
             try {
                 var response = await fetch(url);
-                var results = await response.json();
+                var results: NominatimResult[] = await response.json();
 
                 results.forEach(r => {
                     createOption(r.display_name, i, optionsEle);
                 });
 
-                function createOption(content, i, optionsEle, lastLoc=false) {
+                function createOption(content: string, i: number, optionsEle: Element | undefined, lastLoc=false) {
                     var aEle = document.createElement('button')
                     aEle.classList.add('option')
                     aEle.classList.add('removeStyles')
@@ -242,7 +247,7 @@
                     else {
                         aEle.onclick = e => selectOption(e, i)
                     }
-                    optionsEle.appendChild(aEle)
+                    optionsEle?.appendChild(aEle)
                 }
             } catch (error) {
                 console.error('Geocoding search error:', error);
@@ -250,18 +255,18 @@
         }
     }
 
-    function selectOption(e, i) {
-        var place = e.target.textContent
-        var optionsEle = stops.querySelectorAll('.options')[i]
+    function selectOption(e: MouseEvent, i: number) {
+        var place = (e.target as HTMLElement).textContent ?? ''
+        var optionsEle = stops?.querySelectorAll('.options')[i]
 
-        optionsEle.querySelectorAll('.option').forEach(o => {
+        optionsEle?.querySelectorAll('.option').forEach(o => {
             o.remove()
         })
 
-        var stop = stops.querySelectorAll('.stop')[i]
+        var stop: HTMLInputElement = stops?.querySelectorAll('.stop')[i] as HTMLInputElement
         stop.setAttribute('final-value', place)
         stop.value = place
     }
 
-    goBtn.addEventListener('click', addDirections)
+    goBtn?.addEventListener('click', addDirections)
 </script>
