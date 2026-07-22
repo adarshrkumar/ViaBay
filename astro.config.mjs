@@ -4,6 +4,7 @@ import 'dotenv/config'
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'server', // Enable server-side rendering for API routes
-  adapter: vercel(),
+    output: 'server', // Enable server-side rendering for API routes
+    adapter: vercel(),
+    trailingSlash: 'never',
 });
