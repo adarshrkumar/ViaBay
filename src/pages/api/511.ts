@@ -84,9 +84,9 @@ export const GET: APIRoute = async ({ url, request }) => {
             }
         )
     } catch (err) {
-        console.error('[511 API Route] Request failed, returning error:', (err as Error).message)
+        console.error('[511 API Route] Request failed, returning error:', err instanceof Error ? err.message : String(err))
         return new Response(
-            JSON.stringify({ error: (err as Error).message }),
+            JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
             { status: 500, headers: { 'Content-Type': 'application/json' } }
         )
     }

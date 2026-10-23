@@ -1,6 +1,6 @@
 <script>
     function openSelection(e: HTMLElement) {
-        while (!e.className.includes('select') && e.parentNode) e = e.parentNode as HTMLElement
+        while (!e.className.includes('select') && e.parentElement) e = e.parentElement
         document.querySelectorAll('.select').forEach(s => s.classList.remove('open'))
         e.classList.add('open')
         e.setAttribute('onclick', 'closeSelection(this)')
@@ -8,18 +8,18 @@
     window.openSelection = openSelection
 
     function closeSelection(e: HTMLElement) {
-        while (!e.className.includes('select')) e = e.parentNode as HTMLElement
+        while (!e.className.includes('select') && e.parentElement) e = e.parentElement
         e.classList.remove('open')
         e.setAttribute('onclick', 'openSelection(this)')
     }
     window.closeSelection = closeSelection
 
     if (document.querySelector('.select')) {
-        document.querySelectorAll('select-option').forEach((o, i) => {
-            o.addEventListener('click', e => {
-                if (!!(e.target as HTMLElement)?.getAttribute('disabled') === false) {
-                    ((e.target as HTMLElement)?.parentNode as HTMLElement)?.style.setProperty('--num', i.toString())
-                    var type = (e.target as HTMLElement)?.dataset.type
+        document.querySelectorAll<HTMLElement>('select-option').forEach((o, i) => {
+            o.addEventListener('click', () => {
+                if (!!o.getAttribute('disabled') === false) {
+                    o.parentElement?.style.setProperty('--num', i.toString())
+                    var type = o.dataset.type
                     if (type) {
                         document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => s.setAttribute('hidden', ''))
                         var selector = document.querySelector(`.select[data-type="fare"][data-for="${type}"]`)
@@ -28,6 +28,6 @@
                 }
             })
         })
-        document.querySelectorAll('select-options').forEach(e => (e as HTMLElement).style.setProperty('--amt', e.querySelectorAll('select-option').length.toString()))
+        document.querySelectorAll<HTMLElement>('select-options').forEach(e => e.style.setProperty('--amt', e.querySelectorAll('select-option').length.toString()))
     }
 </script>

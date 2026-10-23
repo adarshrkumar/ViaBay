@@ -23,8 +23,9 @@
                 if (c.endsWith('-parent')) element = c.slice(0, -7)
             })
 
-            checkIfValue(e.querySelector(element) || document.documentElement);
-            e.addEventListener('keyup', event => checkIfValue((event.target as HTMLElement) || document.documentElement))
+            var input = e.querySelector<HTMLInputElement>(element)
+            checkIfValue(input);
+            e.addEventListener('keyup', () => checkIfValue(input))
         })
 
     })
@@ -45,9 +46,9 @@
     }
     window.addEventListener('resize', checkHFHeight)
 
-    function checkIfValue(element: HTMLElement) {
-        if ((element as HTMLInputElement).value) (element.parentNode as HTMLElement)?.setAttribute('open', '')
-        else (element.parentNode as HTMLElement)?.removeAttribute('open')
+    function checkIfValue(element: HTMLInputElement | null) {
+        if (element?.value) element.parentElement?.setAttribute('open', '')
+        else element?.parentElement?.removeAttribute('open')
     }
 
     function goToPage(name: string) {
