@@ -421,11 +421,6 @@
         //Make sure the marker has metadata to display.
         var data = pin.metadata
         if (data) {
-            var isSmallScreen = window.matchMedia('(max-width: 915px)').matches
-            if (isSmallScreen) {
-
-            }
-
             data.LineName = data.PublishedLineName
             if (data.LineName) {
                 if (data.LineName.includes('\\\\')) data.LineName = data.LineName.split('\\\\').join('/')
