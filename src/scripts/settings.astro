@@ -22,8 +22,8 @@
     }
     var settingsKey = 'settings'
 
-    type Setting = { name: string; content?: any }
-    type SettingFunctions = { [key: string]: (value: any) => void }
+    type Setting = { name: string; content?: string | string[] | { [key: string]: string } }
+    type SettingFunctions = { [key: string]: (value: string | string[] | { [key: string]: string }) => void }
 
     var settingFunctions: SettingFunctions = {
         theme: (theme: string) => setTheme(theme)
@@ -68,7 +68,7 @@
         }
 
         var setting = settings[index]
-        var content: any = setting.content
+        var content: string | string[] | { [key: string]: string } = setting.content
         if (!content) {
             switch(type) {
                 case 'object':
@@ -85,10 +85,10 @@
 
         switch(type) {
             case 'object':
-                if (key !== undefined) content[key] = value
+                key !== undefined && content[key] = value
                 break
             case 'list':
-                content.push(value)
+                Array.isArray(content) && content.push(value)
                 break
             default:
                 content = value

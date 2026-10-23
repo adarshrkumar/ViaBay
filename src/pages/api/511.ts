@@ -7,7 +7,7 @@ const apiKey = '7a7f827d-6d7d-451e-a9a6-bcc517c951b9'
 async function make511Request(
     moduleName: string,
     params: string[][] = []
-): Promise<any> {
+) {
     console.log(`[511 API] Starting ${moduleName} request`)
 
     let paramString = ''
