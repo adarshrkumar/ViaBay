@@ -58,8 +58,10 @@ html {
     --accent-hover: #{$lacc-hover};
     --border-color: #{$lborder};
     --surface: #{$lsurface};
+
     color-scheme: light;
 }
+
 [data-theme="dark"] {
     --bg: #{$dbg};
     --bg-secondary: #{$dbg-secondary};
@@ -69,13 +71,13 @@ html {
     --accent-hover: #{$dacc-hover};
     --border-color: #{$dborder};
     --surface: #{$dsurface};
+
     color-scheme: dark;
 }
 
 body {
     margin: 0;
     min-height: 100%;
-
     display: flex;
     flex-direction: column;
 }
@@ -106,21 +108,18 @@ body {
 }
 
 .header {
+    $_backdrop-filter: blur(10px);
+
     padding-inline: $spacing-xlarge;
     background-color: var(--surface);
     border-bottom: $border;
-
-    $_backdrop-filter: blur(10px);
     -webkit-backdrop-filter: $_backdrop-filter;
     backdrop-filter: $_backdrop-filter;
-
     box-shadow: $shadow-small;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: $spacing-xlarge;
-
     font-size: 1.25rem;
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -135,26 +134,20 @@ body {
 .nav {
     flex: 1;
     box-sizing: border-box;
-
     display: flex;
     justify-content: right;
     gap: $spacing-xsmall;
     padding: $spacing-small $spacing-medium;
     padding-right: $spacing-medium;
-
     z-index: 2;
 
     .link {
         aspect-ratio: 1;
-
         height: 100%;
-
         display: grid;
         place-items: center;
-
         color: var(--color-secondary);
         border-radius: $border-radius;
-
         transition: all $transition-time ease;
 
         &:hover {
@@ -182,6 +175,7 @@ body {
             height: 4rem;
         }
     }
+
     @media (max-width: 751px) {
         & {
             height: 100%;
@@ -204,7 +198,6 @@ body {
     background-color: var(--surface);
     border-top: $border;
     box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.05);
-
     display: grid;
     place-items: center;
     font-size: 0.875rem;
@@ -221,13 +214,14 @@ body {
     $p: 2rem;
 
     max-height: 100%;
-
     box-sizing: border-box;
+
     &:not(.full) {
         padding: $p;
     }
 
     width: 100%;
+
     // height: 100%;
 
     z-index: 1;
@@ -239,6 +233,7 @@ body {
     :first-child {
         margin-top: 0;
     }
+
     :last-child {
         margin-bottom: 0;
     }
@@ -249,18 +244,17 @@ body {
 }
 
 .input, .textarea, .select {
-    position: relative;
     $p-i: 1rem;
+    position: relative;
     padding-inline: $p-i;
-
     width: 100%;
+
     &:not(:is(.input-parent, .textarea-parent, .select-parent) > :is(.input, .textarea, .select)) {
         aspect-ratio: 8 / 1;
     }
 
     background-color: var(--accent);
     color: var(--color);
-
     border-radius: 10px;
     border: solid $border-size var(--color);
     outline: none;
@@ -272,9 +266,11 @@ body {
         font-size: 3em;
         line-height: 0;
     }
+
     &[required] .label .star {
         color: red;
     }
+
     &.normal {
         font-size: 4rem;
         line-height: 1;
@@ -284,21 +280,16 @@ body {
 .input-parent, .textarea-parent, .select-parent {
     position: relative;
     box-sizing: border-box;
-
     width: 100%;
     aspect-ratio: 8 / 1;
-
     background-color: var(--surface);
     color: var(--color);
-
     border-radius: $border-radius;
     border: solid $border-size var(--border-color);
     outline: none;
     box-shadow: $shadow-small;
-
     font-size: 2rem;
     transition: all $transition-time ease;
-
     z-index: 1;
 
     &:hover {
@@ -311,24 +302,21 @@ body {
     }
 
     .label {
+        $_user-select: none;
+
         position: absolute;
         top: 50%;
-
         display: inline-block;
         padding: calc($p-i/2) $p-i;
-
         color: inherit;
         border: inherit;
+
         /* border-bottom: none; */
 
-        $_user-select: none;
         line-height: 1;
-
         -webkit-user-select: $_user-select;
         user-select: $_user-select;
-
         transform: skewX(#{-1*$skew});
-
         transition:
             padding $transition-time ease-in-out,
             border $transition-time ease-in-out,
@@ -354,10 +342,8 @@ body {
     &:is([open], :has(:is(input, textarea, select):focus)) {
         .label {
             padding-inline: $p-i;
-
             background-color: inherit;
             font-size: 1em;
-
             translate: $p-i 0;
             transform: translateY(calc(-125%)) skew(#{-1*$skew});
             z-index: 2;
@@ -373,13 +359,16 @@ body {
             }
         }
     }
+
     &:has([required]) .label .star {
         color: red;
     }
+
     &.normal {
         font-size: 4rem;
         line-height: 1;
     }
+
     :is(input, textarea, select) {
         border-radius: calc($border-radius - $border-size);
         width: calc(calc(100% - $border-size) + $border-size);
@@ -401,39 +390,48 @@ body {
 
 .select {
     position: relative;
+
     &:not(.open) {
         overflow: hidden;
+
         select-options {
             top: 0 !important;
             translate: 0 calc((-100%)/var(--amt, 0)*var(--num, 0));
+
             select-option:first-child {
                 color: lightgray;
             }
         }
     }
+
     &:has(select) {
         padding-inline: 0;
     }
+
     &:has(select-options) {
         width: $s-w;
         padding-inline: 0;
         cursor: pointer;
     }
+
     &.open {
         select-options {
             border: solid $border-size var(--color);
             translate: #{-1*$border-size} 0;
             overflow: hidden;
+
             select-option {
                 &:first-child:hover {
                     color: var(--color);
                 }
+
                 &:hover {
                     background-color: gray;
                 }
             }
         }
     }
+
     select-options {
         z-index: 2;
         border-radius: inherit;
@@ -445,12 +443,15 @@ body {
         color: inherit;
         display: grid;
         grid-template-rows: repeat(var(--amt, 0), 1fr);
+
         select-option {
             $_user-select: none;
+
             padding-inline: $p-i;
             -webkit-user-select: $_user-select;
             user-select: $_user-select;
             cursor: pointer;
+
             &[disabled] {
                 color: lightgray;
             }
@@ -463,6 +464,7 @@ body {
     color: inherit;
     background: inherit;
     position: inherit;
+
     &.normal {
         font-size: inherit;
         line-height: inherit;

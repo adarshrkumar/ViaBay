@@ -9,21 +9,17 @@
 :is(.menu, .notifications) item {
     min-height: 10rem;
     padding: $spacing-xlarge;
-
     background-color: var(--surface);
     color: var(--color);
-
     border-radius: $border-radius;
     border: 1px solid var(--border-color);
     outline: none;
     box-shadow: $shadow-medium;
-
     display: flex;
     flex-direction: column;
     gap: $spacing-medium;
     justify-content: center;
     align-items: flex-start;
-
     cursor: pointer;
     transition: all $transition-time ease;
 

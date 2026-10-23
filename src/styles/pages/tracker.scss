@@ -1,5 +1,4 @@
 @use '../variables.scss' as *;
-
 @use 'sass:math';
 
 $padding: 1.5rem;
@@ -15,7 +14,6 @@ $hf-size: 4rem;
     height: 100%;
     position: relative;
     border-radius: 0;
-
     container-type: size;
 
     .custom-nav {
@@ -24,12 +22,9 @@ $hf-size: 4rem;
         position: absolute;
         left: var(--position);
         top: var(--position);
-
         height: calc(100% - (var(--position)/2) - var(--f-height));
         width: 3rem;
-
         z-index: 999;
-
         display: flex;
         flex-direction: column;
         gap: $spacing-medium;
@@ -65,18 +60,18 @@ $hf-size: 4rem;
 }
 
 .vehicle-info-container {
+    $_pos: calc(-100% - $padding);
+
     display: none;
+
     &.visible {
         display: block;
     }
-
-    $_pos: calc(-100% - $padding);
 
     position: fixed;
     top: 100dvh;
     left: 100dvw;
     translate: $_pos $_pos;
-
     z-index: 99999999;
 
     .leaflet-popup-tip-container {
@@ -87,24 +82,16 @@ $hf-size: 4rem;
         position: absolute;
         top: 0;
         right: 0;
-
         margin: math.div($padding, 4);
-
         aspect-ratio: 1;
-
         background: none;
         color: var(--color);
-
         border: none;
         border-radius: 4px;
-
         font-size: 1.5rem;
         line-height: 0;
-
         z-index: 1000;
-
         cursor: pointer;
-
         transition: all $transition-time ease;
 
         &:hover {
@@ -119,34 +106,27 @@ $hf-size: 4rem;
 }
 
 .leaflet-popup-content-wrapper {
+    $_backdrop-filter: blur(10px);
+
     position: static;
     bottom: $padding !important;
     right: $padding !important;
-
     box-sizing: border-box;
     padding: $padding;
-
     display: flex;
     flex-direction: column;
-
     max-height: calc(100dvh - ($padding * 2));
     max-width: calc(100dvw - ($padding * 2));
-
     min-width: -webkit-fill-available;
     min-width: -webkit-fit-content;
     min-width: fit-content;
-
     background-color: var(--surface);
     color: var(--color);
-
     border-radius: $border-radius;
     border: 1px solid var(--border-color);
     box-shadow: $shadow-xlarge;
-
-    $_backdrop-filter: blur(10px);
     -webkit-backdrop-filter: $_backdrop-filter;
     backdrop-filter: $_backdrop-filter;
-
     overflow: auto;
 
     .leaflet-popup-content {
@@ -170,6 +150,7 @@ $hf-size: 4rem;
         &:empty {
             margin-block: 0;
         }
+
         display: grid;
         gap: $spacing-small;
 
