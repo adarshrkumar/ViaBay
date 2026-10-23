@@ -135,9 +135,7 @@
         })
 
         // Sort by distance
-        nearbyVehicles.sort((a, b) => {
-            return a.distance - b.distance
-        })
+        nearbyVehicles.sort((a, b) => a.distance - b.distance)
 
         // Build HTML content
         var content = '<span class="title">Nearby Vehicles</span>'
@@ -171,11 +169,7 @@
             container.classList.add('visible')
 
             var closeBtn = container.querySelector('.leaflet-popup-close-button')
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    container!.classList.remove('visible')
-                })
-            }
+            if (closeBtn) closeBtn.addEventListener('click', () => container!.classList.remove('visible'))
         }
     }
 
@@ -230,9 +224,7 @@
                         }
                     })
                     aObj.vehicles.pins = {}
-                    goodPins.forEach(pin => {
-                        aObj!.vehicles.pins[pin.name] = pin.content
-                    })
+                    goodPins.forEach(pin => aObj!.vehicles.pins[pin.name] = pin.content)
 
                     vehicleData.forEach((vehicle, _vI: number) => {
                         var vehicleActivity = vehicle.MonitoredVehicleJourney
@@ -250,9 +242,7 @@
                                     if (publishedLineName.includes(' ')) parts = publishedLineName.split(' ')
                                     else parts = [publishedLineName]
 
-                                    parts.forEach((p, i: number) => {
-                                        parts[i] = `${p[0]}${p.substring(1).toLowerCase()}`
-                                    })
+                                    parts.forEach((p, i: number) => parts[i] = `${p[0]}${p.substring(1).toLowerCase()}`)
 
                                     vehicleActivity.PublishedLineName = parts.join(' ')
                                 }
@@ -306,9 +296,7 @@
                                 var newPin = window.L.marker(vehicleLatLng, { icon: icon }) as VehicleMarker;
                                 newPin.metadata = vehicleActivity;
 
-                                newPin.on('click', e => {
-                                    showVehicleInfo(e, newPin);
-                                });
+                                newPin.on('click', e => showVehicleInfo(e, newPin));
 
                                 newPin.addTo(map);
                                 pin = newPin;
@@ -463,13 +451,9 @@
                 container.innerHTML = buildPopupContent('<li>Loading stops...</li>')
                 container.classList.add('visible')
 
-                var attachCloseHandler = () => {
+                function attachCloseHandler() {
                     var closeBtn = container!.querySelector('.leaflet-popup-close-button')
-                    if (closeBtn) {
-                        closeBtn.addEventListener('click', () => {
-                            container!.classList.remove('visible')
-                        })
-                    }
+                    if (closeBtn) closeBtn.addEventListener('click', () => container!.classList.remove('visible'))
                 }
                 attachCloseHandler()
 
@@ -490,18 +474,14 @@
                     var stops: StopCall[] = []
                     if (data.MonitoredCall) stops.push(data.MonitoredCall)
                     if (data.OnwardCalls && data.OnwardCalls.OnwardCall && data.OnwardCalls.OnwardCall.length > 0) {
-                        data.OnwardCalls.OnwardCall.forEach(stop => {
-                            stops.push(stop)
-                        })
+                        data.OnwardCalls.OnwardCall.forEach(stop => stops.push(stop))
                     }
 
                     stops.forEach(stop => {
                         var items = TimingPointInJourneyPattern.filter(t => t.Name === stop.StopPointName)
                         if (items && items.length > 0) {
                             if (items.length > 1) {
-                                items.forEach(i => {
-                                    TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(i), 1)
-                                })
+                                items.forEach(i => TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(i), 1))
                             }
                             else TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(items[0]), 1)
                         }

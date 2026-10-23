@@ -3,9 +3,11 @@
     let requestDelay = 0 // milliseconds
 
     // Helper function to wait/delay
-    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+    function delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms))
+    }
 
-    async function makeRequest(moduleName: string, params: string[][] = [], callback: (data: unknown) => void = () => {}) {
+    async function makeRequest(moduleName: string, params: string[][] = [], callback: (data: unknown) => void = function () {}) {
         // Apply current delay if any
         if (requestDelay > 0) await delay(requestDelay)
 

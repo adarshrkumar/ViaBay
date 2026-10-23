@@ -11,15 +11,13 @@
             settingEles.forEach(s => {
                 const sel = s.querySelector('select')
                 if (sel) {
-                    sel.onchange = e => {
-                        setSetting(s.getAttribute('module-name')!, (e.target as HTMLSelectElement).value)
-                    }
+                    sel.addEventListener('change', e => setSetting(s.getAttribute('module-name')!, (e.target as HTMLSelectElement).value))
                 }
             })
         }
     })
 
-    var setTheme = (t: string) => {
+    function setTheme(t: string) {
         document.documentElement.setAttribute('data-theme', (t || 'system'))
     }
     var settingsKey = 'settings'
@@ -28,9 +26,7 @@
     type SettingFunctions = { [key: string]: (value: any) => void }
 
     var settingFunctions: SettingFunctions = {
-        theme: (theme: string) => {
-            setTheme(theme)
-        }
+        theme: (theme: string) => setTheme(theme)
     }
     applySettings()
 
@@ -41,9 +37,7 @@
 
     function applySettings() {
         var settings = getSettings()
-        settings.forEach(s => {
-            settingFunctions[s.name](s.content)
-        })
+        settings.forEach(s => settingFunctions[s.name](s.content))
 
         if (location.pathname.startsWith('/settings') && settings.length > 0) {
             settingEles.forEach(s => {
