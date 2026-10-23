@@ -344,7 +344,7 @@ The UI is visually considered (design tokens, focus-within states, reduced-motio
 1. Replace custom select with a native/accessible control; add ARIA labels to nav (M9, §7).
 2. Clean up layout props/canonical/body attribute and dead code (M4, L1–L2).
 3. Fix docs: README feature list, SECURITY.md, remove unused assets/data (L5–L8).
-4. Add the missing `tests/` Playwright suite and wire `npm run check` into CI.
+4. Add assertions to the placeholder browser tests, wire `npm run check` and the Playwright suite into CI.
 
 ---
 

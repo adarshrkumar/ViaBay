@@ -7,7 +7,7 @@ import { rules, ruleConfigs } from './eslint/custom-rules.js';
 
 export default [
     {
-        ignores: ['node_modules', 'dist', '.astro', '.vercel']
+        ignores: ['node_modules', 'dist', 'build', 'coverage', '.astro', '.vercel']
     },
     {
         files: ['**/*.{js,ts,mjs,cjs,tsx,jsx}', 'eslint/**/*.js'],
