@@ -142,7 +142,7 @@ $hf-size: 4rem;
     border-radius: $border-radius;
     border: 1px solid var(--border-color);
     box-shadow: $shadow-xlarge;
-    
+
     $_backdrop-filter: blur(10px);
     -webkit-backdrop-filter: $_backdrop-filter;
     backdrop-filter: $_backdrop-filter;
