@@ -58,7 +58,7 @@
     }
     window.goToPage = goToPage
 
-    function assertError(err: unknown, name: string) {
+    function assertError(err: Error | string, name: string) {
         var aErr = `${name} Error: ${err}`
         var cErr = `Error with ${name}: ${err}`
         alert(aErr)

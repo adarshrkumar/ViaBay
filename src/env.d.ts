@@ -1,22 +1,22 @@
 /// <reference types="astro/client" />
 
 interface Window {
-    makeRequest: (moduleName: string, params?: string[][], callback?: (data: unknown) => void) => Promise<void>
+    makeRequest: <T>(moduleName: string, params?: string[][], callback?: (data: T) => void) => Promise<void>
     checkAuthentication: (u: string, p: string) => boolean
     setCredentials: (username: string, password: string, dest: string) => void
     setCookie: (cname: string, cvalue: string, exdays: number) => void
     getCookie: (cname: string) => string
-    assertError: (err: unknown, name: string) => void
+    assertError: (err: Error | string, name: string) => void
     goToPage: (name: string) => void
     showModal: (title: string, content: string) => void
-    addNotification: (module: string, name: string, icon: string, content: string, attatchmentInfo: unknown) => void
-    getNotifications: (module?: unknown, title?: unknown, description?: unknown, content?: unknown, attatchmentInfo?: unknown) => void
+    addNotification: (module: string, name: string, icon: string, content: string, attatchmentInfo: string) => void
+    getNotifications: (module?: string, title?: string, description?: string, content?: string, attatchmentInfo?: string) => void
     openSelection: (e: HTMLElement) => void
     closeSelection: (e: HTMLElement) => void
-    showRoutePath: (aId: unknown, rId: unknown) => void
-    findUsingValueofKey: (arr: Record<string, unknown>[], key: string, val: unknown) => Record<string, unknown>[]
+    showRoutePath: (aId: string, rId: string) => void
+    findUsingValueofKey: (arr: Record<string, string>[], key: string, val: string) => Record<string, string>[]
     positionInterval: ReturnType<typeof setInterval> | null
-    allPins: unknown[]
+    allPins: L.Marker[]
     directionsElement: Element | null
     directionsManager: boolean
     login: () => void

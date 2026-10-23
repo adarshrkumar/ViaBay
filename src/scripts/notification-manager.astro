@@ -1,5 +1,5 @@
 <script>
-    function addNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: unknown) {
+    function addNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: string) {
         var notificationList = localStorage.getItem('notifications') ?? '[]'
         var notificationArray: string[] = JSON.parse(notificationList)
 
@@ -12,8 +12,8 @@
     }
     window.addNotification = addNotification
 
-    function packageNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: unknown) {
-        var res: Record<string, unknown> = {}
+    function packageNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: string) {
+        var res: Record<string, string> = {}
 
         if (module) res.module = module
         if (name) res.name = name

@@ -4,7 +4,7 @@
 
     var agencyIds: {Id: string, Name: string}[] = []
     var agencies: Record<string, AgencyObj | undefined> = {}
-    var allPins: unknown[] = []
+    var allPins: L.Marker[] = []
     window.allPins = allPins
     var userPin: L.Marker | null = null
     var userLocation: {lat: number, lng: number} | null = null
@@ -531,15 +531,15 @@
         }
     }
 
-    function showRoutePath(_aId: unknown, _rId: unknown) {
+    function showRoutePath() {
         // TODO: Implement route path display with Leaflet
         // This would require using a routing service or drawing polylines
         console.log('Route path display not yet implemented with Leaflet');
     }
     window.showRoutePath = showRoutePath
 
-    function findUsingValueofKey(arr: Record<string, unknown>[], key: string, val: unknown) {
-        var res = arr.filter((item: Record<string, unknown>) => item[key] === val)
+    function findUsingValueofKey(arr: Record<string, string>[], key: string, val: string) {
+        var res = arr.filter((item: Record<string, string>) => item[key] === val)
         return res
     }
     window.findUsingValueofKey = findUsingValueofKey
