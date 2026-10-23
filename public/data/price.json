@@ -14,7 +14,7 @@
         "id": "AC", 
 	    "name": "AC Transit", 
         "routes": {
-            "default": "2.50"
+            "default": "2.75"
         }
 	}, 
     "AF": {
@@ -28,14 +28,14 @@
         "id": "AM", 
 	    "name": "Capitol Corridor Joint Powers Authority", 
         "routes": {
-            "default": "6+"
+            "default": "5+"
         }
     }, 
     "BA": {
         "id": "BA", 
 	    "name": "Bay Area Rapid Transit", 
         "routes": {
-            "default": "2.30+"
+            "default": "2.55+"
         }
     }, 
     "CC": {
@@ -49,7 +49,7 @@
         "id": "CE", 
 	    "name": "Altamont Corridor Express", 
         "routes": {
-            "default": "4.75+"
+            "default": "5.00+"
         }
     }, 
     "CM": {
@@ -63,20 +63,20 @@
         "id": "CT", 
 	    "name": "Caltrain", 
         "zones": {
-            "1": "3.75", 
-            "2": "6.00", 
-            "3": "8.25", 
-            "4": "10.50", 
-            "5": "12.75", 
-            "6": "15.00", 
-            "default": "3.75+"
+            "1": "4.00", 
+            "2": "6.25", 
+            "3": "8.50", 
+            "4": "10.75", 
+            "5": "13.00", 
+            "6": "15.25", 
+            "default": "4.00+"
         }
     }, 
     "DE": {
         "id": "DE", 
 	    "name": "Dumbarton Express Consortium", 
         "routes": {
-            "default": "2.50"
+            "default": "2.75"
         }
     }, 
     "EM": {
@@ -97,7 +97,7 @@
         "id": "GF", 
 	    "name": "Golden Gate Ferry", 
         "routes": {
-            "Angel Island": "15.00", 
+            "Angel Island": "15.50", 
             "default": "14.00"
         }
     }, 
@@ -105,7 +105,7 @@
         "id": "GG", 
 	    "name": "Golden Gate Transit", 
         "routes": {
-            "default": "5.25+"
+            "default": "5.90+"
         }
 	}, 
     "MA": {
@@ -133,7 +133,7 @@
         "id": "PE", 
 	    "name": "Petaluma Transit", 
         "routes": {
-            "default": "1.50"
+            "default": "0.00"
         }
     }, 
     "PG": {
@@ -161,19 +161,17 @@
         "id": "SA", 
 	    "name": "Sonoma Marin Area Rail Transit", 
         "routes": {
-            "default": ""
+            "default": "1.50+"
         }
 	}, 
     "SB": {
         "id": "SB", 
 	    "name": "San Francisco Bay Ferry", 
-        "zones": {
-            "1": "1.50", 
-            "2": "3.00", 
-            "3": "4.50", 
-            "4": "6.00", 
-            "5": "7.50", 
-            "default": "1.50"
+        "routes": {
+            "Richmond": "5.20", 
+            "South San Francisco": "7.60", 
+            "Vallejo": "10.00", 
+            "default": "5.10"
         }
     }, 
     "SC": {
@@ -187,9 +185,9 @@
         "id": "SF", 
 	    "name": "SF Muni", 
         "routes": {
-            "PH": "8.00", 
-            "PM": "8.00", 
-            "C": "8.00", 
+            "PH": "9.00", 
+            "PM": "9.00", 
+            "C": "9.00", 
             "default": "3.00+"
         }
     }, 
@@ -260,10 +258,10 @@
         "id": "VN", 
 	    "name": "Vine Transit", 
         "routes": {
-            "11X": "3.00", 
-            "21": "3.00", 
-            "29": "5.50", 
-            "default": "1.60"
+            "11X": "2.00", 
+            "21": "3.50", 
+            "29": "6.00", 
+            "default": "2.00"
         }
 	}, 
     "WC": {
@@ -277,7 +275,7 @@
         "id": "WH", 
 	    "name": "Wheels Bus", 
         "routes": {
-            "default": "2.00"
+            "default": "2.50"
         }
     }
 }
