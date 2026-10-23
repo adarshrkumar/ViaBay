@@ -5,15 +5,12 @@
         --gap: $spacing-large;
 
         box-sizing: border-box;
-
         width: -webkit-fill-available;
         width: -webkit-fit-content;
         width: fit-content;
         background-color: var(--surface);
-
         border-left: $border;
         box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.05);
-
         display: flex;
         flex-direction: column;
         gap: var(--gap);
@@ -45,7 +42,6 @@
 
             box-sizing: border-box;
             padding: var(--gap);
-
             display: grid;
             gap: var(--gap);
 
@@ -56,9 +52,7 @@
 
                 .stop-container {
                     position: relative;
-
                     min-height: 3rem;
-
                     border-radius: $border-radius;
                     border: 1px solid var(--border-color);
                     box-shadow: $shadow-small;
@@ -77,18 +71,14 @@
 
                     .stop-parent {
                         position: relative;
-
                         height: -webkit-fill-available;
                         height: -webkit-fit-content;
                         height: fit-content;
                         width: 100%;
-
                         background-color: var(--stop-bg, var(--accent));
                         color: var(--stop-text, white);
-
                         border-radius: inherit;
                         overflow: hidden;
-
                         display: grid;
                         grid-template-columns: 1fr 2rem;
                         gap: $spacing-xsmall;
@@ -96,13 +86,10 @@
                         .stop {
                             box-sizing: border-box;
                             padding: $spacing-small $spacing-medium;
-
                             height: auto;
                             max-width: 100%;
-
                             background-color: inherit;
                             color: inherit;
-
                             border: none;
                             outline: none;
                             font-size: 0.9375rem;
@@ -112,12 +99,11 @@
                                 color: rgba(255, 255, 255, 0.7);
                             }
                         }
+
                         .close {
                             box-sizing: border-box;
-
                             height: 100%;
                             aspect-ratio: 1;
-
                             border-radius: 50%;
                             transition: all $transition-time ease;
                             display: grid;
@@ -138,6 +124,7 @@
                             }
                         }
                     }
+
                     .options {
                         position: relative;
                         display: grid;
@@ -147,6 +134,7 @@
                         &:empty {
                             display: none;
                         }
+
                         &:not(:empty) {
                             border-top: 1px solid var(--border-color);
                         }
@@ -154,14 +142,11 @@
                         .option {
                             box-sizing: border-box;
                             padding: $spacing-small $spacing-medium;
-
                             color: var(--color);
                             background-color: var(--surface);
-
                             text-align: left;
                             line-height: 1.5;
                             font-size: 0.9375rem;
-
                             cursor: pointer;
                             transition: all $transition-time ease;
 
@@ -177,9 +162,11 @@
                     }
                 }
             }
+
             :is(.stops .stop-container, .stop-toolbar) {
                 width: 100%;
             }
+
             .stop-toolbar {
                 height: 3rem;
                 display: grid;
@@ -216,6 +203,7 @@
             width: -webkit-fit-content;
             width: fit-content;
             overflow-y: auto;
+
             // height: 100%;
             // width: 100%;
         }
@@ -225,6 +213,7 @@
 @media (max-width: 915px) {
     .main {
         flex-direction: column-reverse;
+
         .directions-container {
             flex: 1;
         }
