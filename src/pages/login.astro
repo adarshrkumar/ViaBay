@@ -34,10 +34,9 @@ import Layout from '../layouts/Layout.astro'
 
     // document.querySelector('.form').addEventListener('submit', e => {e.preventDefault()})
 
-    function login() {
+    window.login = function () {
         var username = form.querySelector<HTMLInputElement>('#email')!.value
         var password = form.querySelector<HTMLInputElement>('#password')!.value
         window.setCredentials(username, password, dest)
     }
-    window.login = login
 </script>
