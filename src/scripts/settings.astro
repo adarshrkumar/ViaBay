@@ -49,9 +49,7 @@
             settingEles.forEach(s => {
                 var setting = settings.filter(filterCheck)[0].content
                 const sel = s.querySelector('select')
-                if (sel) {
-                    sel.value = setting
-                }
+                if (sel) sel.value = setting
             })
         }
     }
@@ -65,9 +63,7 @@
         console.log(settings)
 
         var item: Setting | undefined
-        if (settings.length > 0) {
-            item = settings.filter(filterCheck)[0]
-        }
+        if (settings.length > 0) item = settings.filter(filterCheck)[0]
 
         var index = item ? settings.indexOf(item) : -1
 

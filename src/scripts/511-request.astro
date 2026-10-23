@@ -7,9 +7,7 @@
 
     async function makeRequest(moduleName: string, params: string[][] = [], callback: (data: unknown) => void = () => {}) {
         // Apply current delay if any
-        if (requestDelay > 0) {
-            await delay(requestDelay)
-        }
+        if (requestDelay > 0) await delay(requestDelay)
 
         // Prepare params for API route
         const paramsString = Array.isArray(params) && params.length > 0
@@ -23,11 +21,8 @@
             const response = await fetch(url)
             // Handle 429 Rate Limit with exponential backoff
             if (response.status === 429) {
-                if (requestDelay === 0) {
-                    requestDelay = 1000 // Start with 1 second
-                } else {
-                    requestDelay = Math.min(requestDelay * 2, 32000) // Double up to max 32 seconds
-                }
+                if (requestDelay === 0) requestDelay = 1000 // Start with 1 second
+                else requestDelay = Math.min(requestDelay * 2, 32000)
                 console.log(`[Client] Rate limited (429). Increasing delay to ${requestDelay}ms and retrying...`)
                 return await makeRequest(moduleName, params, callback)
             }
@@ -45,9 +40,7 @@
             }
 
             // Success - reset delay gradually
-            if (requestDelay > 0) {
-                requestDelay = Math.max(requestDelay / 2, 0)
-            }
+            if (requestDelay > 0) requestDelay = Math.max(requestDelay / 2, 0)
 
             callback(data)
         } catch (err) {

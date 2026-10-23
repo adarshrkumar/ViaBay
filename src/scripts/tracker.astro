@@ -143,9 +143,8 @@
         var content = '<span class="title">Nearby Vehicles</span>'
         content += '<span>Within 1.5 miles of your location</span><br>'
 
-        if (nearbyVehicles.length === 0) {
-            content += '<span>No vehicles nearby</span>'
-        } else {
+        if (nearbyVehicles.length === 0) content += '<span>No vehicles nearby</span>'
+        else {
             content += '<ol class="stops">'
             nearbyVehicles.forEach(v => {
                 content += '<li class="stop">'
@@ -179,7 +178,6 @@
             }
         }
     }
-
 
     function onMapLoad() {
         window.makeRequest('gtfsoperators', [], unknownRes => {
@@ -217,9 +215,7 @@
                             },
                         }
                     }
-                    else {
-                        aObj.vehicles.data = vehicleData
-                    }
+                    else aObj.vehicles.data = vehicleData
 
                     var goodPins: { name: string, content: VehicleMarker }[] = []
 
@@ -268,9 +264,7 @@
                             var width = 30
                             if (route.length > 3) {
                                 var exces = route.length-3
-                                for (let i3 = 0; i3 < exces; i3++) {
-                                    width += 5
-                                }
+                                for (let i3 = 0; i3 < exces; i3++) width += 5
                             }
 
                             // Check for custom colors based on operator and route
@@ -285,17 +279,11 @@
                             // Caltrain: color based on train number
                             else if (operatorRef === 'CT' && route) {
                                 var firstDigit = route.charAt(0)
-                                if (firstDigit === '8') {
-                                    markerColor = 'tan'
-                                } else if (firstDigit === '5') {
-                                    markerColor = 'red'
-                                } else if (firstDigit === '4') {
-                                    markerColor = 'aqua'
-                                } else if (firstDigit === '1') {
-                                    markerColor = 'lightcoral'
-                                } else {
-                                    markerColor = 'gray'
-                                }
+                                if (firstDigit === '8') markerColor = 'tan'
+                                else if (firstDigit === '5') markerColor = 'red'
+                                else if (firstDigit === '4') markerColor = 'aqua'
+                                else if (firstDigit === '1') markerColor = 'lightcoral'
+                                else markerColor = 'gray'
                             }
                             // Other custom colors (like SF Muni)
                             else if (operatorRef && customColors[operatorRef] && customColors[operatorRef][route]) {
@@ -304,9 +292,7 @@
 
                             // Add the marker to the map
                             var pin = aObj!.vehicles.pins[vehicleRef]
-                            if (pin) {
-                                pin.setLatLng(vehicleLatLng);
-                            }
+                            if (pin) pin.setLatLng(vehicleLatLng);
                             else {
                                 // Create custom DivIcon for vehicle marker
                                 var icon = window.L.divIcon({
@@ -381,7 +367,8 @@
                         maximumAge: 0
                     }
                 );
-            } else {
+            }
+            else {
                 console.warn('Geolocation is not supported by this browser');
                 // Geolocation not supported, use default location
                 initializeMap(defaultLocation, initialZoom);
@@ -397,11 +384,9 @@
                 }).addTo(map);
 
                 // Close popup when clicking on the map
-                map.on('click', _e => {
+                map.on('click', () => {
                     var container = getVehicleInfoContainer();
-                    if (container) {
-                        container.classList.remove('visible');
-                    }
+                    if (container) container.classList.remove('visible');
                 });
 
                 if (onMapLoad) onMapLoad()
@@ -431,11 +416,8 @@
                 }
             }
         }
-        else {
-            window.addEventListener('DOMContentLoaded', GetMap)
-        }
+        else window.addEventListener('DOMContentLoaded', GetMap)
     }
-
 
     function showVehicleInfo(_e: L.LeafletMouseEvent, pin: VehicleMarker) {
         //Make sure the marker has metadata to display.
@@ -520,9 +502,8 @@
                                 items.forEach(i => {
                                     TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(i), 1)
                                 })
-                            } else {
-                                TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(items[0]), 1)
                             }
+                            else TimingPointInJourneyPattern.splice(TimingPointInJourneyPattern.indexOf(items[0]), 1)
                         }
                     })
 

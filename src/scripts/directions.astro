@@ -41,7 +41,8 @@
                         maximumAge: 0
                     }
                 );
-            } else {
+            }
+            else {
                 console.warn('Geolocation is not supported by this browser');
                 // Geolocation not supported, use default location
                 initializeMap();
@@ -60,9 +61,7 @@
                 if (window.onMapLoad) window.onMapLoad(map!)
             }
         }
-        else {
-            window.addEventListener('DOMContentLoaded', GetMap)
-        }
+        else window.addEventListener('DOMContentLoaded', GetMap)
     }
 
     var stopsArea = document.querySelector('.stops-area')
@@ -78,9 +77,7 @@
         try {
             var response = await fetch(url);
             var data = await response.json();
-            if (data && data.length > 0) {
-                return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-            }
+            if (data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
         } catch (error) {
             console.error('Geocoding error:', error);
         }
@@ -91,9 +88,7 @@
         var places: string[] = []
 
         stops?.querySelectorAll('.stop').forEach(s => {
-            if (s.getAttribute('final-value')) {
-                places.push(s.getAttribute('final-value')!)
-            }
+            if (s.getAttribute('final-value')) places.push(s.getAttribute('final-value')!)
         })
 
         if (places.length < 2) {
@@ -102,17 +97,14 @@
         }
 
         // Remove existing routing control if any
-        if (routingControl) {
-            map?.removeControl(routingControl);
-        }
+        if (routingControl) map?.removeControl(routingControl);
 
         // Geocode all places
         var waypoints = [];
         for (var i = 0; i < places.length; i++) {
             var coords = await geocodeAddress(places[i]);
-            if (coords) {
-                waypoints.push(window.L.latLng(coords.lat, coords.lng));
-            } else {
+            if (coords) waypoints.push(window.L.latLng(coords.lat, coords.lng));
+            else {
                 alert('Could not geocode: ' + places[i]);
                 return;
             }
@@ -142,9 +134,8 @@
                     '<p>Estimated Time: ' + Math.round(summary.totalTime / 60) + ' minutes</p>' +
                     '</div>');
             });
-        } else {
-            alert('Routing library not loaded. Please refresh the page.');
         }
+        else alert('Routing library not loaded. Please refresh the page.');
     }
 
     document.querySelector('.add-stop')?.addEventListener('click', _e => {
@@ -244,9 +235,7 @@
                         aEle.classList.add('lastLoc')
                         aEle.disabled = true
                     }
-                    else {
-                        aEle.onclick = e => selectOption(e, i)
-                    }
+                    else aEle.onclick = e => selectOption(e, i)
                     optionsEle?.appendChild(aEle)
                 }
             } catch (error) {
