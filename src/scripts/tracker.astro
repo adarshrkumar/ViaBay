@@ -106,82 +106,7 @@
     }
 
     // Show nearby vehicles when user clicks their location pin
-    function showNearbyVehicles() {
-        if (!userLocation) return
-
-        var loc = userLocation
-        var nearbyVehicles: {distance: number, agency: string, route: string, lineName: string, destination: string, vehicleRef: string}[] = []
-        var maxDistance = 1.5 // 1.5 mile radius
-
-        // Search through all agencies and their vehicles
-        agencyIds.forEach(agency => {
-            var aObj = agencies[agency.Id]
-            if (!aObj || !aObj.vehicles || !aObj.vehicles.data) return
-
-            var aName = aObj.name
-            aObj.vehicles.data.forEach(vehicle => {
-                var vehicleActivity = vehicle.MonitoredVehicleJourney
-                if (!vehicleActivity || !vehicleActivity.VehicleLocation) return
-
-                var vehicleLoc = vehicleActivity.VehicleLocation
-                var distance = calculateDistance(
-                    loc.lat,
-                    loc.lng,
-                    vehicleLoc.Latitude,
-                    vehicleLoc.Longitude
-                )
-
-                if (distance <= maxDistance) {
-                    nearbyVehicles.push({
-                        distance: distance,
-                        agency: aName,
-                        route: vehicleActivity.LineRef,
-                        lineName: vehicleActivity.PublishedLineName || vehicleActivity.LineRef,
-                        destination: vehicleActivity.DestinationName || 'Unknown',
-                        vehicleRef: vehicleActivity.VehicleRef
-                    })
-                }
-            })
-        })
-
-        // Sort by distance
-        nearbyVehicles.sort((a, b) => a.distance - b.distance)
-
-        // Build HTML content
-        var content = '<span class="title">Nearby Vehicles</span>'
-        content += '<span>Within 1.5 miles of your location</span><br>'
-
-        if (nearbyVehicles.length === 0) content += '<span>No vehicles nearby</span>'
-        else {
-            content += '<ol class="stops">'
-            nearbyVehicles.forEach(v => {
-                content += '<li class="stop">'
-                content += '<strong>' + v.route + '</strong> - ' + v.lineName + '<br>'
-                content += 'To: ' + v.destination + '<br>'
-                content += 'Distance: ' + v.distance.toFixed(2) + ' mi'
-                content += '</li>'
-            })
-            content += '</ol>'
-        }
-
-        var container = getVehicleInfoContainer()
-        if (container) {
-            container.innerHTML = `
-                <div class="leaflet-popup-content-wrapper">
-                    <button class="leaflet-popup-close-button" type="button" aria-label="Close popup">×</button>
-                    <div class="leaflet-popup-content">
-                        <div class="infobox">
-                            ${content}
-                        </div>
-                    </div>
-                </div>
-            `
-            container.classList.add('visible')
-
-            var closeBtn = container.querySelector('.leaflet-popup-close-button')
-            if (closeBtn) closeBtn.addEventListener('click', () => container!.classList.remove('visible'))
-        }
-    }
+    // function showNearbyVehicles
 
     function onMapLoad() {
         window.makeRequest<{Id: string, Name: string}[]>('gtfsoperators', [], res => {
@@ -350,7 +275,101 @@
                         initializeMap([userLocation.lat, userLocation.lng], 12);
 
                         // Add user marker
-                        addUserMarker();
+                        if (userLocation) {
+                            // Create custom green icon for user location
+                            var userIcon = L.divIcon({
+                                html: '<div style="background-color: green; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;"></div>',
+                                className: 'user-marker',
+                                iconSize: [20, 20],
+                                iconAnchor: [10, 10]
+                            });
+
+                            // Add a marker for user's location
+                            userPin = L.marker([userLocation.lat, userLocation.lng], {
+                                icon: userIcon,
+                                title: 'Your Location'
+                            });
+
+                            // Add click handler to show nearby vehicles
+                            userPin.on('click', () => {
+                                if (!userLocation) return
+
+                                var loc = userLocation
+                                var nearbyVehicles: {distance: number, agency: string, route: string, lineName: string, destination: string, vehicleRef: string}[] = []
+                                var maxDistance = 1.5 // 1.5 mile radius
+
+                                // Search through all agencies and their vehicles
+                                agencyIds.forEach(agency => {
+                                    var aObj = agencies[agency.Id]
+                                    if (!aObj || !aObj.vehicles || !aObj.vehicles.data) return
+
+                                    var aName = aObj.name
+                                    aObj.vehicles.data.forEach(vehicle => {
+                                        var vehicleActivity = vehicle.MonitoredVehicleJourney
+                                        if (!vehicleActivity || !vehicleActivity.VehicleLocation) return
+
+                                        var vehicleLoc = vehicleActivity.VehicleLocation
+                                        var distance = calculateDistance(
+                                            loc.lat,
+                                            loc.lng,
+                                            vehicleLoc.Latitude,
+                                            vehicleLoc.Longitude
+                                        )
+
+                                        if (distance <= maxDistance) {
+                                            nearbyVehicles.push({
+                                                distance: distance,
+                                                agency: aName,
+                                                route: vehicleActivity.LineRef,
+                                                lineName: vehicleActivity.PublishedLineName || vehicleActivity.LineRef,
+                                                destination: vehicleActivity.DestinationName || 'Unknown',
+                                                vehicleRef: vehicleActivity.VehicleRef
+                                            })
+                                        }
+                                    })
+                                })
+
+                                // Sort by distance
+                                nearbyVehicles.sort((a, b) => a.distance - b.distance)
+
+                                // Build HTML content
+                                var content = '<span class="title">Nearby Vehicles</span>'
+                                content += '<span>Within 1.5 miles of your location</span><br>'
+
+                                if (nearbyVehicles.length === 0) content += '<span>No vehicles nearby</span>'
+                                else {
+                                    content += '<ol class="stops">'
+                                    nearbyVehicles.forEach(v => {
+                                        content += '<li class="stop">'
+                                        content += '<strong>' + v.route + '</strong> - ' + v.lineName + '<br>'
+                                        content += 'To: ' + v.destination + '<br>'
+                                        content += 'Distance: ' + v.distance.toFixed(2) + ' mi'
+                                        content += '</li>'
+                                    })
+                                    content += '</ol>'
+                                }
+
+                                var container = getVehicleInfoContainer()
+                                if (container) {
+                                    container.innerHTML = `
+                                        <div class="leaflet-popup-content-wrapper">
+                                            <button class="leaflet-popup-close-button" type="button" aria-label="Close popup">×</button>
+                                            <div class="leaflet-popup-content">
+                                                <div class="infobox">
+                                                    ${content}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `
+                                    container.classList.add('visible')
+
+                                    var closeBtn = container.querySelector('.leaflet-popup-close-button')
+                                    if (closeBtn) closeBtn.addEventListener('click', () => container!.classList.remove('visible'))
+                                }
+                            });
+
+                            userPin.addTo(map);
+                        }
                     },
                     error => {
                         console.warn('Geolocation error:', error.message);
@@ -387,29 +406,6 @@
 
                 if (onMapLoad) onMapLoad()
                 positionInterval = setInterval(onMapLoad, 60000)
-            }
-
-            function addUserMarker() {
-                if (userLocation) {
-                    // Create custom green icon for user location
-                    var userIcon = L.divIcon({
-                        html: '<div style="background-color: green; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;"></div>',
-                        className: 'user-marker',
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                    });
-
-                    // Add a marker for user's location
-                    userPin = L.marker([userLocation.lat, userLocation.lng], {
-                        icon: userIcon,
-                        title: 'Your Location'
-                    });
-
-                    // Add click handler to show nearby vehicles
-                    userPin.on('click', showNearbyVehicles);
-
-                    userPin.addTo(map);
-                }
             }
         }
         else window.addEventListener('DOMContentLoaded', GetMap)
