@@ -125,14 +125,14 @@
             }).addTo(map!);
 
             // Display route in the directions element
-            routingControl.on('routesfound', (e: RoutingResultEvent) => {
+            routingControl?.on('routesfound', (e: RoutingResultEvent) => {
                 var routes = e.routes;
                 var summary = routes[0].summary;
-                directionsElement && (directionsElement.innerHTML = '<div class="route-summary">' +
+                if (directionsElement) directionsElement.innerHTML = '<div class="route-summary">' +
                     '<h3>Route Summary</h3>' +
                     '<p>Total Distance: ' + (summary.totalDistance / 1609.34).toFixed(2) + ' miles</p>' +
                     '<p>Estimated Time: ' + Math.round(summary.totalTime / 60) + ' minutes</p>' +
-                    '</div>');
+                    '</div>';
             });
         }
         else alert('Routing library not loaded. Please refresh the page.');
