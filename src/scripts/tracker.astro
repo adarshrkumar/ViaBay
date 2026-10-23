@@ -526,12 +526,11 @@
         }
     }
 
-    function showRoutePath() {
+    window.showRoutePath = function () {
         // TODO: Implement route path display with Leaflet
         // This would require using a routing service or drawing polylines
         console.log('Route path display not yet implemented with Leaflet');
     }
-    window.showRoutePath = showRoutePath
 
     function findUsingValueofKey(arr: Record<string, string>[], key: string, val: string) {
         var res = arr.filter((item: Record<string, string>) => item[key] === val)
