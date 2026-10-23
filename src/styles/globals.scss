@@ -193,7 +193,7 @@ body {
                 border-radius: 0;
 
                 &:hover {
-                    background-color: rgba(var(--accent), 0.1);
+                    background-color: rgb(from var(--accent) r g b / 0.1);
                 }
             }
         }
@@ -269,7 +269,7 @@ body {
         position: absolute;
         top: 1rem;
         left: 1rem;
-        font-size: 3;
+        font-size: 3em;
         line-height: 0;
     }
     &[required] .label .star {
