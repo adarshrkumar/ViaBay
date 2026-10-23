@@ -36,9 +36,7 @@ export default {
                     while (lines.length > 0 && lines[0] === '') lines.shift();
                     while (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
 
-                    const cleanedLines = lines.map(line => {
-                        return line.replace(/^\*\s?/, '').trim();
-                    });
+                    const cleanedLines = lines.map(line => line.replace(/^\*\s?/, '').trim());
 
                     if (cleanedLines.filter(line => line.length > 0).length > 1) return;
 

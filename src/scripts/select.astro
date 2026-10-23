@@ -16,7 +16,7 @@
 
     if (document.querySelector('.select')) {
         document.querySelectorAll('select-option').forEach((o, i) => {
-            (o as HTMLSelectElement).onclick = e => {
+            o.addEventListener('click', e => {
                 if (!!(e.target as HTMLElement)?.getAttribute('disabled') === false) {
                     ((e.target as HTMLElement)?.parentNode as HTMLElement)?.style.setProperty('--num', i.toString())
                     var type = (e.target as HTMLElement)?.dataset.type
@@ -26,7 +26,7 @@
                         selector?.removeAttribute('hidden')
                     }
                 }
-            }
+            })
         })
         document.querySelectorAll('select-options').forEach(e => (e as HTMLElement).style.setProperty('--amt', e.querySelectorAll('select-option').length.toString()))
     }

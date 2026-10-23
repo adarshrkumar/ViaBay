@@ -12,9 +12,7 @@
         var isOutside = checkIfOuterModal(e)
         if (isOutside) modal.close()
     })
-    modal.querySelector('.btn')!.addEventListener('click', _e => {
-        modal.close()
-    })
+    modal.querySelector('.btn')!.addEventListener('click', modal.close)
 
     function checkIfOuterModal(e: MouseEvent) {
         const dimensions = modal.getBoundingClientRect()

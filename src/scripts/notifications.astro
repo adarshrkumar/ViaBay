@@ -35,8 +35,8 @@
 
         nGroup?.appendChild(nEle)
 
-        nEle.onclick = _e => {
+        nEle.addEventListener('click', () => {
             if (nContent) window.showModal(nTitle, nContent)
-        }
+        })
     }
 </script>

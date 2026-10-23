@@ -151,17 +151,13 @@
         stop.classList.add('stop')
         stop.placeholder = `Stop #${stopsAmt+1}`
         stop.title = `Stop #${stopsAmt+1}`
-        stop.addEventListener('keypress', e => {
-            stopChange(e as Event, stopsAmt-1)
-        })
+        stop.addEventListener('keypress', e => stopChange(e as Event, stopsAmt-1))
         stopParent.appendChild(stop)
 
         var closeButton = document.createElement('button')
         closeButton.classList.add('close')
         closeButton.classList.add('removeStyles')
-        closeButton.onclick = e => {
-            onCloseClick(e)
-        }
+        closeButton.addEventListener('click', onCloseClick)
 
         var closeIcon = document.createElement('svg')
         closeIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
@@ -183,9 +179,7 @@
         stops?.appendChild(stopContainer)
     })
 
-    closeButtons.forEach(b => {
-        (b as HTMLButtonElement).onclick = (e: Event) => onCloseClick(e)
-    })
+    closeButtons.forEach(b => b.addEventListener('click', onCloseClick))
 
     function onCloseClick(e: Event) {
         ((e.target as HTMLElement)?.parentNode?.parentNode?.parentNode as HTMLElement)?.remove();
@@ -193,16 +187,10 @@
     }
 
     function reorderStops() {
-        stops?.querySelectorAll('.stop').forEach((s, i) => {
-            (s as HTMLInputElement).placeholder = `Stop #${i+1}`
-        })
+        stops?.querySelectorAll('.stop').forEach((s, i) => (s as HTMLInputElement).placeholder = `Stop #${i+1}`)
     }
 
-    stops?.querySelectorAll('.stop').forEach((s, i) => {
-        (s as HTMLInputElement).onchange = e => {
-            stopChange(e, i)
-        }
-    })
+    stops?.querySelectorAll('.stop').forEach((s, i) => (s as HTMLInputElement).onchange = function (e) { stopChange(e, i) })
 
     async function stopChange(e: Event, i: number) {
         var finalValue = (e.target as HTMLInputElement).getAttribute('final-value')
@@ -210,9 +198,7 @@
 
         var optionsEle = stops?.querySelectorAll('.options')[i]
 
-        optionsEle?.querySelectorAll('.option').forEach(o => {
-            o.remove()
-        })
+        optionsEle?.querySelectorAll('.option').forEach(o => o.remove())
 
         if (finalValue !== searchText && searchText.length > 2) {
             // Use Nominatim geocoding service for search
@@ -222,9 +208,7 @@
                 var response = await fetch(url);
                 var results: NominatimResult[] = await response.json();
 
-                results.forEach(r => {
-                    createOption(r.display_name, i, optionsEle);
-                });
+                results.forEach(r => createOption(r.display_name, i, optionsEle));
 
                 function createOption(content: string, i: number, optionsEle: Element | undefined, lastLoc=false) {
                     var aEle = document.createElement('button')
@@ -235,7 +219,7 @@
                         aEle.classList.add('lastLoc')
                         aEle.disabled = true
                     }
-                    else aEle.onclick = e => selectOption(e, i)
+                    else aEle.addEventListener('click', e => selectOption(e, i))
                     optionsEle?.appendChild(aEle)
                 }
             } catch (error) {
@@ -248,9 +232,7 @@
         var place = (e.target as HTMLElement).textContent ?? ''
         var optionsEle = stops?.querySelectorAll('.options')[i]
 
-        optionsEle?.querySelectorAll('.option').forEach(o => {
-            o.remove()
-        })
+        optionsEle?.querySelectorAll('.option').forEach(o => o.remove())
 
         var stop: HTMLInputElement = stops?.querySelectorAll('.stop')[i] as HTMLInputElement
         stop.setAttribute('final-value', place)

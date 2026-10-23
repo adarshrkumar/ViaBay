@@ -12,9 +12,7 @@
         if (titleEl) titleEl.textContent = title
 
         if (!location.pathname.startsWith('/login')) {
-            document.querySelectorAll('.nav').forEach(n => {
-                n.removeAttribute('hidden')
-            })
+            document.querySelectorAll('.nav').forEach(n => n.removeAttribute('hidden'))
         }
 
         document.querySelectorAll('.input-parent, .textarea-parent, .select-parent').forEach(e => {
@@ -29,9 +27,7 @@
             })
 
             checkIfValue(e.querySelector(element) || document.documentElement);
-            (e as HTMLInputElement).onkeyup = event => {
-                checkIfValue((event.target as HTMLElement) || document.documentElement)
-            }
+            e.addEventListener('keyup', event => checkIfValue((event.target as HTMLElement) || document.documentElement))
         })
 
     })
