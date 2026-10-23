@@ -7,7 +7,7 @@
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    async function makeRequest(moduleName: string, params: string[][] = [], callback: (data: unknown) => void = function () {}) {
+    async function makeRequest<T>(moduleName: string, params: string[][] = [], callback: (data: T) => void = function () {}) {
         // Apply current delay if any
         if (requestDelay > 0) await delay(requestDelay)
 

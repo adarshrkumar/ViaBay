@@ -6,7 +6,7 @@
     var map: L.Map | null = null
     var routingControl: RoutingControl | null = null
 
-    function assertError(err: unknown, name: string) {
+    function assertError(err: Error | string, name: string) {
         err = `${name} Error: ${err}`
         alert(err)
         console.error(err)
@@ -112,7 +112,7 @@
 
         // Create routing control with waypoints
         if (typeof window.L.Routing !== 'undefined') {
-            routingControl = (window.L.Routing.control({
+            routingControl = window.L.Routing.control({
                 waypoints: waypoints,
                 routeWhileDragging: false,
                 showAlternatives: false,
@@ -122,7 +122,7 @@
                     extendToWaypoints: true,
                     missingRouteTolerance: 0
                 }
-            }).addTo(map!) as unknown) as RoutingControl;
+            }).addTo(map!) as RoutingControl;
 
             // Display route in the directions element
             routingControl.on('routesfound', (e: RoutingResultEvent) => {

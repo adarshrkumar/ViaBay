@@ -1,7 +1,7 @@
 <script>
     var nGroup = document.querySelector('.notifications')
 
-    function getNotifications(_module: unknown, _title: unknown, _description: unknown, _content: unknown, _attatchmentInfo: unknown) {
+    function getNotifications() {
         var notificationList = localStorage.getItem('notifications')
         var notificationObject = JSON.parse(notificationList || '')
 
