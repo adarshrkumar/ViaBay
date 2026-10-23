@@ -31,7 +31,7 @@ ViaBay is a small (~1,500 lines of hand-written source) but ambitious app. The c
 | Critical | 4 | Secrets, open proxy, fake auth, XSS |
 | High | 5 | Broken settings/notifications, geo API abuse, unverifiable build, vulnerable deps |
 | Medium | 15 | Unbuilt pages exposed in nav, error leakage, caching/rate limits, CDN trust, dead globals, event bugs, accessibility |
-| Low | 24 | Dead code, invalid CSS, duplicate files, unused assets, no tests/CI |
+| Low | 16 | Dead code, duplicate files, unused assets, no CI |
 
 ---
 
@@ -263,32 +263,22 @@ Remaining cleanup:
 
 | # | Finding | Location |
 | --- | --- | --- |
-| L1 | Invalid CSS: `font-size: 3;` (unitless, invalid) | `src/styles/globals.scss:272` |
-| L2 | Invalid CSS: `rgba(var(--accent), 0.1)` — `--accent` is a hex color, not RGB channels | `src/styles/globals.scss:196` |
-| L3 | Overriding Leaflet internals (`.leaflet-map-pane { width/height: fit-content }`) can break panning/layout | `src/styles/pages/tracker.scss:60-65` |
-| L4 | `width: fit-content` applied after `-webkit-fill-available` in several places, likely collapsing containers | `tracker.scss:135-137`, `directions.scss:7-9, 210-212` |
-| L5 | `$hf-size` duplicated in `variables.scss` and `tracker.scss` | both |
-| L6 | `sass` and `sass-embedded` both installed; `@astrojs/check`, `typescript`, `sass`, `sass-embedded`, `@types/*` are in `dependencies` rather than `devDependencies` | `package.json` |
-| L7 | `dotenv` added but only used to load an unused env file; the key is hardcoded | `astro.config.mjs:3`, `package.json` |
-| L8 | `GEMINI.md` is byte-identical to `CLAUDE.md` (5,543 bytes) — drift waiting to happen; `.claude/settings.json` also references hooks that do not exist in the repo | repo root, `.claude/` |
-| L9 | `SECURITY.md` is the stock GitHub template with irrelevant versions (5.1.x/5.0.x/4.0.x) and no contact | `SECURITY.md` |
-| L10 | README advertises unimplemented features: booking, notifications, transit cards, fare prediction, reminders, preferred routes; and lists routes that redirect | `README.md` |
-| L11 | `public/data/price.json` (282 lines of fare data) is not referenced anywhere | `public/data/price.json` |
-| L12 | Large unused assets: `gMaps.png` (~690 KB), `ViaBay_logo-full.jpg` (~440 KB) | `public/assets/` |
-| L13 | `public/ef3-placeholder-image.svg` appears unused | `public/` |
-| L14 | No tests, no lint/format config, no CI workflow, no `LICENSE` | repo root |
-| L15 | Commit messages are all `u`; history is uninformative | `git log` |
-| L16 | `showRoutePath` shipped as a TODO stub; `findUsingValueofKey` unused | `tracker.astro:563-574` |
-| L17 | `any` used for the 511 payload and settings content; `env.d.ts` declares several globals that are never actually set | `511.ts:10`, `settings.astro:27-28`, `env.d.ts` |
-| L18 | `[onclick]` global cursor rule and inline handlers make the UI hard to test and CSP-hostile | `globals.scss:97-99` |
-| L19 | `assertError` uses blocking `alert()` for user-facing errors | `index.astro:70`, `directions.astro:11` |
-| L20 | `alt`/`aria-label` missing on all nav icon links and the login logo; nav links have no accessible name | `Layout.astro:98-115`, `login.astro:8` |
-| L21 | `.DS_Store` files exist in the working tree (ignored); `public/.DS_Store` was present before the rule — confirm it never enters history | `public/` |
-| L22 | `Layout.astro` imports page scripts per SSR request via dynamic `import`; fine for caching but needlessly indirect versus static imports | `Layout.astro:11-14` |
-| L23 | Copyright is generated in CSS from a `current-year` attribute (`"© 2024-2026"`); fine today, but content-in-CSS is awkward and untranslatable | `globals.scss:213-217`, `Layout.astro:55-56` |
-| L24 | The tracker's "nearby vehicles" feature has no loading/error state and always reports a hard-coded 1.5-mile radius | `tracker.astro:99-181` |
-
-No secrets or credentials were found beyond the 511 key. `npm audit` findings are covered in H5.
+| L1 | Overriding Leaflet internals (`.leaflet-map-pane { width/height: fit-content }`) can break panning/layout | `src/styles/pages/tracker.scss:60-65` |
+| L2 | `width: fit-content` applied after `-webkit-fill-available` in several places, likely collapsing containers | `tracker.scss:135-137`, `directions.scss:7-9, 210-212` |
+| L3 | `sass` and `sass-embedded` both installed; pick one implementation. Build-only packages (`@astrojs/check`, `typescript`, `sass`, `sass-embedded`, `@types/*`) belong in `devDependencies` | `package.json` |
+| L4 | `dotenv` added but only used to load an unused env file; the key is hardcoded | `astro.config.mjs:3`, `package.json` |
+| L5 | `SECURITY.md` is the stock GitHub template with irrelevant versions (5.1.x/5.0.x/4.0.x) and no contact | `SECURITY.md` |
+| L6 | README advertises unimplemented features: booking, notifications, transit cards, fare prediction, reminders, preferred routes; and lists routes that redirect | `README.md` |
+| L7 | Large unused assets: `gMaps.png` (~690 KB), `ViaBay_logo-full.jpg` (~440 KB) | `public/assets/` |
+| L8 | `public/ef3-placeholder-image.svg` appears unused | `public/` |
+| L9 | Commit messages are all `u`; history is uninformative | `git log` |
+| L10 | `showRoutePath` shipped as a TODO stub; `findUsingValueofKey` unused | `tracker.astro:563-574` |
+| L11 | `any` used for the 511 payload and settings content; `env.d.ts` declares several globals that are never actually set | `511.ts:10`, `settings.astro:27-28`, `env.d.ts` |
+| L12 | `[onclick]` global cursor rule and inline handlers make the UI hard to test and CSP-hostile | `globals.scss:97-99` |
+| L13 | `assertError` uses blocking `alert()` for user-facing errors | `index.astro:70`, `directions.astro:11` |
+| L14 | `alt`/`aria-label` missing on all nav icon links and the login logo; nav links have no accessible name | `Layout.astro:98-115`, `login.astro:8` |
+| L15 | `Layout.astro` imports page scripts per SSR request via dynamic `import`; fine for caching but needlessly indirect versus static imports | `Layout.astro:11-14` |
+| L16 | The tracker's "nearby vehicles" feature has no loading/error state and always reports a hard-coded 1.5-mile radius | `tracker.astro:99-181` |
 
 ---
 
@@ -352,9 +342,9 @@ The UI is visually considered (design tokens, focus-within states, reduced-motio
 ### Then
 
 1. Replace custom select with a native/accessible control; add ARIA labels to nav (M9, §7).
-2. Clean up layout props/canonical/body attribute and dead code (M4, L1–L4).
-3. Fix docs: README feature list, SECURITY.md, GEMINI/CLAUDE sync, remove unused assets/data (L8–L12).
-4. Add ESLint/Prettier, a smoke test (Playwright) for the tracker, and error monitoring.
+2. Clean up layout props/canonical/body attribute and dead code (M4, L1–L2).
+3. Fix docs: README feature list, SECURITY.md, remove unused assets/data (L5–L8).
+4. Add the missing `tests/` Playwright suite and wire `npm run check` into CI.
 
 ---
 
