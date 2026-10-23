@@ -1,7 +1,7 @@
 <script>
     var nGroup = document.querySelector('.notifications')
 
-    function getNotifications() {
+    window.getNotifications = function () {
         var notificationList = localStorage.getItem('notifications')
         var notificationObject = JSON.parse(notificationList || '')
 
@@ -15,7 +15,6 @@
         notificationList = JSON.stringify(notificationObject)
         localStorage.setItem('notifications', notificationList)
     }
-    window.getNotifications = getNotifications
 
     function addNotification(notification: { icon: string, title: string, content: string }) {
         var nIcon = notification.icon
