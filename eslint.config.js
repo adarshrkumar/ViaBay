@@ -27,7 +27,10 @@ export default [
                 FormDataEntryValue: 'readonly',
                 TextEncoder: 'readonly',
                 ReadableStream: 'readonly',
-                Event: 'readonly'
+                Event: 'readonly',
+                Element: 'readonly',
+                HTMLElement: 'readonly',
+                setInterval: 'readonly'
             }
         },
         plugins: {
@@ -101,8 +104,14 @@ export default [
                 HTMLButtonElement: 'readonly',
                 HTMLDialogElement: 'readonly',
                 HTMLInputElement: 'readonly',
+                HTMLSelectElement: 'readonly',
                 KeyboardEvent: 'readonly',
+                MouseEvent: 'readonly',
                 TouchEvent: 'readonly',
+                navigator: 'readonly',
+                location: 'readonly',
+                setInterval: 'readonly',
+                clearInterval: 'readonly',
                 atob: 'readonly',
                 btoa: 'readonly'
             }
