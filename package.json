@@ -1,28 +1,43 @@
 {
-  "name": "viabay",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.9.6",
-    "@astrojs/vercel": "^9.0.0",
-    "@vercel/analytics": "^1.6.1",
-    "astro": "^5.15.6",
-    "dotenv": "^17.2.3",
-    "leaflet": "^1.9.4",
-    "leaflet-routing-machine": "^3.2.12",
-    "sass": "^1.94.0",
-    "sass-embedded": "^1.93.3",
-    "typescript": "^5.9.3"
-  },
-  "devDependencies": {
-    "@types/leaflet": "^1.9.21",
-    "@types/leaflet-routing-machine": "^3.2.9",
-    "@types/node": "^25.3.0"
-  }
+    "name": "viabay",
+    "type": "module",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "astro dev",
+        "build": "astro build",
+        "preview": "astro preview",
+        "astro": "astro",
+        "ts": "node --experimental-strip-types",
+        "test:chrome": "npx playwright test --headed --browser=chromium",
+        "test:firefox": "npx playwright test --headed --browser=firefox",
+        "test:safari": "npx playwright test --headed --browser=webkit",
+        "test": "npm run test:chrome && npm run test:firefox && npm run test:safari",
+        "test:nopause:chrome": "npx playwright test tests/browser.test.nopause.ts --browser=chromium",
+        "test:nopause:firefox": "npx playwright test tests/browser.test.nopause.ts --browser=firefox",
+        "test:nopause:safari": "npx playwright test tests/browser.test.nopause.ts --browser=webkit",
+        "test:nopause": "npm run test:nopause:chrome && npm run test:nopause:firefox && npm run test:nopause:safari",
+        "test:nopause:chrome:headed": "npx playwright test tests/browser.test.nopause.ts --headed --browser=chromium",
+        "test:nopause:firefox:headed": "npx playwright test tests/browser.test.nopause.ts --headed --browser=firefox",
+        "test:nopause:safari:headed": "npx playwright test tests/browser.test.nopause.ts --headed --browser=webkit",
+        "check": "eslint . --max-warnings 0 && stylelint \"./**/*.scss\" && astro check && astro build",
+        "eslint:fix": "eslint --fix",
+        "stylelint:fix": "stylelint \"./**/*.scss\" --fix"
+    },
+    "dependencies": {
+        "@astrojs/check": "^0.9.6",
+        "@astrojs/vercel": "^9.0.0",
+        "@vercel/analytics": "^1.6.1",
+        "astro": "^5.15.6",
+        "dotenv": "^17.2.3",
+        "leaflet": "^1.9.4",
+        "leaflet-routing-machine": "^3.2.12",
+        "sass": "^1.94.0",
+        "sass-embedded": "^1.93.3",
+        "typescript": "^5.9.3"
+    },
+    "devDependencies": {
+        "@types/leaflet": "^1.9.21",
+        "@types/leaflet-routing-machine": "^3.2.9",
+        "@types/node": "^25.3.0"
+    }
 }
