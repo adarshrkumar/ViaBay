@@ -1,50 +1,5 @@
 {
     "hooks": {
-        "SessionStart": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "node ./.claude/hooks/syncAgentMDs.js",
-                        "timeout": 60
-                    }
-                ]
-            }
-        ],
-        "UserPromptSubmit": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "node ./.claude/hooks/syncAgentMDs.js",
-                        "timeout": 60
-                    }
-                ]
-            }
-        ],
-        "FileChanged": [
-            {
-                "matcher": "AGENTS.md",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "node ./.claude/hooks/syncAgentMDs.js",
-                        "timeout": 60
-                    }
-                ]
-            }
-        ],
-        "SessionEnd": [
-            {
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "node ./.claude/hooks/removeOtherAgentMDs.js",
-                        "timeout": 60
-                    }
-                ]
-            }
-        ],
         "PreToolUse": [
             {
                 "matcher": "Read|Edit|NotebookEdit|Agent|Bash",
