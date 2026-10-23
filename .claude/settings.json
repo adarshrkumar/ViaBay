@@ -1,0 +1,136 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node ./.claude/hooks/syncAgentMDs.js",
+                        "timeout": 60
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node ./.claude/hooks/syncAgentMDs.js",
+                        "timeout": 60
+                    }
+                ]
+            }
+        ],
+        "FileChanged": [
+            {
+                "matcher": "AGENTS.md",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node ./.claude/hooks/syncAgentMDs.js",
+                        "timeout": 60
+                    }
+                ]
+            }
+        ],
+        "SessionEnd": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node ./.claude/hooks/removeOtherAgentMDs.js",
+                        "timeout": 60
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Read|Edit|NotebookEdit|Agent|Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node ~/.claude/hooks/index.js",
+                        "timeout": 20
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Agent",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node ~/.claude/hooks/check-empty-agents-dir.js",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash ~/.claude/hooks/on-stop.sh",
+                        "timeout": 60
+                    }
+                ]
+            }
+        ]
+    },
+    "permissions": {
+        "allow": [
+            "WebFetch(domain:docs.uploadthing.com)",
+            "Bash(npm run build:*)",
+            "Bash(git add:*)",
+            "Bash(git rm:*)",
+            "WebFetch(domain:ai.google.dev)",
+            "Bash(find:*)",
+            "mcp__ide__getDiagnostics",
+            "Bash(npx astro check)",
+            "mcp__context7__resolve-library-id",
+            "mcp__context7__get-library-docs",
+            "mcp__context7__query-docs",
+            "mcp__vercel__list_teams",
+            "mcp__vercel__list_projects",
+            "mcp__vercel__get_project",
+            "mcp__vercel__list_deployments",
+            "mcp__vercel__get_deployment",
+            "mcp__vercel__get_deployment_build_logs",
+            "mcp__vercel__get_runtime_logs",
+            "mcp__vercel__web_fetch_vercel_url",
+            "mcp__sentry__find_organizations",
+            "mcp__sentry__search_issues",
+            "mcp__sentry__get_issue_details",
+            "mcp__sentry__analyze_issue_with_seer",
+            "mcp__ide__getDiagnostics",
+            "WebFetch(domain:neon.com)",
+            "WebFetch(domain:www.better-auth.com)",
+            "WebFetch(domain:docs.astro.build)",
+            "Bash(npx tsx:*)",
+            "Bash(npx vercel:*)",
+            "Bash(vercel project:*)",
+            "Bash(vercel env:*)",
+            "Bash(npx drizzle-kit:*)",
+            "Bash(nvm use)",
+            "Bash(npm run check)",
+            "Bash(ls:*)",
+            "Edit(*)",
+            "Write(*)"
+        ],
+        "deny": [
+            "Bash(* git add *)",
+            "Bash(* git commit *)",
+            "Bash(* git push *)",
+            "Bash(* git pull *)",
+            "Bash(npm run check 2>&1 | *)",
+            "Bash(* npm run check 2>&1 | *)"
+        ],
+        "ask": [
+            "Edit(eslint/**/*.js)"
+        ]
+    }
+}
