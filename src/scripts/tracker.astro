@@ -294,7 +294,7 @@
                             if (pin) pin.setLatLng(vehicleLatLng);
                             else {
                                 // Create custom DivIcon for vehicle marker
-                                var icon = window.L.divIcon({
+                                var icon = L.divIcon({
                                     html: `<div style="background-color: ${markerColor}; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;">${route}</div>`,
                                     className: 'vehicle-marker',
                                     iconSize: [width, 20],
@@ -302,7 +302,7 @@
                                 });
 
                                 vehicleActivity.infoboxOpen = false
-                                var newPin: VehicleMarker = Object.assign(window.L.marker(vehicleLatLng, { icon: icon }), { metadata: vehicleActivity });
+                                var newPin: VehicleMarker = Object.assign(L.marker(vehicleLatLng, { icon: icon }), { metadata: vehicleActivity });
 
                                 newPin.on('click', e => showVehicleInfo(e, newPin));
 
@@ -331,7 +331,7 @@
 
     GetMap()
     function GetMap() {
-        if (document.getElementById('myMap') && typeof window.L !== 'undefined') {
+        if (document.getElementById('myMap') && typeof L !== 'undefined') {
             // Default location (Bay Area)
             var defaultLocation: [number, number] = [37.7749, -122.4194];
             var initialZoom = 10;
@@ -372,9 +372,9 @@
 
             function initializeMap(center: [number, number], zoom: number) {
                 // Initialize Leaflet map
-                map = window.L.map('myMap').setView(center, zoom);
+                map = L.map('myMap').setView(center, zoom);
 
-                window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                     maxZoom: 19
                 }).addTo(map);
@@ -392,7 +392,7 @@
             function addUserMarker() {
                 if (userLocation) {
                     // Create custom green icon for user location
-                    var userIcon = window.L.divIcon({
+                    var userIcon = L.divIcon({
                         html: '<div style="background-color: green; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;"></div>',
                         className: 'user-marker',
                         iconSize: [20, 20],
@@ -400,7 +400,7 @@
                     });
 
                     // Add a marker for user's location
-                    userPin = window.L.marker([userLocation.lat, userLocation.lng], {
+                    userPin = L.marker([userLocation.lat, userLocation.lng], {
                         icon: userIcon,
                         title: 'Your Location'
                     });

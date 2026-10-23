@@ -15,7 +15,7 @@
 
     GetMap()
     function GetMap() {
-        if (document.getElementById('myMap') && typeof window.L !== 'undefined') {
+        if (document.getElementById('myMap') && typeof L !== 'undefined') {
             // Default location (Bay Area)
             var defaultLocation: [number, number] = [37.7749, -122.4194];
             var initialZoom = 10;
@@ -50,10 +50,10 @@
 
             function initializeMap() {
                 // Initialize Leaflet map
-                map = window.L.map('myMap').setView(mapCenter, initialZoom);
+                map = L.map('myMap').setView(mapCenter, initialZoom);
 
                 // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
-                window.L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
+                L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
                     attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
                     maxZoom: 19
                 }).addTo(map!);
@@ -103,7 +103,7 @@
         var waypoints = [];
         for (var i = 0; i < places.length; i++) {
             var coords = await geocodeAddress(places[i]);
-            if (coords) waypoints.push(window.L.latLng(coords.lat, coords.lng));
+            if (coords) waypoints.push(L.latLng(coords.lat, coords.lng));
             else {
                 alert('Could not geocode: ' + places[i]);
                 return;
@@ -111,8 +111,8 @@
         }
 
         // Create routing control with waypoints
-        if (typeof window.L.Routing !== 'undefined') {
-            routingControl = window.L.Routing.control({
+        if (typeof L.Routing !== 'undefined') {
+            routingControl = L.Routing.control({
                 waypoints: waypoints,
                 routeWhileDragging: false,
                 showAlternatives: false,
