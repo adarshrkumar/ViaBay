@@ -62,7 +62,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     if (paramsString) {
         try {
             params = JSON.parse(paramsString)
-        } catch (err) {
+        } catch {
             console.error('[511 API Route] Invalid params format:', paramsString)
             return new Response(
                 JSON.stringify({ error: 'Invalid params format' }),
