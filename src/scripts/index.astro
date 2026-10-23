@@ -2,8 +2,7 @@
     window.addEventListener('DOMContentLoaded', _e => {
         var title = document.title
         if (title.includes(' | ')) {
-            var splitTitle = []
-            splitTitle = title.split(' | ')
+            var splitTitle = title.split(' | ')
             splitTitle.pop()
             title = splitTitle.join(' | ')
         }
@@ -17,9 +16,7 @@
 
         document.querySelectorAll('.input-parent, .textarea-parent, .select-parent').forEach(e => {
             var classes = e.className
-            var splitClasses = []
-            if (classes.includes(' ')) splitClasses = classes.split(' ')
-            else splitClasses = [classes]
+            var splitClasses = classes.split(' ')
 
             var element = ''
             splitClasses.forEach(c => {
