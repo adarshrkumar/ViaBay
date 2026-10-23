@@ -30,7 +30,8 @@ export default [
                 Event: 'readonly',
                 Element: 'readonly',
                 HTMLElement: 'readonly',
-                setInterval: 'readonly'
+                setInterval: 'readonly',
+                L: 'readonly'
             }
         },
         plugins: {
@@ -112,6 +113,7 @@ export default [
                 location: 'readonly',
                 setInterval: 'readonly',
                 clearInterval: 'readonly',
+                L: 'readonly',
                 atob: 'readonly',
                 btoa: 'readonly'
             }
