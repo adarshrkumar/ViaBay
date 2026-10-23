@@ -11,18 +11,15 @@ type ScriptFactory = typeof CookiesScript
 
 var mainScriptNames = ['cookies', 'index', 'authentication', '511-request', 'notification-manager', 'settings']
 var mainScripts = await Promise.all(
-    mainScriptNames.map(async n => ((await import(`../scripts/${n}.astro`)) as { default: ScriptFactory }).default)
+    mainScriptNames.map(async n => {
+        var script: { default: ScriptFactory } = await import(`../scripts/${n}.astro`)
+        return script.default
+    })
 )
-
-interface Props {
-    title?: string
-    classItems?: string[]
-    headItems?: []
-}
 
 var sTitle = 'ViaBay'
 
-var { title, classItems: classItemsProp, headItems: headItemsProp } = Astro.props as Props
+var { title, classItems: classItemsProp, headItems: headItemsProp } = Astro.props
 
 var docTitle = ''
 if (

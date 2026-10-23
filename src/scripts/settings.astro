@@ -11,7 +11,7 @@
             settingEles.forEach(s => {
                 const sel = s.querySelector('select')
                 if (sel) {
-                    sel.addEventListener('change', e => setSetting(s.getAttribute('module-name')!, (e.target as HTMLSelectElement).value))
+                    sel.addEventListener('change', () => setSetting(s.getAttribute('module-name')!, sel.value))
                 }
             })
         }
@@ -32,7 +32,7 @@
 
     function getSettings(): Setting[] {
         var raw = localStorage.getItem(settingsKey) || '[]'
-        return JSON.parse(raw) as Setting[]
+        return JSON.parse(raw)
     }
 
     function applySettings() {

@@ -115,7 +115,7 @@
 
         // Search through all agencies and their vehicles
         agencyIds.forEach(agency => {
-            var aObj = agencies[agency.Id] as AgencyObj | undefined
+            var aObj = agencies[agency.Id]
             if (!aObj || !aObj.vehicles || !aObj.vehicles.data) return
 
             var aName = aObj.name
@@ -184,8 +184,7 @@
     }
 
     function onMapLoad() {
-        window.makeRequest('gtfsoperators', [], unknownRes => {
-            var res = unknownRes as {Id: string, Name: string}[]
+        window.makeRequest<{Id: string, Name: string}[]>('gtfsoperators', [], res => {
             res.forEach((agency, i: number) => {
                 var cI = i
                 if (cI >= colors.length) cI = cI - colors.length
@@ -193,8 +192,8 @@
 
                 agencyIds.push(agency)
 
-                window.makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleResult => {
-                    var vehicleData: {MonitoredVehicleJourney: VehicleData}[] = (vehicleResult as VehicleResponse)?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery?.VehicleActivity ?? []
+                window.makeRequest<VehicleResponse>('VehicleMonitoring', [['agency', agency.Id]], vehicleResult => {
+                    var vehicleData: {MonitoredVehicleJourney: VehicleData}[] = vehicleResult?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery?.VehicleActivity ?? []
 
                     var aName = agency.Name
                     switch (aName) {
@@ -303,8 +302,7 @@
                                 });
 
                                 vehicleActivity.infoboxOpen = false
-                                var newPin = window.L.marker(vehicleLatLng, { icon: icon }) as VehicleMarker;
-                                newPin.metadata = vehicleActivity;
+                                var newPin: VehicleMarker = Object.assign(window.L.marker(vehicleLatLng, { icon: icon }), { metadata: vehicleActivity });
 
                                 newPin.on('click', e => showVehicleInfo(e, newPin));
 
@@ -462,12 +460,10 @@
                 }
                 attachCloseHandler()
 
-                window.makeRequest('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
-                    var typedRes = res as { journeyPatterns?: JourneyPattern[] }
-                    var journeyPatterns = typedRes.journeyPatterns
+                window.makeRequest<{ journeyPatterns?: JourneyPattern[] }>('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
                     var pattern: JourneyPattern | null = null
-                    if (journeyPatterns) {
-                        var filtered = journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
+                    if (res.journeyPatterns) {
+                        var filtered = res.journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
                         if (filtered.length > 0) pattern = filtered[0]
                     }
 

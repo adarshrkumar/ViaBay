@@ -26,7 +26,7 @@
                 navigator.geolocation.getCurrentPosition(
                     position => {
                         // Got user location, use it
-                        mapCenter = [position.coords.latitude, position.coords.longitude] as [number, number];
+                        mapCenter = [position.coords.latitude, position.coords.longitude];
                         initialZoom = 12;
                         initializeMap();
                     },
@@ -122,7 +122,7 @@
                     extendToWaypoints: true,
                     missingRouteTolerance: 0
                 }
-            }).addTo(map!) as RoutingControl;
+            }).addTo(map!);
 
             // Display route in the directions element
             routingControl.on('routesfound', (e: RoutingResultEvent) => {
@@ -151,7 +151,7 @@
         stop.classList.add('stop')
         stop.placeholder = `Stop #${stopsAmt+1}`
         stop.title = `Stop #${stopsAmt+1}`
-        stop.addEventListener('keypress', e => stopChange(e as Event, stopsAmt-1))
+        stop.addEventListener('keypress', e => stopChange(e, stopsAmt-1))
         stopParent.appendChild(stop)
 
         var closeButton = document.createElement('button')
@@ -182,19 +182,21 @@
     closeButtons.forEach(b => b.addEventListener('click', onCloseClick))
 
     function onCloseClick(e: Event) {
-        ((e.target as HTMLElement)?.parentNode?.parentNode?.parentNode as HTMLElement)?.remove();
+        if (e.target instanceof Element) e.target.parentElement?.parentElement?.parentElement?.remove();
         reorderStops()
     }
 
     function reorderStops() {
-        stops?.querySelectorAll('.stop').forEach((s, i) => (s as HTMLInputElement).placeholder = `Stop #${i+1}`)
+        stops?.querySelectorAll<HTMLInputElement>('.stop').forEach((s, i) => s.placeholder = `Stop #${i+1}`)
     }
 
-    stops?.querySelectorAll('.stop').forEach((s, i) => (s as HTMLInputElement).onchange = function (e) { stopChange(e, i) })
+    stops?.querySelectorAll<HTMLInputElement>('.stop').forEach((s, i) => s.addEventListener('change', e => stopChange(e, i)))
 
     async function stopChange(e: Event, i: number) {
-        var finalValue = (e.target as HTMLInputElement).getAttribute('final-value')
-        var searchText = (e.target as HTMLInputElement).value
+        if (!(e.target instanceof HTMLInputElement)) return
+
+        var finalValue = e.target.getAttribute('final-value')
+        var searchText = e.target.value
 
         var optionsEle = stops?.querySelectorAll('.options')[i]
 
@@ -229,14 +231,14 @@
     }
 
     function selectOption(e: MouseEvent, i: number) {
-        var place = (e.target as HTMLElement).textContent ?? ''
+        var place = e.target instanceof HTMLElement ? e.target.textContent ?? '' : ''
         var optionsEle = stops?.querySelectorAll('.options')[i]
 
         optionsEle?.querySelectorAll('.option').forEach(o => o.remove())
 
-        var stop: HTMLInputElement = stops?.querySelectorAll('.stop')[i] as HTMLInputElement
-        stop.setAttribute('final-value', place)
-        stop.value = place
+        var stop = stops?.querySelectorAll<HTMLInputElement>('.stop')[i]
+        stop?.setAttribute('final-value', place)
+        if (stop) stop.value = place
     }
 
     goBtn?.addEventListener('click', addDirections)
