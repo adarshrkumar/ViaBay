@@ -48,6 +48,16 @@
         }
     }
 
+    type VehicleResponse = {
+        Siri?: {
+            ServiceDelivery?: {
+                VehicleMonitoringDelivery?: {
+                    VehicleActivity?: { MonitoredVehicleJourney: VehicleData }[]
+                }
+            }
+        }
+    }
+
     type TimingPoint = { Name: string }
 
     type JourneyPattern = {
@@ -184,7 +194,7 @@
                 agencyIds.push(agency)
 
                 window.makeRequest('VehicleMonitoring', [['agency', agency.Id]], vehicleResult => {
-                    var vehicleData: {MonitoredVehicleJourney: VehicleData}[] = (vehicleResult as any)?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery?.VehicleActivity ?? []
+                    var vehicleData: {MonitoredVehicleJourney: VehicleData}[] = (vehicleResult as VehicleResponse)?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery?.VehicleActivity ?? []
 
                     var aName = agency.Name
                     switch (aName) {
