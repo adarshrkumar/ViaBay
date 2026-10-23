@@ -183,10 +183,6 @@
 
     function onCloseClick(e: Event) {
         if (e.target instanceof Element) e.target.parentElement?.parentElement?.parentElement?.remove();
-        reorderStops()
-    }
-
-    function reorderStops() {
         stops?.querySelectorAll<HTMLInputElement>('.stop').forEach((s, i) => s.placeholder = `Stop #${i+1}`)
     }
 
