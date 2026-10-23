@@ -1,9 +1,7 @@
 <script>
     function openSelection(e: HTMLElement) {
         while (!e.className.includes('select') && e.parentNode) e = e.parentNode as HTMLElement
-        document.querySelectorAll('.select').forEach(s => {
-            s.classList.remove('open')
-        })
+        document.querySelectorAll('.select').forEach(s => s.classList.remove('open'))
         e.classList.add('open')
         e.setAttribute('onclick', 'closeSelection(this)')
     }
@@ -16,24 +14,20 @@
     }
     window.closeSelection = closeSelection
 
-    if (!!document.querySelector('.select')) {
+    if (document.querySelector('.select')) {
         document.querySelectorAll('select-option').forEach((o, i) => {
             (o as HTMLSelectElement).onclick = e => {
                 if (!!(e.target as HTMLElement)?.getAttribute('disabled') === false) {
                     ((e.target as HTMLElement)?.parentNode as HTMLElement)?.style.setProperty('--num', i.toString())
                     var type = (e.target as HTMLElement)?.dataset.type
-                    if (!!type) {
-                        document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => {
-                            s.setAttribute('hidden', '')
-                        })
+                    if (type) {
+                        document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => s.setAttribute('hidden', ''))
                         var selector = document.querySelector(`.select[data-type="fare"][data-for="${type}"]`)
                         selector?.removeAttribute('hidden')
                     }
                 }
             }
         })
-        document.querySelectorAll('select-options').forEach(e => {
-            (e as HTMLElement).style.setProperty('--amt', e.querySelectorAll('select-option').length.toString())
-        })
+        document.querySelectorAll('select-options').forEach(e => (e as HTMLElement).style.setProperty('--amt', e.querySelectorAll('select-option').length.toString()))
     }
 </script>

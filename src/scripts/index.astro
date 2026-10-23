@@ -9,9 +9,7 @@
         }
 
         const titleEl = document.querySelector('.header > .title')
-        if (titleEl) {
-            titleEl.textContent = title
-        }
+        if (titleEl) titleEl.textContent = title
 
         if (!location.pathname.startsWith('/login')) {
             document.querySelectorAll('.nav').forEach(n => {

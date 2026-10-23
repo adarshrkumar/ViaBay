@@ -1,10 +1,11 @@
 ---
 import Analytics from '@vercel/analytics/astro'
+
 import '../styles/globals.scss'
 import '../styles/modal.scss'
+import type CookiesScript from '../scripts/cookies.astro'
 import ModalScript from '../scripts/modal.astro'
 import SelectScript from '../scripts/select.astro'
-import type CookiesScript from '../scripts/cookies.astro'
 
 type ScriptFactory = typeof CookiesScript
 
@@ -30,23 +31,17 @@ if (
 ) {
     docTitle = sTitle
 }
-else {
-    docTitle = `${title} | ${sTitle}`
-}
+else docTitle = `${title} | ${sTitle}`
 
 let classItemsArray = classItemsProp || []
-if (classItemsArray.length < 0) {
-    classItemsArray = []
-}
+if (classItemsArray.length < 0) classItemsArray = []
 classItemsArray.unshift('page')
 classItemsArray.unshift('main')
 
 const classItems = classItemsArray.join(' ')
 
 let headItemsArray = headItemsProp || []
-if (headItemsArray.length < 0) {
-    headItemsArray = []
-}
+if (headItemsArray.length < 0) headItemsArray = []
 
 const headItems = headItemsArray.join('')
 
@@ -56,9 +51,7 @@ var startingYear = 2024
 var yearStr = year == startingYear ? '' : `-${year}`
 
 const url = new URL(Astro.request.url)
-if (url.pathname.endsWith('/')) {
-    url.pathname = url.pathname.slice(0, -1)
-}
+if (url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0, -1)
 const canonicalUrl = url.toString()
 ---
 <!DOCTYPE html>

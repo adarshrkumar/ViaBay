@@ -13,12 +13,8 @@
         let ca = decodedCookie.split(';');
         var rValue = ''
         ca.forEach(c => {
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                rValue = c.substring(name.length, c.length);
-            }
+            while (c.charAt(0) == ' ') c = c.substring(1);
+            if (c.indexOf(name) == 0) rValue = c.substring(name.length, c.length);
         })
         return rValue;
     }
