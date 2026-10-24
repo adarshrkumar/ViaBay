@@ -167,7 +167,7 @@ body {
         }
     }
 
-    @media (min-width: 750px) {
+    @media (width >= 750px) {
         & {
             position: absolute;
             top: 0;
@@ -176,7 +176,7 @@ body {
         }
     }
 
-    @media (max-width: 751px) {
+    @media (width <= 751px) {
         & {
             height: 100%;
             justify-content: space-evenly;
