@@ -2,8 +2,6 @@
 
 .main {
     .directions-container {
-        --gap: #{$spacing-large};
-
         box-sizing: border-box;
         width: -webkit-fill-available;
         width: -webkit-fit-content;
@@ -13,7 +11,7 @@
         box-shadow: -4px 0 6px -1px rgb(0 0 0 / 5%);
         display: flex;
         flex-direction: column;
-        gap: var(--gap);
+        gap: $spacing-large;
 
         .stops-area {
             [data-theme="dark"] & {
@@ -41,14 +39,14 @@
             }
 
             box-sizing: border-box;
-            padding: var(--gap);
+            padding: $spacing-large;
             display: grid;
-            gap: var(--gap);
+            gap: $spacing-large;
 
             .stops {
                 width: 100%;
                 display: grid;
-                gap: var(--gap);
+                gap: $spacing-large;
 
                 .stop-container {
                     position: relative;
@@ -171,7 +169,7 @@
                 height: 3rem;
                 display: grid;
                 grid-template-columns: 3fr 1fr;
-                gap: var(--gap);
+                gap: $spacing-large;
 
                 > button {
                     border: 1px solid var(--border-color);

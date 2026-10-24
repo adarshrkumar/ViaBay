@@ -38,12 +38,10 @@
 }
 
 .btns {
-    --gap: #{$spacing-medium};
-
     width: 100%;
     display: flex;
     justify-content: space-between;
-    gap: var(--gap);
+    gap: $spacing-medium;
 }
 
 .btn {
