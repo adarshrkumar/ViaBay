@@ -4,12 +4,10 @@ import Analytics from '@vercel/analytics/astro'
 import '../styles/globals.scss'
 import '../styles/modal.scss'
 import type CookiesScript from '../scripts/cookies.astro'
-import ModalScript from '../scripts/modal.astro'
-import SelectScript from '../scripts/select.astro'
 
 type ScriptFactory = typeof CookiesScript
 
-var mainScriptNames = ['cookies', 'index', 'authentication', '511-request', 'notification-manager', 'settings']
+var mainScriptNames = ['cookies', 'index', 'authentication', '511-request', 'notification-manager', 'settings', 'modal', 'select']
 var mainScripts = await Promise.all(
     mainScriptNames.map(async n => {
         var script: { default: ScriptFactory } = await import(`../scripts/${n}.astro`)
@@ -115,7 +113,5 @@ const canonicalUrl = url.toString()
                 </div>
             </content>
         </dialog>
-        <ModalScript />
-        <SelectScript />
     </body>
 </html>
