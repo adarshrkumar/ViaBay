@@ -210,7 +210,7 @@
     }
 }
 
-@media (max-width: 915px) {
+@media (width <= 915px) {
     .main {
         flex-direction: column-reverse;
 
