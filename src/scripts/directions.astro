@@ -1,4 +1,6 @@
 <script>
+    import * as L from 'leaflet'
+
     interface NominatimResult { display_name: string; lat: string; lon: string; }
     interface RoutingResultEvent { routes: Array<{ summary: { totalDistance: number; totalTime: number } }>; }
     interface RoutingControl extends L.Control { on(type: string, fn: (event: RoutingResultEvent) => void): this; }
