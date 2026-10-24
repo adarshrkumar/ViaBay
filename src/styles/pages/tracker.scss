@@ -124,7 +124,6 @@ $hf-size: 4rem;
     border-radius: $border-radius;
     border: 1px solid var(--border-color);
     box-shadow: $shadow-xlarge;
-    -webkit-backdrop-filter: $_backdrop-filter;
     backdrop-filter: $_backdrop-filter;
     overflow: auto;
 
