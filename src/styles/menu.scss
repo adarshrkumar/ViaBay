@@ -6,7 +6,7 @@
     gap: $spacing-large;
 }
 
-:is(.menu, .notifications) item {
+:is(.menu, .notifications) .item {
     min-height: 10rem;
     padding: $spacing-xlarge;
     background-color: var(--surface);
@@ -46,7 +46,7 @@
     }
 }
 
-.notifications item {
+.notifications .item {
     padding: $spacing-large;
     flex-direction: row;
     align-items: center;

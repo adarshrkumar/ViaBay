@@ -84,7 +84,7 @@
         }
     }
 
-    var directionsElement = document.querySelector('#hiddenDirections')
+    var directionsElement = document.querySelector('#hidden-directions')
     window.directionsElement = directionsElement
     var directionsManager = false
     window.directionsManager = directionsManager
@@ -256,7 +256,7 @@
 
     GetMap()
     function GetMap() {
-        if (document.getElementById('myMap') && typeof L !== 'undefined') {
+        if (document.getElementById('my-map') && typeof L !== 'undefined') {
             // Default location (Bay Area)
             var defaultLocation: [number, number] = [37.7749, -122.4194];
             var initialZoom = 10;
@@ -391,7 +391,7 @@
 
             function initializeMap(center: [number, number], zoom: number) {
                 // Initialize Leaflet map
-                map = L.map('myMap').setView(center, zoom);
+                map = L.map('my-map').setView(center, zoom);
 
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
