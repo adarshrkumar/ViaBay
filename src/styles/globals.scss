@@ -167,27 +167,23 @@ body {
     }
 
     @media (width >= 750px) {
-        & {
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: 4rem;
-        }
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 4rem;
     }
 
     @media (width <= 751px) {
-        & {
-            height: 100%;
-            justify-content: space-evenly;
-            gap: 0;
+        height: 100%;
+        justify-content: space-evenly;
+        gap: 0;
 
-            .link {
-                flex: 1;
-                border-radius: 0;
+        .link {
+            flex: 1;
+            border-radius: 0;
 
-                &:hover {
-                    background-color: rgb(from var(--accent) r g b / 10%);
-                }
+            &:hover {
+                background-color: rgb(from var(--accent) r g b / 10%);
             }
         }
     }
@@ -346,13 +342,11 @@ body {
             z-index: 2;
 
             @media (prefers-reduced-motion) {
-                & {
-                    display: none;
-                    transition: none;
-                    transform: none;
-                    font-size: 0;
-                    z-index: -1;
-                }
+                display: none;
+                transition: none;
+                transform: none;
+                font-size: 0;
+                z-index: -1;
             }
         }
     }
