@@ -113,7 +113,6 @@ body {
     padding-inline: $spacing-xlarge;
     background-color: var(--surface);
     border-bottom: $border;
-    -webkit-backdrop-filter: $_backdrop-filter;
     backdrop-filter: $_backdrop-filter;
     box-shadow: $shadow-small;
     display: flex;
@@ -303,8 +302,6 @@ body {
     }
 
     .label {
-        $_user-select: none;
-
         position: absolute;
         top: 50%;
         display: inline-block;
@@ -315,8 +312,7 @@ body {
         /* border-bottom: none; */
 
         line-height: 1;
-        -webkit-user-select: $_user-select;
-        user-select: $_user-select;
+        user-select: none;
         transform: skewX(#{-1 * $skew});
         transition:
             padding $transition-time ease-in-out,
@@ -446,11 +442,8 @@ body {
         grid-template-rows: repeat(var(--amt, 0), 1fr);
 
         select-option {
-            $_user-select: none;
-
             padding-inline: $p-i;
-            -webkit-user-select: $_user-select;
-            user-select: $_user-select;
+            user-select: none;
             cursor: pointer;
 
             &[disabled] {

@@ -22,9 +22,7 @@
         "property-no-deprecated": [true, {
             "ignoreProperties": ["word-wrap"]
         }],
-        "property-no-vendor-prefix": [true, {
-            "ignoreProperties": ["-webkit-backdrop-filter"]
-        }]
+        "property-no-vendor-prefix": true
     },
     "overrides": [
         {
