@@ -19,6 +19,9 @@
         "scss/dollar-variable-pattern": ["^(-|_)?[a-z][a-z0-9]*(-[a-z0-9]+)*$", {
             "message": "Expected variable name \"%s\" to be kebab-case, optionally prefixed with \"_\"."
         }],
+        "property-no-deprecated": [true, {
+            "ignoreProperties": ["word-wrap"]
+        }],
         "property-no-vendor-prefix": [true, {
             "ignoreProperties": ["-webkit-backdrop-filter"]
         }]
