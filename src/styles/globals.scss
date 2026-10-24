@@ -104,7 +104,7 @@ body {
     position: relative;
     height: 100dvh;
     display: grid;
-    grid-template-rows: $hf-size calc(100% - $hf-size*2) $hf-size;
+    grid-template-rows: $hf-size calc(100% - $hf-size * 2) $hf-size;
 }
 
 .header {
@@ -307,7 +307,7 @@ body {
         position: absolute;
         top: 50%;
         display: inline-block;
-        padding: calc($p-i/2) $p-i;
+        padding: calc($p-i / 2) $p-i;
         color: inherit;
         border: inherit;
 
@@ -316,7 +316,7 @@ body {
         line-height: 1;
         -webkit-user-select: $_user-select;
         user-select: $_user-select;
-        transform: skewX(#{-1*$skew});
+        transform: skewX(#{-1 * $skew});
         transition:
             padding $transition-time ease-in-out,
             border $transition-time ease-in-out,
@@ -345,7 +345,7 @@ body {
             background-color: inherit;
             font-size: 1em;
             translate: $p-i 0;
-            transform: translateY(calc(-125%)) skew(#{-1*$skew});
+            transform: translateY(calc(-125%)) skew(#{-1 * $skew});
             z-index: 2;
 
             @media (prefers-reduced-motion) {
@@ -372,7 +372,7 @@ body {
     :is(input, textarea, select) {
         border-radius: calc($border-radius - $border-size);
         width: calc(calc(100% - $border-size) + $border-size);
-        height: calc(100% - $border-size/2);
+        height: calc(100% - $border-size / 2);
         padding-inline: $p-i;
         background-color: inherit;
         border: none;
@@ -396,7 +396,7 @@ body {
 
         select-options {
             top: 0 !important;
-            translate: 0 calc((-100%)/var(--amt, 0)*var(--num, 0));
+            translate: 0 calc((-100%) / var(--amt, 0) * var(--num, 0));
 
             select-option:first-child {
                 color: lightgray;
@@ -417,7 +417,7 @@ body {
     &.open {
         select-options {
             border: solid $border-size var(--color);
-            translate: #{-1*$border-size} 0;
+            translate: #{-1 * $border-size} 0;
             overflow: hidden;
 
             select-option {
