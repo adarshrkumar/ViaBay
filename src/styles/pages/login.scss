@@ -38,7 +38,7 @@
 }
 
 .btns {
-    --gap: $spacing-medium;
+    --gap: #{$spacing-medium};
 
     width: 100%;
     display: flex;

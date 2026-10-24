@@ -2,7 +2,7 @@
 
 .main {
     .directions-container {
-        --gap: $spacing-large;
+        --gap: #{$spacing-large};
 
         box-sizing: border-box;
         width: -webkit-fill-available;
