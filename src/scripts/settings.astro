@@ -23,10 +23,10 @@
     var settingsKey = 'settings'
 
     type Setting = { name: string; content?: string | string[] | { [key: string]: string } }
-    type SettingFunctions = { [key: string]: (value: string | string[] | { [key: string]: string }) => void }
+    type SettingFunctions = { [key: string]: (value?: string | string[] | { [key: string]: string }) => void }
 
     var settingFunctions: SettingFunctions = {
-        theme: (theme: string) => setTheme(theme)
+        theme: (theme?: string | string[] | { [key: string]: string }) => setTheme(typeof theme === 'string' ? theme : 'system')
     }
     applySettings()
 
@@ -43,7 +43,7 @@
             settingEles.forEach(s => {
                 var setting = settings.filter(filterCheck)[0].content
                 const sel = s.querySelector('select')
-                if (sel) sel.value = setting
+                if (sel && typeof setting === 'string') sel.value = setting
             })
         }
     }
@@ -68,7 +68,7 @@
         }
 
         var setting = settings[index]
-        var content: string | string[] | { [key: string]: string } = setting.content
+        var content: string | string[] | { [key: string]: string } | undefined = setting.content
         if (!content) {
             switch(type) {
                 case 'object':
@@ -85,10 +85,10 @@
 
         switch(type) {
             case 'object':
-                key !== undefined && content[key] = value
+                if (key !== undefined && typeof content === 'object' && !Array.isArray(content)) content[key] = value
                 break
             case 'list':
-                Array.isArray(content) && content.push(value)
+                if (Array.isArray(content)) content.push(value)
                 break
             default:
                 content = value
