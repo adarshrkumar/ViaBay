@@ -22,7 +22,7 @@ $hf-size: 4rem;
         position: absolute;
         left: var(--position);
         top: var(--position);
-        height: calc(100% - (var(--position)/2) - var(--f-height));
+        height: calc(100% - (var(--position) / 2) - var(--f-height));
         width: 3rem;
         z-index: 999;
         display: flex;
