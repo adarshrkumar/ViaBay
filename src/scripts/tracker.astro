@@ -1,4 +1,6 @@
 <script>
+    import * as L from 'leaflet'
+
     var map: L.Map, positionInterval = null
     window.positionInterval = positionInterval
 
@@ -471,7 +473,7 @@
                     var stops: StopCall[] = []
                     if (data.MonitoredCall) stops.push(data.MonitoredCall)
                     if (data.OnwardCalls && data.OnwardCalls.OnwardCall && data.OnwardCalls.OnwardCall.length > 0) {
-                        data.OnwardCalls.OnwardCall.forEach(stop => stops.push(stop))
+                        data.OnwardCalls.OnwardCall.forEach((stop: StopCall) => stops.push(stop))
                     }
 
                     stops.forEach(stop => {
