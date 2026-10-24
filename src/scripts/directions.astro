@@ -15,7 +15,7 @@
 
     GetMap()
     function GetMap() {
-        if (document.getElementById('myMap') && typeof L !== 'undefined') {
+        if (document.getElementById('my-map') && typeof L !== 'undefined') {
             // Default location (Bay Area)
             var defaultLocation: [number, number] = [37.7749, -122.4194];
             var initialZoom = 10;
@@ -50,7 +50,7 @@
 
             function initializeMap() {
                 // Initialize Leaflet map
-                map = L.map('myMap').setView(mapCenter, initialZoom);
+                map = L.map('my-map').setView(mapCenter, initialZoom);
 
                 // Add Wikimedia maps tile layer (clean, regular style, no highway exits)
                 L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
@@ -156,7 +156,7 @@
 
         var closeButton = document.createElement('button')
         closeButton.classList.add('close')
-        closeButton.classList.add('removeStyles')
+        closeButton.classList.add('remove-styles')
         closeButton.addEventListener('click', onCloseClick)
 
         var closeIcon = document.createElement('svg')
@@ -211,10 +211,10 @@
                 function createOption(content: string, i: number, optionsEle: Element | undefined, lastLoc=false) {
                     var aEle = document.createElement('button')
                     aEle.classList.add('option')
-                    aEle.classList.add('removeStyles')
+                    aEle.classList.add('remove-styles')
                     aEle.textContent = content
                     if (lastLoc) {
-                        aEle.classList.add('lastLoc')
+                        aEle.classList.add('last-loc')
                         aEle.disabled = true
                     }
                     else aEle.addEventListener('click', e => selectOption(e, i))

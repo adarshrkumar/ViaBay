@@ -82,7 +82,7 @@ body {
     flex-direction: column;
 }
 
-:is(button, input:is([type="button"], [type="submit"])).removeStyles {
+:is(button, input:is([type="button"], [type="submit"])).remove-styles {
     background: none;
     color: inherit;
     border: none;
@@ -329,7 +329,7 @@ body {
         }
     }
 
-    &:is(:not([open], :has(:is(input, textarea, select):focus)), :has(.hasInput)) .label {
+    &:is(:not([open], :has(:is(input, textarea, select):focus)), :has(.has-input)) .label {
         translate: 0 -50%;
         font-size: inherit;
         border-color: transparent;
