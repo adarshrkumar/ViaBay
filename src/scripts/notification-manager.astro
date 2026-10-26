@@ -7,7 +7,11 @@
     function getNotificationKeys(): string[] {
         try {
             var parsed: string[] = JSON.parse(localStorage.getItem(notificationsKey) ?? '[]')
-            return Array.isArray(parsed) ? parsed.filter(k => typeof k === 'string') : []
+            return Array.isArray(parsed)
+                ? parsed.filter(k => typeof k === 'string').map(k =>
+                    !k.startsWith('NOTIFICATIONS://') && k.includes('|') ? `NOTIFICATIONS://${k}` : k
+                )
+                : []
         } catch {
             return []
         }
