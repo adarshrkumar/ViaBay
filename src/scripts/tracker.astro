@@ -1,8 +1,25 @@
 <script>
     import * as L from 'leaflet'
 
-    var map: L.Map, positionInterval = null
-    window.positionInterval = positionInterval
+    var map: L.Map
+    window.positionInterval = null
+
+    function stopPositionUpdates() {
+        if (window.positionInterval !== null) clearInterval(window.positionInterval)
+        window.positionInterval = null
+    }
+    function startPositionUpdates() {
+        stopPositionUpdates()
+        window.positionInterval = setInterval(onMapLoad, 60000)
+    }
+    window.addEventListener('pagehide', stopPositionUpdates)
+    // Restart updates when the page comes back from the back/forward cache
+    window.addEventListener('pageshow', e => {
+        if (e.persisted && map) {
+            onMapLoad()
+            startPositionUpdates()
+        }
+    })
 
     var agencyIds: {Id: string, Name: string}[] = []
     var agencies: Record<string, AgencyObj | undefined> = {}
@@ -407,7 +424,7 @@
                 });
 
                 if (onMapLoad) onMapLoad()
-                positionInterval = setInterval(onMapLoad, 60000)
+                startPositionUpdates()
             }
         }
         else window.addEventListener('DOMContentLoaded', GetMap)
