@@ -95,33 +95,23 @@
         return document.querySelector('.vehicle-info-container')
     }
 
-    // Build elements with textContent so feed data is never parsed as HTML
-    function createElement(tag: string, className?: string, text?: string) {
-        var element = document.createElement(tag)
-        if (className) element.className = className
-        if (text !== undefined) element.textContent = text
-        return element
-    }
-
-    function appendLines(parent: HTMLElement, lines: string[]) {
-        lines.forEach((line, i) => {
-            if (i > 0) parent.appendChild(document.createElement('br'))
-            parent.appendChild(document.createTextNode(line))
-        })
-    }
-
-    // Replace the popup with a fresh one and return its infobox for the caller to fill
+    // Replace the popup with a fresh one and return its infobox; callers add text, never HTML, so feed data cannot inject markup
     function showPopup(container: Element) {
-        var wrapper = createElement('div', 'leaflet-popup-content-wrapper')
+        var wrapper = document.createElement('div')
+        wrapper.className = 'leaflet-popup-content-wrapper'
 
-        var closeBtn = createElement('button', 'leaflet-popup-close-button', '×')
-        closeBtn.setAttribute('type', 'button')
+        var closeBtn = document.createElement('button')
+        closeBtn.className = 'leaflet-popup-close-button'
+        closeBtn.textContent = '×'
+        closeBtn.type = 'button'
         closeBtn.setAttribute('aria-label', 'Close popup')
         closeBtn.addEventListener('click', () => container.classList.remove('visible'))
         wrapper.appendChild(closeBtn)
 
-        var content = createElement('div', 'leaflet-popup-content')
-        var infobox = createElement('div', 'infobox')
+        var content = document.createElement('div')
+        content.className = 'leaflet-popup-content'
+        var infobox = document.createElement('div')
+        infobox.className = 'infobox'
         content.appendChild(infobox)
         wrapper.appendChild(content)
 
@@ -256,7 +246,8 @@
                             if (pin) pin.setLatLng(vehicleLatLng);
                             else {
                                 // Create custom DivIcon for vehicle marker
-                                var iconLabel = createElement('div', undefined, route)
+                                var iconLabel = document.createElement('div')
+                                iconLabel.textContent = route
                                 iconLabel.style.cssText = 'color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap;'
                                 iconLabel.style.backgroundColor = markerColor
 
@@ -376,21 +367,31 @@
                                 var container = getVehicleInfoContainer()
                                 if (container) {
                                     var infobox = showPopup(container)
-                                    infobox.appendChild(createElement('span', 'title', 'Nearby Vehicles'))
-                                    infobox.appendChild(createElement('span', undefined, 'Within 1.5 miles of your location'))
-                                    infobox.appendChild(document.createElement('br'))
+                                    var title = document.createElement('span')
+                                    title.className = 'title'
+                                    title.textContent = 'Nearby Vehicles'
+                                    var subtitle = document.createElement('span')
+                                    subtitle.textContent = 'Within 1.5 miles of your location'
+                                    infobox.append(title, subtitle, document.createElement('br'))
 
-                                    if (nearbyVehicles.length === 0) infobox.appendChild(createElement('span', undefined, 'No vehicles nearby'))
+                                    if (nearbyVehicles.length === 0) {
+                                        var empty = document.createElement('span')
+                                        empty.textContent = 'No vehicles nearby'
+                                        infobox.appendChild(empty)
+                                    }
                                     else {
-                                        var list = createElement('ol', 'stops')
+                                        var list = document.createElement('ol')
+                                        list.className = 'stops'
                                         nearbyVehicles.forEach(v => {
-                                            var item = createElement('li', 'stop')
-                                            item.appendChild(createElement('strong', undefined, v.route))
-                                            appendLines(item, [
-                                                ` - ${v.lineName}`,
-                                                `To: ${v.destination}`,
+                                            var item = document.createElement('li')
+                                            item.className = 'stop'
+                                            var route = document.createElement('strong')
+                                            route.textContent = v.route
+                                            item.append(
+                                                route, ` - ${v.lineName}`, document.createElement('br'),
+                                                `To: ${v.destination}`, document.createElement('br'),
                                                 `Distance: ${v.distance.toFixed(2)} mi`
-                                            ])
+                                            )
                                             list.appendChild(item)
                                         })
                                         infobox.appendChild(list)
@@ -453,7 +454,6 @@
                 if (data.LineName.includes('  ')) data.LineName = data.LineName.split('  ').join(' ')
             }
 
-            var titleLines = [data.agency, `${data.LineRef}: ${data.LineName || ''}`]
             var descriptionLines = [
                 `Direction: ${data.DirectionRef ? data.DirectionRef : 'Unknown Direction'}`,
                 `Origin: ${data.OriginName ? data.OriginName : 'No Origin or Unknown'}`,
@@ -467,17 +467,20 @@
             if (container) {
                 var infobox = showPopup(container)
 
-                var title = createElement('span', 'title')
-                appendLines(title, titleLines)
-                infobox.appendChild(title)
+                var title = document.createElement('span')
+                title.className = 'title'
+                title.append(data.agency, document.createElement('br'), `${data.LineRef}: ${data.LineName || ''}`)
 
-                var description = createElement('span')
-                appendLines(description, descriptionLines)
-                infobox.appendChild(description)
+                var description = document.createElement('span')
+                description.append(...descriptionLines.flatMap((line, i) => i > 0 ? [document.createElement('br'), line] : [line]))
 
-                var stopsList = createElement('ol', 'stops')
-                stopsList.appendChild(createElement('li', undefined, 'Loading stops...'))
-                infobox.appendChild(stopsList)
+                var stopsList = document.createElement('ol')
+                stopsList.className = 'stops'
+                var loadingItem = document.createElement('li')
+                loadingItem.textContent = 'Loading stops...'
+                stopsList.appendChild(loadingItem)
+
+                infobox.append(title, description, stopsList)
 
                 window.makeRequest<{ journeyPatterns?: JourneyPattern[] }>('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
                     var pattern: JourneyPattern | null = null
@@ -527,12 +530,18 @@
 
                         var color = isLate ? 'red' : (isEarly ? 'green' : (isOnTime ? 'blue' : 'black'))
 
-                        var stopItem = createElement('li', 'stop', `${stop.StopPointName} (${stop.StopPointRef}): ${stopTime} (${earlyLateText})`)
+                        var stopItem = document.createElement('li')
+                        stopItem.className = 'stop'
+                        stopItem.textContent = `${stop.StopPointName} (${stop.StopPointRef}): ${stopTime} (${earlyLateText})`
                         stopItem.style.color = color
                         stopItems.push(stopItem)
                     })
 
-                    if (stopItems.length === 0) stopItems.push(createElement('li', undefined, 'No stop information available'))
+                    if (stopItems.length === 0) {
+                        var emptyItem = document.createElement('li')
+                        emptyItem.textContent = 'No stop information available'
+                        stopItems.push(emptyItem)
+                    }
 
                     stopsList.replaceChildren(...stopItems)
                 })
