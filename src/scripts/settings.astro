@@ -1,18 +1,19 @@
 <script>
-    var settingEles = document.querySelectorAll('setting-option')
-    // var selectEles = document.querySelectorAll('setting-option select')
-
+    // Apply settings once, after the <setting-option> nodes exist
     window.addEventListener('DOMContentLoaded', _e => {
-        settingEles = document.querySelectorAll('setting-option')
-        // selectEles = document.querySelectorAll('setting-option select')
+        settings.forEach(setting => {
+            if (Object.hasOwn(settingFunctions, setting.name)) settingFunctions[setting.name](setting.content)
+        })
 
-        applySettings()
         if (location.pathname.startsWith('/settings')) {
-            settingEles.forEach(s => {
+            document.querySelectorAll('setting-option').forEach(s => {
                 const sel = s.querySelector('select')
-                if (sel) {
-                    sel.addEventListener('change', () => setSetting(s.getAttribute('module-name')!, sel.value))
-                }
+                const name = s.getAttribute('module-name')
+                if (!sel || !name) return
+
+                var setting = settings.find(setting => setting.name === name)?.content
+                if (typeof setting === 'string') sel.value = setting
+                sel.addEventListener('change', () => setSetting(name, sel.value))
             })
         }
     })
@@ -30,43 +31,22 @@
     var settingFunctions: SettingFunctions = {
         theme: (theme?: string | string[] | { [key: string]: string }) => setTheme(typeof theme === 'string' ? theme : 'system')
     }
-    applySettings()
 
-    function getSettings(): Setting[] {
-        var raw = localStorage.getItem(settingsKey) || '[]'
-        return JSON.parse(raw)
-    }
-
-    function applySettings() {
-        var settings = getSettings()
-        settings.forEach(s => settingFunctions[s.name](s.content))
-
-        if (location.pathname.startsWith('/settings') && settings.length > 0) {
-            settingEles.forEach(s => {
-                var setting = settings.filter(filterCheck)[0].content
-                const sel = s.querySelector('select')
-                if (sel && typeof setting === 'string') sel.value = setting
-            })
-        }
-    }
-
-    function filterCheck(setting: Setting) {
-        return setting.name === 'theme'
+    // Missing or corrupt data reads as no settings, and malformed entries are dropped
+    var settings: Setting[] = []
+    try {
+        var parsed: (Setting | null)[] = JSON.parse(localStorage.getItem(settingsKey) || '[]')
+        if (Array.isArray(parsed)) settings = parsed.filter((s): s is Setting => typeof s === 'object' && s !== null && typeof s.name === 'string')
+    } catch {
+        // Keep the empty default
     }
 
     function setSetting(name: string, value: string, type?: string, key?: string) {
-        var settings = getSettings()
-        console.log(settings)
+        var index = settings.findIndex(s => s.name === name)
 
-        var item: Setting | undefined
-        if (settings.length > 0) item = settings.filter(filterCheck)[0]
-
-        var index = item ? settings.indexOf(item) : -1
-
-        if (index < 0 || settings.length < 1) {
-            var settingsLength = settings.length
+        if (index < 0) {
             settings.push({name: name})
-            index = settingsLength
+            index = settings.length - 1
         }
 
         var setting = settings[index]
@@ -101,6 +81,6 @@
         settings[index] = setting
         localStorage.setItem(settingsKey, JSON.stringify(settings))
 
-        settingFunctions[setting.name](setting.content)
+        if (Object.hasOwn(settingFunctions, setting.name)) settingFunctions[setting.name](setting.content)
     }
 </script>
