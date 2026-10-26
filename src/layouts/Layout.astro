@@ -15,9 +15,14 @@ var mainScripts = await Promise.all(
     })
 )
 
+interface Props {
+    title?: string
+    classItems?: string[]
+}
+
 var sTitle = 'ViaBay'
 
-var { title, classItems: classItemsProp, headItems: headItemsProp } = Astro.props
+var { title, classItems: classItemsProp } = Astro.props
 
 var docTitle = ''
 if (
@@ -28,17 +33,7 @@ if (
 }
 else docTitle = `${title} | ${sTitle}`
 
-let classItemsArray = classItemsProp || []
-if (classItemsArray.length < 0) classItemsArray = []
-classItemsArray.unshift('page')
-classItemsArray.unshift('main')
-
-const classItems = classItemsArray.join(' ')
-
-let headItemsArray = headItemsProp || []
-if (headItemsArray.length < 0) headItemsArray = []
-
-const headItems = headItemsArray.join('')
+const classItems = ['main', 'page', ...(classItemsProp ?? [])].join(' ')
 
 var d = new Date()
 var year = d.getFullYear()
@@ -46,6 +41,8 @@ var startingYear = 2024
 var yearStr = year == startingYear ? '' : `-${year}`
 
 const url = new URL(Astro.request.url)
+url.search = ''
+url.hash = ''
 if (url.pathname.endsWith('/')) url.pathname = url.pathname.slice(0, -1)
 const canonicalUrl = url.toString()
 ---
@@ -63,7 +60,7 @@ const canonicalUrl = url.toString()
         <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
         <link rel="canonical" href={canonicalUrl} />
         <Analytics />
-        { (!!headItems && headItems.length > 0) ? <div set:html={headItems}></div> : '' }
+        <slot name="head" />
         {
             mainScripts.map((Module) => {
                 return <Module />
@@ -72,8 +69,7 @@ const canonicalUrl = url.toString()
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" is:inline></script>
         <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" is:inline></script>
     </head>
-    { /* @ts-ignore */ }
-    <body sTitle={sTitle}>
+    <body>
         <div class="app">
             <header class="header">
                 <h1 class="title">{title}</h1>
