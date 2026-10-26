@@ -8,13 +8,6 @@
     var map: L.Map | null = null
     var routingControl: RoutingControl | null = null
 
-    function assertError(err: Error | string, name: string) {
-        err = `${name} Error: ${err}`
-        alert(err)
-        console.error(err)
-    }
-    window.assertError = assertError
-
     GetMap()
     function GetMap() {
         if (document.getElementById('my-map') && typeof L !== 'undefined') {
