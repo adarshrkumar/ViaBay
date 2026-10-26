@@ -52,6 +52,8 @@
                     attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
                     maxZoom: 19
                 }).addTo(map!);
+
+                if (window.onMapLoad) window.onMapLoad(map!)
             }
         }
         else window.addEventListener('DOMContentLoaded', GetMap)
