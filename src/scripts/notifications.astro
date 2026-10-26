@@ -19,6 +19,7 @@
 
     window.getNotifications = function () {
         window.getNotificationKeys().forEach(storageKey => {
+            if (!storageKey.startsWith('NOTIFICATIONS://')) return
             var notification = readNotification(storageKey)
             if (notification) renderNotification(notification)
             localStorage.removeItem(storageKey)
