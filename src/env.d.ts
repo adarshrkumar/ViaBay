@@ -14,11 +14,6 @@ interface Window {
     openSelection: (e: HTMLElement) => void
     closeSelection: (e: HTMLElement) => void
     showRoutePath: (aId: string, rId: string) => void
-    findUsingValueofKey: (arr: Record<string, string>[], key: string, val: string) => Record<string, string>[]
     positionInterval: ReturnType<typeof setInterval> | null
-    allPins: L.Marker[]
-    directionsElement: Element | null
-    directionsManager: boolean
     login: () => void
-    onMapLoad: ((map: L.Map) => void) | null
 }
