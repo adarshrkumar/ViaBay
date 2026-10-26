@@ -1,33 +1,90 @@
 <script>
     function openSelection(e: HTMLElement) {
-        while (!e.className.includes('select') && e.parentElement) e = e.parentElement
-        document.querySelectorAll('.select').forEach(s => s.classList.remove('open'))
-        e.classList.add('open')
-        e.setAttribute('onclick', 'closeSelection(this)')
+        var select = e.closest<HTMLElement>('.select')
+        if (!select) return
+        document.querySelectorAll<HTMLElement>('.select.open').forEach(s => closeSelection(s))
+        select.classList.add('open')
+        select.setAttribute('aria-expanded', 'true')
+        select.setAttribute('onclick', 'closeSelection(this)')
     }
     window.openSelection = openSelection
 
     function closeSelection(e: HTMLElement) {
-        while (!e.className.includes('select') && e.parentElement) e = e.parentElement
-        e.classList.remove('open')
-        e.setAttribute('onclick', 'openSelection(this)')
+        var select = e.closest<HTMLElement>('.select')
+        if (!select) return
+        select.classList.remove('open')
+        select.setAttribute('aria-expanded', 'false')
+        select.setAttribute('onclick', 'openSelection(this)')
     }
     window.closeSelection = closeSelection
 
-    if (document.querySelector('.select')) {
-        document.querySelectorAll<HTMLElement>('select-option').forEach((o, i) => {
-            o.addEventListener('click', () => {
-                if (!!o.getAttribute('disabled') === false) {
-                    o.parentElement?.style.setProperty('--num', i.toString())
-                    var type = o.dataset.type
-                    if (type) {
-                        document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => s.setAttribute('hidden', ''))
-                        var selector = document.querySelector(`.select[data-type="fare"][data-for="${type}"]`)
-                        selector?.removeAttribute('hidden')
-                    }
-                }
-            })
+    function chooseOption(select: HTMLElement, o: HTMLElement) {
+        if (o.hasAttribute('disabled')) return
+
+        var options = Array.from(select.querySelectorAll<HTMLElement>('select-option'))
+        o.parentElement?.style.setProperty('--num', options.indexOf(o).toString())
+        options.forEach(opt => {
+            opt.toggleAttribute('selected', opt === o)
+            opt.setAttribute('aria-selected', (opt === o).toString())
         })
-        document.querySelectorAll<HTMLElement>('select-options').forEach(e => e.style.setProperty('--amt', e.querySelectorAll('select-option').length.toString()))
+        if (o.id) select.setAttribute('aria-activedescendant', o.id)
+
+        if (o.dataset.type) {
+            document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => s.setAttribute('hidden', ''))
+            document.querySelector(`.select[data-type="fare"][data-for="${o.dataset.type}"]`)?.removeAttribute('hidden')
+        }
     }
+
+    function moveSelection(select: HTMLElement, step: number) {
+        var enabled = Array.from(select.querySelectorAll<HTMLElement>('select-option:not([disabled])'))
+        if (enabled.length === 0) return
+        var current = enabled.findIndex(o => o.hasAttribute('selected'))
+        chooseOption(select, enabled[current < 0 ? (step > 0 ? 0 : enabled.length - 1) : Math.min(Math.max(current + step, 0), enabled.length - 1)])
+    }
+
+    document.querySelectorAll<HTMLElement>('.select').forEach((select, sI) => {
+        var list = select.querySelector<HTMLElement>('select-options')
+        if (!list) return
+
+        var options = select.querySelectorAll<HTMLElement>('select-option')
+        list.style.setProperty('--amt', options.length.toString())
+        if (!list.id) list.id = `select-${sI}-listbox`
+        list.setAttribute('role', 'listbox')
+        select.setAttribute('aria-controls', list.id)
+
+        select.setAttribute('role', 'combobox')
+        select.setAttribute('aria-haspopup', 'listbox')
+        select.setAttribute('aria-expanded', select.classList.contains('open').toString())
+        if (!select.hasAttribute('tabindex')) select.tabIndex = 0
+
+        options.forEach((o, oI) => {
+            if (!o.id) o.id = `select-${sI}-option-${oI}`
+            o.setAttribute('role', 'option')
+            o.setAttribute('aria-selected', o.hasAttribute('selected').toString())
+            if (o.hasAttribute('disabled')) o.setAttribute('aria-disabled', 'true')
+            o.addEventListener('click', () => chooseOption(select, o))
+        })
+
+        select.addEventListener('keydown', e => {
+            switch (e.key) {
+                case 'Enter':
+                case ' ':
+                    e.preventDefault()
+                    if (select.classList.contains('open')) closeSelection(select)
+                    else openSelection(select)
+                    break
+                case 'Escape':
+                    closeSelection(select)
+                    break
+                case 'ArrowDown':
+                    e.preventDefault()
+                    moveSelection(select, 1)
+                    break
+                case 'ArrowUp':
+                    e.preventDefault()
+                    moveSelection(select, -1)
+                    break
+            }
+        })
+    })
 </script>

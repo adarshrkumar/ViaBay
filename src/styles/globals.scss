@@ -419,8 +419,18 @@ body {
                 &:hover {
                     background-color: gray;
                 }
+
+                &[aria-selected="true"] {
+                    background-color: var(--accent-hover);
+                    font-weight: 600;
+                }
             }
         }
+    }
+
+    &:focus-visible {
+        outline: solid 2px var(--color);
+        outline-offset: 2px;
     }
 
     select-options {
