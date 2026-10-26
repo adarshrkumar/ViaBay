@@ -9,8 +9,9 @@ interface Window {
     assertError: (err: Error | string, name: string) => void
     goToPage: (name: string) => void
     showModal: (title: string, content: string) => void
-    addNotification: (module: string, name: string, icon: string, content: string, attatchmentInfo: string) => void
-    getNotifications: (module?: string, title?: string, description?: string, content?: string, attatchmentInfo?: string) => void
+    addNotification: (module: string, name: string, icon: string, content: string, attachmentInfo?: string) => void
+    getNotificationKeys: () => string[]
+    getNotifications: () => void
     openSelection: (e: HTMLElement) => void
     closeSelection: (e: HTMLElement) => void
     showRoutePath: (aId: string, rId: string) => void
