@@ -1,10 +1,6 @@
 <script>
-    function getSelect(e: HTMLElement) {
-        return e.closest<HTMLElement>('.select')
-    }
-
     function openSelection(e: HTMLElement) {
-        var select = getSelect(e)
+        var select = e.closest<HTMLElement>('.select')
         if (!select) return
         document.querySelectorAll<HTMLElement>('.select.open').forEach(s => closeSelection(s))
         select.classList.add('open')
@@ -14,7 +10,7 @@
     window.openSelection = openSelection
 
     function closeSelection(e: HTMLElement) {
-        var select = getSelect(e)
+        var select = e.closest<HTMLElement>('.select')
         if (!select) return
         select.classList.remove('open')
         select.setAttribute('aria-expanded', 'false')
@@ -22,18 +18,10 @@
     }
     window.closeSelection = closeSelection
 
-    function getOptions(select: HTMLElement) {
-        return Array.from(select.querySelectorAll<HTMLElement>('select-option'))
-    }
-
-    function isDisabled(o: HTMLElement) {
-        return o.hasAttribute('disabled')
-    }
-
     function chooseOption(select: HTMLElement, o: HTMLElement) {
-        if (isDisabled(o)) return
+        if (o.hasAttribute('disabled')) return
 
-        var options = getOptions(select)
+        var options = Array.from(select.querySelectorAll<HTMLElement>('select-option'))
         o.parentElement?.style.setProperty('--num', options.indexOf(o).toString())
         options.forEach(opt => {
             opt.toggleAttribute('selected', opt === o)
@@ -50,7 +38,7 @@
     }
 
     function moveSelection(select: HTMLElement, step: number) {
-        var enabled = getOptions(select).filter(o => !isDisabled(o))
+        var enabled = Array.from(select.querySelectorAll<HTMLElement>('select-option:not([disabled])'))
         if (enabled.length === 0) return
         var current = enabled.findIndex(o => o.hasAttribute('selected'))
         var next = current < 0 ? (step > 0 ? 0 : enabled.length - 1) : Math.min(Math.max(current + step, 0), enabled.length - 1)
@@ -61,7 +49,7 @@
         var list = select.querySelector<HTMLElement>('select-options')
         if (!list) return
 
-        var options = getOptions(select)
+        var options = select.querySelectorAll<HTMLElement>('select-option')
         list.style.setProperty('--amt', options.length.toString())
         list.setAttribute('role', 'listbox')
 
@@ -74,7 +62,7 @@
             if (!o.id) o.id = `select-${sI}-option-${oI}`
             o.setAttribute('role', 'option')
             o.setAttribute('aria-selected', o.hasAttribute('selected').toString())
-            if (isDisabled(o)) o.setAttribute('aria-disabled', 'true')
+            if (o.hasAttribute('disabled')) o.setAttribute('aria-disabled', 'true')
             o.addEventListener('click', () => chooseOption(select, o))
         })
 
