@@ -4,20 +4,15 @@
     var map: L.Map
     window.positionInterval = null
 
-    function stopPositionUpdates() {
+    window.addEventListener('pagehide', () => {
         if (window.positionInterval !== null) clearInterval(window.positionInterval)
         window.positionInterval = null
-    }
-    function startPositionUpdates() {
-        stopPositionUpdates()
-        window.positionInterval = setInterval(onMapLoad, 60000)
-    }
-    window.addEventListener('pagehide', stopPositionUpdates)
+    })
     // Restart updates when the page comes back from the back/forward cache
     window.addEventListener('pageshow', e => {
         if (e.persisted && map) {
             onMapLoad()
-            startPositionUpdates()
+            window.positionInterval = setInterval(onMapLoad, 60000)
         }
     })
 
@@ -424,7 +419,7 @@
                 });
 
                 if (onMapLoad) onMapLoad()
-                startPositionUpdates()
+                window.positionInterval = setInterval(onMapLoad, 60000)
             }
         }
         else window.addEventListener('DOMContentLoaded', GetMap)
