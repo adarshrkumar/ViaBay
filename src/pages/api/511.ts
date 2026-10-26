@@ -21,6 +21,20 @@ async function make511Request(
     const response = await fetch(url)
     console.log('[511 API] Response status:', response.status, response.statusText)
 
+    // Pass upstream rate limits through so the client can back off, keeping Retry-After when sent
+    if (response.status === 429) {
+        return new Response(
+            JSON.stringify({ error: 'Rate limited by 511.org' }),
+            {
+                status: 429,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(response.headers.has('Retry-After') ? { 'Retry-After': response.headers.get('Retry-After')! } : {})
+                }
+            }
+        )
+    }
+
     if (!response.ok) {
         const errorText = await response.text()
         console.error('[511 API] Error response body:', errorText)
@@ -73,6 +87,7 @@ export const GET: APIRoute = async ({ url, request }) => {
 
     try {
         const data = await make511Request(moduleName, params)
+        if (data instanceof Response) return data
         return new Response(
             JSON.stringify(data),
             {

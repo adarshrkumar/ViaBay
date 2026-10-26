@@ -1,16 +1,16 @@
 <script>
-    // Track delay for rate limiting
-    let requestDelay = 0 // milliseconds
+    var maxAttempts = 5
+    var baseDelay = 1000 // milliseconds
+    var maxDelay = 32000 // milliseconds
 
     // Helper function to wait/delay
     function delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    async function makeRequest<T>(moduleName: string, params: string[][] = [], callback: (data: T) => void = function () {}) {
-        // Apply current delay if any
-        if (requestDelay > 0) await delay(requestDelay)
+    var errorTimeout: ReturnType<typeof setTimeout> | null = null
 
+    async function makeRequest<T>(moduleName: string, params: string[][] = [], callback: (data: T) => void = function () {}) {
         // Prepare params for API route
         const paramsString = Array.isArray(params) && params.length > 0
             ? JSON.stringify(params)
@@ -19,35 +19,62 @@
         // Build URL for our API route
         const url = `/api/511?module=${encodeURIComponent(moduleName)}${paramsString ? `&params=${encodeURIComponent(paramsString)}` : ''}`
 
+        let result: T
         try {
-            const response = await fetch(url)
-            // Handle 429 Rate Limit with exponential backoff
-            if (response.status === 429) {
-                if (requestDelay === 0) requestDelay = 1000 // Start with 1 second
-                else requestDelay = Math.min(requestDelay * 2, 32000)
-                console.log(`[Client] Rate limited (429). Increasing delay to ${requestDelay}ms and retrying...`)
-                return await makeRequest(moduleName, params, callback)
+            for (let attempt = 0; ; attempt++) {
+                const response = await fetch(url)
+
+                // Handle 429 Rate Limit with capped, jittered backoff for this request only
+                if (response.status === 429) {
+                    if (attempt + 1 >= maxAttempts) throw new Error(`Rate limited after ${maxAttempts} attempts`)
+                    // Honour Retry-After (seconds or an HTTP date) when the server sends it, else exponential backoff with full jitter
+                    var retryAfter = response.headers.get('Retry-After')
+                    var wait = retryAfter === null
+                        ? NaN
+                        : Number.isFinite(Number(retryAfter)) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now()
+                    wait = Number.isFinite(wait)
+                        ? Math.min(Math.max(0, wait), maxDelay)
+                        : Math.random() * Math.min(baseDelay * 2 ** attempt, maxDelay)
+                    console.log(`[Client] Rate limited (429). Retrying ${moduleName} in ${Math.round(wait)}ms...`)
+                    await delay(wait)
+                    continue
+                }
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}))
+                    console.error('511 API Error Response:', data)
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${data.error || 'Unknown error'}`)
+                }
+
+                const data = await response.json()
+                if (data.error) {
+                    console.error('511 API returned error:', data.error)
+                    throw new Error(data.error)
+                }
+
+                result = data
+                break
             }
-
-            if (!response.ok) {
-                const data = await response.json().catch(() => ({}))
-                console.error('511 API Error Response:', data)
-                throw new Error(`HTTP error! status: ${response.status}, message: ${data.error || 'Unknown error'}`)
-            }
-
-            const data = await response.json()
-            if (data.error) {
-                console.error('511 API returned error:', data.error)
-                throw new Error(data.error)
-            }
-
-            // Success - reset delay gradually
-            if (requestDelay > 0) requestDelay = Math.max(requestDelay / 2, 0)
-
-            callback(data)
         } catch (err) {
             console.error('511 API Error:', err)
+
+            // Show a single, self-dismissing banner so repeated failures do not stack up
+            let banner = document.querySelector<HTMLElement>('.request-error')
+            if (!banner) {
+                banner = document.createElement('div')
+                banner.classList.add('request-error')
+                banner.setAttribute('role', 'alert')
+                document.body.appendChild(banner)
+            }
+            banner.textContent = 'Could not load live transit data. Some information may be missing or out of date.'
+            banner.removeAttribute('hidden')
+
+            if (errorTimeout !== null) clearTimeout(errorTimeout)
+            errorTimeout = setTimeout(() => banner?.setAttribute('hidden', ''), 8000)
+            return
         }
+
+        callback(result)
     }
     window.makeRequest = makeRequest
 </script>

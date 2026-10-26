@@ -472,3 +472,18 @@ body {
 link {
     cursor: pointer;
 }
+
+.request-error {
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    bottom: calc(#{$hf-size} + #{$spacing-medium});
+    translate: -50% 0;
+    max-width: calc(100% - #{$spacing-xlarge});
+    box-sizing: border-box;
+    padding: $spacing-small $spacing-medium;
+    border-radius: $border-radius;
+    background-color: #b91c1c;
+    color: white;
+    box-shadow: $shadow-medium;
+}
