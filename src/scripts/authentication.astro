@@ -1,6 +1,10 @@
 <script>
     var authentication = localStorage.getItem('auth')
 
+    if (authentication && JSON.parse(authentication).password !== undefined) {
+        localStorage.setItem('auth', JSON.stringify({ username: JSON.parse(authentication).username }))
+    }
+
     authentication = authentication ? JSON.parse(authentication) : {}
 
     // var username = authentication.username ? authentication.username : ''
@@ -18,10 +22,9 @@
     }
     window.checkAuthentication = checkAuthentication
 
-    function setCredentials(username: string, password: string, dest: string) {
+    function setCredentials(username: string, _password: string, dest: string) {
         authentication = JSON.stringify({
             username: username,
-            password: btoa(password),
         })
         localStorage.setItem('auth', authentication)
         location.href = dest
