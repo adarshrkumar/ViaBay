@@ -73,7 +73,7 @@ const canonicalUrl = url.toString()
                 <slot />
             </main>
             <footer class="footer" site-title={sTitle} current-year={yearStr}>
-                <nav class="nav" hidden>
+                <nav class="nav" hidden={Astro.url.pathname.startsWith('/login')}>
                     <a class="link" href="/tracker" aria-label="Live tracker">
                         <img class="icon" alt="" src="/icons/map.svg">
                     </a>

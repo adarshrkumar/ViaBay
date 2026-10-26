@@ -283,6 +283,9 @@
                     })
 
                     agencies[agency.Id] = aObj
+
+                    var status = document.querySelector('.vehicle-status')
+                    if (status) status.textContent = `Showing ${Object.values(agencies).reduce((total, a) => total + (a?.vehicles.data.length ?? 0), 0)} live vehicles`
                 })
 
                 // windodw.makeRequest('lines', [['operator_id', agency.Id]], lS => {
