@@ -1,8 +1,9 @@
 <script>
     // Apply settings once, after the <setting-option> nodes exist
     window.addEventListener('DOMContentLoaded', _e => {
-        var settings = getSettings()
-        settings.forEach(applySetting)
+        settings.forEach(setting => {
+            if (Object.hasOwn(settingFunctions, setting.name)) settingFunctions[setting.name](setting.content)
+        })
 
         if (location.pathname.startsWith('/settings')) {
             document.querySelectorAll('setting-option').forEach(s => {
@@ -10,7 +11,7 @@
                 const name = s.getAttribute('module-name')
                 if (!sel || !name) return
 
-                var setting = findSetting(settings, name)?.content
+                var setting = settings.find(setting => setting.name === name)?.content
                 if (typeof setting === 'string') sel.value = setting
                 sel.addEventListener('change', () => setSetting(name, sel.value))
             })
@@ -29,33 +30,17 @@
         theme: (theme?: string | string[] | { [key: string]: string }) => setTheme(typeof theme === 'string' ? theme : 'system')
     }
 
-    function isSetting(s: Setting | null): s is Setting {
-        return typeof s === 'object' && s !== null && typeof s.name === 'string'
-    }
-
     // Missing or corrupt data reads as no settings, and malformed entries are dropped
-    function getSettings(): Setting[] {
-        try {
-            var parsed: (Setting | null)[] = JSON.parse(localStorage.getItem(settingsKey) || '[]')
-            return Array.isArray(parsed) ? parsed.filter(isSetting) : []
-        } catch {
-            return []
-        }
-    }
-
-    function findSetting(settings: Setting[], name: string) {
-        return settings.find(s => s.name === name)
-    }
-
-    function applySetting(setting: Setting) {
-        if (Object.hasOwn(settingFunctions, setting.name)) settingFunctions[setting.name](setting.content)
+    var settings: Setting[] = []
+    try {
+        var parsed: (Setting | null)[] = JSON.parse(localStorage.getItem(settingsKey) || '[]')
+        if (Array.isArray(parsed)) settings = parsed.filter((s): s is Setting => typeof s === 'object' && s !== null && typeof s.name === 'string')
+    } catch {
+        // Keep the empty default
     }
 
     function setSetting(name: string, value: string, type?: string, key?: string) {
-        var settings = getSettings()
-
-        var item = findSetting(settings, name)
-        var index = item ? settings.indexOf(item) : -1
+        var index = settings.findIndex(s => s.name === name)
 
         if (index < 0) {
             settings.push({name: name})
@@ -94,6 +79,6 @@
         settings[index] = setting
         localStorage.setItem(settingsKey, JSON.stringify(settings))
 
-        applySetting(setting)
+        if (Object.hasOwn(settingFunctions, setting.name)) settingFunctions[setting.name](setting.content)
     }
 </script>
