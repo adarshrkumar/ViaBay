@@ -29,11 +29,9 @@
         })
         if (o.id) select.setAttribute('aria-activedescendant', o.id)
 
-        var type = o.dataset.type
-        if (type) {
+        if (o.dataset.type) {
             document.querySelectorAll(`.select[data-type="fare"]`).forEach(s => s.setAttribute('hidden', ''))
-            var selector = document.querySelector(`.select[data-type="fare"][data-for="${type}"]`)
-            selector?.removeAttribute('hidden')
+            document.querySelector(`.select[data-type="fare"][data-for="${o.dataset.type}"]`)?.removeAttribute('hidden')
         }
     }
 
@@ -41,8 +39,7 @@
         var enabled = Array.from(select.querySelectorAll<HTMLElement>('select-option:not([disabled])'))
         if (enabled.length === 0) return
         var current = enabled.findIndex(o => o.hasAttribute('selected'))
-        var next = current < 0 ? (step > 0 ? 0 : enabled.length - 1) : Math.min(Math.max(current + step, 0), enabled.length - 1)
-        chooseOption(select, enabled[next])
+        chooseOption(select, enabled[current < 0 ? (step > 0 ? 0 : enabled.length - 1) : Math.min(Math.max(current + step, 0), enabled.length - 1)])
     }
 
     document.querySelectorAll<HTMLElement>('.select').forEach((select, sI) => {
