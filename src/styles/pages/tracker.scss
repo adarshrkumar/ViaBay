@@ -53,9 +53,7 @@ $hf-size: 4rem;
 }
 
 .leaflet-map-pane {
-    width: -webkit-fill-available;
     width: fit-content;
-    height: -webkit-fill-available;
     height: fit-content;
 }
 
@@ -117,7 +115,6 @@ $hf-size: 4rem;
     flex-direction: column;
     max-height: calc(100dvh - ($padding * 2));
     max-width: calc(100dvw - ($padding * 2));
-    min-width: -webkit-fill-available;
     min-width: fit-content;
     background-color: var(--surface);
     color: var(--color);
