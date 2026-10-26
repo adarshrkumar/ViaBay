@@ -68,7 +68,6 @@
 
     var stopsArea = document.querySelector('.stops-area')
     var stops = stopsArea?.querySelector('.stops')
-    var closeButtons = document.querySelectorAll('.close')
     var goBtn = document.querySelector('.calc-route')
 
     var directionsElement = document.querySelector('#directions')
@@ -163,19 +162,16 @@
         stop.classList.add('stop')
         stop.placeholder = `Stop #${stopsAmt+1}`
         stop.title = `Stop #${stopsAmt+1}`
-        stop.addEventListener('keypress', e => stopChange(e, stopsAmt-1))
         stopParent.appendChild(stop)
 
         var closeButton = document.createElement('button')
         closeButton.classList.add('close')
         closeButton.classList.add('remove-styles')
-        closeButton.addEventListener('click', onCloseClick)
 
-        var closeIcon = document.createElement('svg')
-        closeIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        var closeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
         closeIcon.setAttribute('viewBox', '0 -960 960 960')
 
-        var closePath = document.createElement('path')
+        var closePath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
         closePath.setAttribute('d', 'm256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z')
         closeIcon.appendChild(closePath)
 
@@ -191,26 +187,41 @@
         stops?.appendChild(stopContainer)
     })
 
-    closeButtons.forEach(b => b.addEventListener('click', onCloseClick))
+    // Stops are found from the event target, so adding or removing stops never leaves a listener on a stale index
+    stops?.addEventListener('click', e => {
+        if (!(e.target instanceof Element)) return
+        var closeButton = e.target.closest('.close')
+        if (!closeButton) return
 
-    function onCloseClick(e: Event) {
-        if (e.target instanceof Element) e.target.parentElement?.parentElement?.parentElement?.remove();
-        stops?.querySelectorAll<HTMLInputElement>('.stop').forEach((s, i) => s.placeholder = `Stop #${i+1}`)
-    }
+        closeButton.closest('.stop-container')?.remove()
+        stops?.querySelectorAll<HTMLInputElement>('.stop').forEach((s, i) => {
+            s.placeholder = `Stop #${i+1}`
+            s.title = `Stop #${i+1}`
+        })
+    })
 
-    stops?.querySelectorAll<HTMLInputElement>('.stop').forEach((s, i) => s.addEventListener('change', e => stopChange(e, i)))
+    // Search only when a stop is committed (Enter or blur): Nominatim's usage policy forbids autocomplete
+    stops?.addEventListener('change', e => {
+        if (e.target instanceof HTMLInputElement && e.target.classList.contains('stop')) stopChange(e.target)
+    })
 
-    async function stopChange(e: Event, i: number) {
-        if (!(e.target instanceof HTMLInputElement)) return
+    var nextSearchAt = 0
 
-        var finalValue = e.target.getAttribute('final-value')
-        var searchText = e.target.value
+    async function stopChange(stop: HTMLInputElement) {
+        const optionsEle = stop.closest('.stop-container')?.querySelector('.options')
+        if (!optionsEle) return
 
-        var optionsEle = stops?.querySelectorAll('.options')[i]
+        // Snapshot of the text being searched, compared after the fetch to drop stale results
+        var searchText = stop.value
 
-        optionsEle?.querySelectorAll('.option').forEach(o => o.remove())
+        optionsEle.querySelectorAll('.option').forEach(o => o.remove())
 
-        if (finalValue !== searchText && searchText.length > 2) {
+        if (stop.getAttribute('final-value') !== searchText && searchText.length > 2) {
+            // Nominatim allows at most one request per second across the whole app
+            var wait = nextSearchAt - Date.now()
+            nextSearchAt = Math.max(nextSearchAt, Date.now()) + 1000
+            if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait))
+
             // Use Nominatim geocoding service for search
             var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}&limit=5`;
 
@@ -218,35 +229,28 @@
                 var response = await fetch(url);
                 var results: NominatimResult[] = await response.json();
 
-                results.forEach(r => createOption(r.display_name, i, optionsEle));
+                // Ignore results for text the user has already changed
+                if (stop.value !== searchText) return
 
-                function createOption(content: string, i: number, optionsEle: Element | undefined, lastLoc=false) {
+                results.forEach(r => {
                     var aEle = document.createElement('button')
                     aEle.classList.add('option')
                     aEle.classList.add('remove-styles')
-                    aEle.textContent = content
-                    if (lastLoc) {
-                        aEle.classList.add('last-loc')
-                        aEle.disabled = true
-                    }
-                    else aEle.addEventListener('click', e => selectOption(e, i))
-                    optionsEle?.appendChild(aEle)
-                }
+                    aEle.textContent = r.display_name
+                    aEle.addEventListener('click', () => selectOption(stop, r.display_name))
+                    optionsEle.appendChild(aEle)
+                })
             } catch (error) {
                 console.error('Geocoding search error:', error);
             }
         }
     }
 
-    function selectOption(e: MouseEvent, i: number) {
-        var place = e.target instanceof HTMLElement ? e.target.textContent ?? '' : ''
-        var optionsEle = stops?.querySelectorAll('.options')[i]
+    function selectOption(stop: HTMLInputElement, place: string) {
+        stop.closest('.stop-container')?.querySelectorAll('.options .option').forEach(o => o.remove())
 
-        optionsEle?.querySelectorAll('.option').forEach(o => o.remove())
-
-        var stop = stops?.querySelectorAll<HTMLInputElement>('.stop')[i]
-        stop?.setAttribute('final-value', place)
-        if (stop) stop.value = place
+        stop.setAttribute('final-value', place)
+        stop.value = place
     }
 
     goBtn?.addEventListener('click', addDirections)
