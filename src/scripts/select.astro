@@ -51,7 +51,9 @@
 
         var options = select.querySelectorAll<HTMLElement>('select-option')
         list.style.setProperty('--amt', options.length.toString())
+        if (!list.id) list.id = `select-${sI}-listbox`
         list.setAttribute('role', 'listbox')
+        select.setAttribute('aria-controls', list.id)
 
         select.setAttribute('role', 'combobox')
         select.setAttribute('aria-haspopup', 'listbox')
