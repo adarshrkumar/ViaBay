@@ -35,7 +35,6 @@ async function make511Request(
         )
     }
 
-    // The upstream body stays in the server log; the client only gets a generic error
     if (!response.ok) {
         console.error('[511 API] Error response body:', await response.text())
         throw new Error(`Upstream status ${response.status}`)
@@ -72,7 +71,6 @@ export const GET: APIRoute = async ({ url, request }) => {
         )
     }
 
-    // params must be a short list of [name, value] string pairs
     let params: string[][] | null = []
     if (paramsString) {
         try {
