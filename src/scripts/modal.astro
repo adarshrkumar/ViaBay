@@ -3,7 +3,7 @@
 
     function showModal(title: string, content: string) {
         modal.querySelector('.title')!.textContent = title
-        modal.querySelector<HTMLElement>('.message')!.innerHTML = content
+        modal.querySelector<HTMLElement>('.message')!.textContent = content
         modal.showModal();
     }
     window.showModal = showModal
