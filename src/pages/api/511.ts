@@ -4,7 +4,6 @@ export const prerender = false
 
 const apiKey = '7a7f827d-6d7d-451e-a9a6-bcc517c951b9'
 
-// Only these 511 modules and parameter names can be requested; maxAge is the edge cache lifetime in seconds
 const modules: Record<string, { params: string[], maxAge: number }> = {
     gtfsoperators: { params: [], maxAge: 3600 },
     VehicleMonitoring: { params: ['agency'], maxAge: 15 },
@@ -12,7 +11,6 @@ const modules: Record<string, { params: string[], maxAge: number }> = {
     lines: { params: ['operator_id'], maxAge: 3600 },
 }
 
-// Best-effort per-IP limit: each serverless instance counts separately, so a hard cap needs Vercel WAF or a shared store
 const rateLimitWindowMs = 60_000
 const rateLimitMax = 120
 const requestCounts = new Map<string, { count: number, resetAt: number }>()
@@ -23,7 +21,6 @@ async function make511Request(
 ) {
     console.log(`[511 API] Starting ${moduleName} request`)
 
-    // Names and values are encoded, so & or = inside them cannot add extra parameters
     const url = `https://api.511.org/transit/${moduleName}?api_key=${apiKey}${params.map(([name, value]) => `&${encodeURIComponent(name)}=${encodeURIComponent(value)}`).join('')}`
     console.log('[511 API] Fetching URL:', url.replace(apiKey, 'KEY_REDACTED'))
 
@@ -70,7 +67,6 @@ export const GET: APIRoute = async ({ url, request, clientAddress }) => {
     console.log('[511 API Route] Request URL:', request.url)
     console.log('[511 API Route] SearchParams keys:', Array.from(url.searchParams.keys()))
 
-    // Drop expired counters once the map grows, so it cannot grow without bound
     if (requestCounts.size > 10_000) {
         requestCounts.forEach((entry, ip) => {
             if (entry.resetAt <= Date.now()) requestCounts.delete(ip)
@@ -99,7 +95,6 @@ export const GET: APIRoute = async ({ url, request, clientAddress }) => {
         )
     }
 
-    // Each param must be a [name, value] string pair whose name the module allows
     let params: string[][] | null = []
     if (paramsString) {
         try {
@@ -128,7 +123,6 @@ export const GET: APIRoute = async ({ url, request, clientAddress }) => {
                 status: 200,
                 headers: {
                     'Content-Type': 'application/json',
-                    // Let Vercel's edge share responses between users so the 511 quota is not spent per visitor
                     'Cache-Control': `public, max-age=0, s-maxage=${modules[moduleName].maxAge}, stale-while-revalidate=${modules[moduleName].maxAge}`
                 }
             }
