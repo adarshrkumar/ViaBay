@@ -17,8 +17,10 @@
         }
     })
 
+    // "system" removes the attribute so the prefers-color-scheme rules in globals.scss apply
     function setTheme(t: string) {
-        document.documentElement.setAttribute('data-theme', (t || 'system'))
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t)
+        else document.documentElement.removeAttribute('data-theme')
     }
     var settingsKey = 'settings'
 
