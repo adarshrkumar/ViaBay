@@ -8,36 +8,7 @@
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    // Exponential backoff with full jitter, honouring Retry-After when the server sends it
-    function getRetryDelay(attempt: number, response: Response) {
-        var retryAfter = response.headers.get('Retry-After')
-        if (retryAfter !== null) {
-            var seconds = Number(retryAfter)
-            var retryDelay = Number.isFinite(seconds)
-                ? seconds * 1000
-                : Date.parse(retryAfter) - Date.now()
-            if (Number.isFinite(retryDelay)) return Math.min(Math.max(0, retryDelay), maxDelay)
-        }
-        return Math.random() * Math.min(baseDelay * 2 ** attempt, maxDelay)
-    }
-
     var errorTimeout: ReturnType<typeof setTimeout> | null = null
-
-    // Show a single, self-dismissing banner so repeated failures do not stack up
-    function showRequestError(message: string) {
-        var banner = document.querySelector<HTMLElement>('.request-error')
-        if (!banner) {
-            banner = document.createElement('div')
-            banner.classList.add('request-error')
-            banner.setAttribute('role', 'alert')
-            document.body.appendChild(banner)
-        }
-        banner.textContent = message
-        banner.removeAttribute('hidden')
-
-        if (errorTimeout !== null) clearTimeout(errorTimeout)
-        errorTimeout = setTimeout(() => banner!.setAttribute('hidden', ''), 8000)
-    }
 
     async function makeRequest<T>(moduleName: string, params: string[][] = [], callback: (data: T) => void = function () {}) {
         // Prepare params for API route
@@ -56,7 +27,14 @@
                 // Handle 429 Rate Limit with capped, jittered backoff for this request only
                 if (response.status === 429) {
                     if (attempt + 1 >= maxAttempts) throw new Error(`Rate limited after ${maxAttempts} attempts`)
-                    var wait = getRetryDelay(attempt, response)
+                    // Honour Retry-After (seconds or an HTTP date) when the server sends it, else exponential backoff with full jitter
+                    var retryAfter = response.headers.get('Retry-After')
+                    var wait = retryAfter === null
+                        ? NaN
+                        : Number.isFinite(Number(retryAfter)) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now()
+                    wait = Number.isFinite(wait)
+                        ? Math.min(Math.max(0, wait), maxDelay)
+                        : Math.random() * Math.min(baseDelay * 2 ** attempt, maxDelay)
                     console.log(`[Client] Rate limited (429). Retrying ${moduleName} in ${Math.round(wait)}ms...`)
                     await delay(wait)
                     continue
@@ -79,7 +57,20 @@
             }
         } catch (err) {
             console.error('511 API Error:', err)
-            showRequestError('Could not load live transit data. Some information may be missing or out of date.')
+
+            // Show a single, self-dismissing banner so repeated failures do not stack up
+            let banner = document.querySelector<HTMLElement>('.request-error')
+            if (!banner) {
+                banner = document.createElement('div')
+                banner.classList.add('request-error')
+                banner.setAttribute('role', 'alert')
+                document.body.appendChild(banner)
+            }
+            banner.textContent = 'Could not load live transit data. Some information may be missing or out of date.'
+            banner.removeAttribute('hidden')
+
+            if (errorTimeout !== null) clearTimeout(errorTimeout)
+            errorTimeout = setTimeout(() => banner?.setAttribute('hidden', ''), 8000)
             return
         }
 
