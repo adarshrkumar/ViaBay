@@ -16,6 +16,7 @@ interface Window {
     showRoutePath: (aId: string, rId: string) => void
     positionInterval: ReturnType<typeof setInterval> | null
     directionsElement: Element | null
+    directionsManager: boolean
     login: () => void
     onMapLoad: ((map: L.Map) => void) | null
 }
