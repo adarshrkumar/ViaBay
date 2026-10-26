@@ -10,8 +10,14 @@
 
     // Exponential backoff with full jitter, honouring Retry-After when the server sends it
     function getRetryDelay(attempt: number, response: Response) {
-        var retryAfter = Number(response.headers.get('Retry-After'))
-        if (retryAfter > 0) return Math.min(retryAfter * 1000, maxDelay)
+        var retryAfter = response.headers.get('Retry-After')
+        if (retryAfter !== null) {
+            var seconds = Number(retryAfter)
+            var retryDelay = Number.isFinite(seconds)
+                ? seconds * 1000
+                : Date.parse(retryAfter) - Date.now()
+            if (Number.isFinite(retryDelay)) return Math.min(Math.max(0, retryDelay), maxDelay)
+        }
         return Math.random() * Math.min(baseDelay * 2 ** attempt, maxDelay)
     }
 
