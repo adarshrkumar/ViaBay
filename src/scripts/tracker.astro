@@ -147,20 +147,15 @@
                     }
                     else aObj.vehicles.data = vehicleData
 
-                    var goodPins: { name: string, content: VehicleMarker }[] = []
-
-                    vehicleData.forEach(vehicle => {
-                        var vehicleRef = vehicle.MonitoredVehicleJourney.VehicleRef
-                        var existingPin = aObj!.vehicles.pins[vehicleRef]
-                        if (existingPin) {
-                            goodPins.push({
-                                name: vehicleRef,
-                                content: existingPin
-                            })
-                        }
-                    })
+                    // Remove markers for vehicles that are no longer in the feed
+                    var currentRefs = new Set(vehicleData.map(vehicle => vehicle.MonitoredVehicleJourney.VehicleRef))
+                    var oldPins = aObj.vehicles.pins
                     aObj.vehicles.pins = {}
-                    goodPins.forEach(pin => aObj!.vehicles.pins[pin.name] = pin.content)
+                    Object.entries(oldPins).forEach(([vehicleRef, pin]) => {
+                        if (!pin) return
+                        if (currentRefs.has(vehicleRef)) aObj!.vehicles.pins[vehicleRef] = pin
+                        else pin.remove()
+                    })
 
                     vehicleData.forEach((vehicle, _vI: number) => {
                         var vehicleActivity = vehicle.MonitoredVehicleJourney
