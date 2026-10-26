@@ -10,10 +10,6 @@
         const titleEl = document.querySelector('.header > .title')
         if (titleEl) titleEl.textContent = title
 
-        if (!location.pathname.startsWith('/login')) {
-            document.querySelectorAll('.nav').forEach(n => n.removeAttribute('hidden'))
-        }
-
         document.querySelectorAll('.input-parent, .textarea-parent, .select-parent').forEach(e => {
             var classes = e.className
             var splitClasses = classes.split(' ')
