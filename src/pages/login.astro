@@ -26,9 +26,8 @@ import Layout from '../layouts/Layout.astro'
 </Layout>
 
 <script>
-    var dest = '/tracker'
-    var destUrl = URL.parse(new URLSearchParams(window.location.search).get('dest') ?? dest, location.origin)
-    if (destUrl?.origin === location.origin) dest = destUrl.pathname + destUrl.search + destUrl.hash
+    var dest = URL.parse(new URLSearchParams(window.location.search).get('dest') ?? '/tracker', location.origin)
+    if (dest?.origin !== location.origin) dest = new URL('/tracker', location.origin)
 
     var form = document.querySelector('[role="form"]')!
 
@@ -37,6 +36,6 @@ import Layout from '../layouts/Layout.astro'
     window.login = function () {
         var username = form.querySelector<HTMLInputElement>('#email')!.value
         var password = form.querySelector<HTMLInputElement>('#password')!.value
-        window.setCredentials(username, password, dest)
+        window.setCredentials(username, password, dest!.href)
     }
 </script>
