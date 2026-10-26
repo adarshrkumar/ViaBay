@@ -1,24 +1,31 @@
 <script>
+    import type { StoredNotification } from '../types/notification'
+
     var nGroup = document.querySelector('.notifications')
+    var defaultIcon = 'notification'
 
-    window.getNotifications = function () {
-        var notificationList = localStorage.getItem('notifications')
-        var notificationObject = JSON.parse(notificationList || '')
-
-        notificationObject?.forEach((name: number) => {
-            // var notification = localStorage.getItem(`NOTIFICATIONS://${name}`)
-            addNotification(notificationObject[name])
-            notificationObject?.shift()
-            localStorage.removeItem(`NOTIFICATIONS://${name}`)
-        })
-
-        notificationList = JSON.stringify(notificationObject)
-        localStorage.setItem('notifications', notificationList)
+    function readNotification(storageKey: string): StoredNotification | null {
+        try {
+            var parsed = JSON.parse(localStorage.getItem(storageKey) ?? 'null')
+            if (parsed && typeof parsed.name === 'string') return parsed
+        } catch {
+            // Fall through and treat corrupt entries as missing
+        }
+        return null
     }
 
-    function addNotification(notification: { icon: string, title: string, content: string }) {
-        var nIcon = notification.icon
-        var nTitle = notification.title
+    window.getNotifications = function () {
+        window.getNotificationKeys().forEach(storageKey => {
+            var notification = readNotification(storageKey)
+            if (notification) renderNotification(notification)
+            localStorage.removeItem(storageKey)
+        })
+
+        localStorage.setItem('notifications', '[]')
+    }
+
+    function renderNotification(notification: StoredNotification) {
+        var nTitle = notification.name
         var nContent = notification.content
 
         var nEle = document.createElement('div')
@@ -26,7 +33,9 @@
 
         var nEleIcon = document.createElement('img')
         nEleIcon.classList.add('icon')
-        nEleIcon.src = `/icons/${nIcon}.svg`
+        nEleIcon.alt = ''
+        nEleIcon.src = `/icons/${encodeURIComponent(notification.icon || defaultIcon)}.svg`
+        nEleIcon.addEventListener('error', () => nEleIcon.src = `/icons/${defaultIcon}.svg`, { once: true })
         nEle.appendChild(nEleIcon)
 
         var nEleContent = document.createElement('item-content')
@@ -39,4 +48,6 @@
             if (nContent) window.showModal(nTitle, nContent)
         })
     }
+
+    window.getNotifications()
 </script>
