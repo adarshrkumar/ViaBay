@@ -1,26 +1,37 @@
 <script>
-    function addNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: string) {
-        var notificationList = localStorage.getItem('notifications') ?? '[]'
-        var notificationArray: string[] = JSON.parse(notificationList)
+    import type { StoredNotification } from '../types/notification'
 
-        var notificationPackage = packageNotification(module, name, icon, content, attatchmentInfo)
+    var notificationsKey = 'notifications'
 
-        localStorage.setItem(`NOTIFICATIONS://${module}|${name}`, JSON.stringify(notificationPackage))
+    // Keys of stored notifications, oldest first. Missing or corrupt data reads as an empty list.
+    function getNotificationKeys(): string[] {
+        try {
+            var parsed: string[] = JSON.parse(localStorage.getItem(notificationsKey) ?? '[]')
+            return Array.isArray(parsed)
+                ? parsed.filter(k => typeof k === 'string').map(k =>
+                    !k.startsWith('NOTIFICATIONS://') && k.includes('|') ? `NOTIFICATIONS://${k}` : k
+                )
+                : []
+        } catch {
+            return []
+        }
+    }
+    window.getNotificationKeys = getNotificationKeys
 
-        notificationArray.push(`${module}|${name}`)
-        localStorage.setItem('notifications', JSON.stringify(notificationArray))
+    function getNotificationStorageKey(module: string, name: string) {
+        return `NOTIFICATIONS://${module}|${name}`
+    }
+
+    function addNotification(module: string, name: string, icon: string, content: string, attachmentInfo?: string) {
+        var notification: StoredNotification = { module, name, icon, content }
+        if (attachmentInfo) notification.attachmentInfo = attachmentInfo
+
+        var storageKey = getNotificationStorageKey(module, name)
+        localStorage.setItem(storageKey, JSON.stringify(notification))
+
+        var keys = getNotificationKeys()
+        if (!keys.includes(storageKey)) keys.push(storageKey)
+        localStorage.setItem(notificationsKey, JSON.stringify(keys))
     }
     window.addNotification = addNotification
-
-    function packageNotification(module: string, name: string, icon: string, content: string, attatchmentInfo: string) {
-        var res: Record<string, string> = {}
-
-        if (module) res.module = module
-        if (name) res.name = name
-        if (icon) res.icon = icon
-        if (content) res.content = content
-        if (attatchmentInfo) res.attatchmentInfo = attatchmentInfo
-
-        return res
-    }
 </script>
