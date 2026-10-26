@@ -158,11 +158,10 @@
         closeButton.classList.add('close')
         closeButton.classList.add('remove-styles')
 
-        var svgNs = 'http://www.w3.org/2000/svg'
-        var closeIcon = document.createElementNS(svgNs, 'svg')
+        var closeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
         closeIcon.setAttribute('viewBox', '0 -960 960 960')
 
-        var closePath = document.createElementNS(svgNs, 'path')
+        var closePath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
         closePath.setAttribute('d', 'm256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z')
         closeIcon.appendChild(closePath)
 
@@ -203,9 +202,8 @@
     })
 
     async function stopChange(stop: HTMLInputElement) {
-        var stopContainer = stop.closest('.stop-container')
-        const optionsEle = stopContainer?.querySelector('.options')
-        if (!stopContainer || !optionsEle) return
+        const optionsEle = stop.closest('.stop-container')?.querySelector('.options')
+        if (!optionsEle) return
 
         var finalValue = stop.getAttribute('final-value')
         var searchText = stop.value
