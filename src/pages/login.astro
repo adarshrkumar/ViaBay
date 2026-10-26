@@ -26,14 +26,9 @@ import Layout from '../layouts/Layout.astro'
 </Layout>
 
 <script>
-    // Only follow same-origin destinations, so a crafted link cannot send users to another site after sign-in
     var dest = '/tracker'
-    try {
-        var destUrl = new URL(new URLSearchParams(window.location.search).get('dest') ?? dest, location.origin)
-        if (destUrl.origin === location.origin) dest = destUrl.pathname + destUrl.search + destUrl.hash
-    } catch {
-        // Keep the default for values that are not URLs
-    }
+    var destUrl = URL.parse(new URLSearchParams(window.location.search).get('dest') ?? dest, location.origin)
+    if (destUrl?.origin === location.origin) dest = destUrl.pathname + destUrl.search + destUrl.hash
 
     var form = document.querySelector('[role="form"]')!
 
