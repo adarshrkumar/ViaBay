@@ -147,15 +147,22 @@
 
     function onMapLoad() {
         window.makeRequest<{Id: string, Name: string}[]>('gtfsoperators', [], res => {
-            res.forEach((agency, i: number) => {
-                var cI = i
-                if (cI >= colors.length) cI = cI - colors.length
-                var color = colors[cI]
+            if (!Array.isArray(res)) {
+                console.warn('Unexpected gtfsoperators response', res)
+                return
+            }
+            res.filter(agency => typeof agency?.Id === 'string').forEach((agency, i: number) => {
+                var color = colors[i % colors.length]
 
                 agencyIds.push(agency)
 
                 window.makeRequest<VehicleResponse>('VehicleMonitoring', [['agency', agency.Id]], vehicleResult => {
-                    var vehicleData: {MonitoredVehicleJourney: VehicleData}[] = vehicleResult?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery?.VehicleActivity ?? []
+                    var vehicleActivities = vehicleResult?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery?.VehicleActivity
+                    var vehicleData = (Array.isArray(vehicleActivities) ? vehicleActivities : []).filter(vehicle =>
+                        typeof vehicle?.MonitoredVehicleJourney?.VehicleRef === 'string' &&
+                        Number.isFinite(Number(vehicle.MonitoredVehicleJourney.VehicleLocation?.Latitude)) &&
+                        Number.isFinite(Number(vehicle.MonitoredVehicleJourney.VehicleLocation?.Longitude))
+                    )
 
                     var aName = agency.Name
                     switch (aName) {
@@ -489,19 +496,19 @@
 
                 window.makeRequest<{ journeyPatterns?: JourneyPattern[] }>('patterns', [['operator_id', data.aId], ['line_id', data.LineRef]], res => {
                     var pattern: JourneyPattern | null = null
-                    if (res.journeyPatterns) {
-                        var filtered = res.journeyPatterns.filter(p => p.DirectionRef === data.DirectionRef)
+                    if (Array.isArray(res?.journeyPatterns)) {
+                        var filtered = res.journeyPatterns.filter(p => p?.DirectionRef === data.DirectionRef)
                         if (filtered.length > 0) pattern = filtered[0]
                     }
 
                     var TimingPointInJourneyPattern: TimingPoint[] = []
-                    if (pattern && pattern.PointsInSequence && pattern.PointsInSequence.TimingPointInJourneyPattern) {
+                    if (Array.isArray(pattern?.PointsInSequence?.TimingPointInJourneyPattern)) {
                         TimingPointInJourneyPattern = [...pattern.PointsInSequence.TimingPointInJourneyPattern]
                     }
 
                     var stops: StopCall[] = []
                     if (data.MonitoredCall) stops.push(data.MonitoredCall)
-                    if (data.OnwardCalls && data.OnwardCalls.OnwardCall && data.OnwardCalls.OnwardCall.length > 0) {
+                    if (Array.isArray(data.OnwardCalls?.OnwardCall)) {
                         data.OnwardCalls.OnwardCall.forEach((stop: StopCall) => stops.push(stop))
                     }
 
