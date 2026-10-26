@@ -7,7 +7,10 @@
     function readNotification(storageKey: string): StoredNotification | null {
         try {
             var parsed = JSON.parse(localStorage.getItem(storageKey) ?? 'null')
-            if (parsed && typeof parsed.name === 'string') return parsed
+            if (
+                parsed && typeof parsed.name === 'string' &&
+                (parsed.icon == null || typeof parsed.icon === 'string')
+            ) return parsed
         } catch {
             // Fall through and treat corrupt entries as missing
         }
