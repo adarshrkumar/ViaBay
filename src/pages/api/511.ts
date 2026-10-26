@@ -2,7 +2,8 @@ import type { APIRoute } from 'astro'
 
 export const prerender = false
 
-const apiKey = '7a7f827d-6d7d-451e-a9a6-bcc517c951b9'
+// Set API_511_KEY in .env locally (loaded by dotenv in astro.config.mjs) and in the Vercel project settings
+const apiKey = process.env.API_511_KEY
 
 async function make511Request(
     moduleName: string,
@@ -16,7 +17,7 @@ async function make511Request(
     }
 
     const url = `https://api.511.org/transit/${moduleName}?api_key=${apiKey}${paramString}`
-    console.log('[511 API] Fetching URL:', url.replace(apiKey, 'KEY_REDACTED'))
+    console.log('[511 API] Fetching URL:', url.replace(/api_key=[^&]*/, 'api_key=KEY_REDACTED'))
 
     const response = await fetch(url)
     console.log('[511 API] Response status:', response.status, response.statusText)
@@ -60,6 +61,14 @@ export const GET: APIRoute = async ({ url, request }) => {
     console.log('[511 API Route] Received request:', url.toString())
     console.log('[511 API Route] Request URL:', request.url)
     console.log('[511 API Route] SearchParams keys:', Array.from(url.searchParams.keys()))
+
+    if (!apiKey) {
+        console.error('[511 API Route] API_511_KEY is not set')
+        return new Response(
+            JSON.stringify({ error: 'Server is not configured' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        )
+    }
 
     const moduleName = url.searchParams.get('module')
     const paramsString = url.searchParams.get('params')

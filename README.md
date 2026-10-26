@@ -50,8 +50,11 @@ ViaBay is an all-in-one transit platform designed for the San Francisco Bay Area
 
 ## Development
 
+The `/api/511` route needs a [511.org API key](https://511.org/open-data/token) in the `API_511_KEY` environment variable. Locally, copy `.env.example` to `.env` and set it there. On Vercel, add it under Project Settings → Environment Variables.
+
 ```bash
 npm install
+cp .env.example .env   # then set API_511_KEY
 npm run dev
 ```
 
