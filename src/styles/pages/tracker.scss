@@ -52,13 +52,6 @@ $hf-size: 4rem;
     }
 }
 
-.leaflet-map-pane {
-    width: -webkit-fill-available;
-    width: fit-content;
-    height: -webkit-fill-available;
-    height: fit-content;
-}
-
 .vehicle-info-container {
     $_pos: calc(-100% - $padding);
 
