@@ -201,12 +201,12 @@
         const optionsEle = stop.closest('.stop-container')?.querySelector('.options')
         if (!optionsEle) return
 
-        var finalValue = stop.getAttribute('final-value')
+        // Snapshot of the text being searched, compared after the fetch to drop stale results
         var searchText = stop.value
 
         optionsEle.querySelectorAll('.option').forEach(o => o.remove())
 
-        if (finalValue !== searchText && searchText.length > 2) {
+        if (stop.getAttribute('final-value') !== searchText && searchText.length > 2) {
             // Nominatim allows at most one request per second across the whole app
             var wait = nextSearchAt - Date.now()
             nextSearchAt = Math.max(nextSearchAt, Date.now()) + 1000
