@@ -190,16 +190,12 @@
         })
     })
 
-    var searchTimeouts = new WeakMap<HTMLInputElement, ReturnType<typeof setTimeout>>()
-
-    stops?.addEventListener('input', e => {
-        if (!(e.target instanceof HTMLInputElement) || !e.target.classList.contains('stop')) return
-        var stop = e.target
-
-        var pending = searchTimeouts.get(stop)
-        if (pending !== undefined) clearTimeout(pending)
-        searchTimeouts.set(stop, setTimeout(() => stopChange(stop), 400))
+    // Search only when a stop is committed (Enter or blur): Nominatim's usage policy forbids autocomplete
+    stops?.addEventListener('change', e => {
+        if (e.target instanceof HTMLInputElement && e.target.classList.contains('stop')) stopChange(e.target)
     })
+
+    var nextSearchAt = 0
 
     async function stopChange(stop: HTMLInputElement) {
         const optionsEle = stop.closest('.stop-container')?.querySelector('.options')
@@ -211,6 +207,11 @@
         optionsEle.querySelectorAll('.option').forEach(o => o.remove())
 
         if (finalValue !== searchText && searchText.length > 2) {
+            // Nominatim allows at most one request per second across the whole app
+            var wait = nextSearchAt - Date.now()
+            nextSearchAt = Math.max(nextSearchAt, Date.now()) + 1000
+            if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait))
+
             // Use Nominatim geocoding service for search
             var url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}&limit=5`;
 
