@@ -147,7 +147,6 @@
 
     function onMapLoad() {
         window.makeRequest<{Id: string, Name: string}[]>('gtfsoperators', [], res => {
-            // The 511 payload shape is not guaranteed, so skip anything malformed instead of throwing
             if (!Array.isArray(res)) {
                 console.warn('Unexpected gtfsoperators response', res)
                 return
