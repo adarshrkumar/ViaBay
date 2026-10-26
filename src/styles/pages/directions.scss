@@ -13,24 +13,23 @@
         gap: $spacing-large;
 
         .stops-area {
-            // Stop colours meet WCAG AA (4.5:1) for both the text and the placeholder
             [data-theme="dark"] & {
                 --stop-bg: #{$dacc};
-                --stop-text: #{$dbg};
+                --stop-text: #{$dclr};
             }
 
             @media (prefers-color-scheme: dark) {
                 --stop-bg: #{$dacc};
-                --stop-text: #{$dbg};
+                --stop-text: #{$dclr};
             }
 
             [data-theme="light"] & {
-                --stop-bg: #{$lacc-hover};
+                --stop-bg: #{$lacc};
                 --stop-text: #{$lsurface};
             }
 
             @media (prefers-color-scheme: light) {
-                --stop-bg: #{$lacc-hover};
+                --stop-bg: #{$lacc};
                 --stop-text: #{$lsurface};
             }
 
@@ -89,8 +88,7 @@
                             font-weight: 500;
 
                             &::placeholder {
-                                color: color-mix(in srgb, currentcolor 92%, transparent);
-                                opacity: 1;
+                                color: rgb(255 255 255 / 70%);
                             }
                         }
 

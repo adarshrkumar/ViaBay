@@ -277,7 +277,6 @@
 
                     agencies[agency.Id] = aObj
 
-                    // Announce the refreshed vehicle count to screen readers
                     var status = document.querySelector('.vehicle-status')
                     if (status) status.textContent = `Showing ${Object.values(agencies).reduce((total, a) => total + (a?.vehicles.data.length ?? 0), 0)} live vehicles`
                 })

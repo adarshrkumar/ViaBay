@@ -5,7 +5,7 @@ import Layout from '../layouts/Layout.astro'
 ---
 <Layout title="Login">
     <img class="logo" src="/assets/logo.svg">
-    <form class="form">
+    <div role="form" class="form">
         <div class="input-parent">
             <label for="email" class="label">
                 <span>Email <span class="star">*</span></span>
@@ -19,10 +19,10 @@ import Layout from '../layouts/Layout.astro'
             <input type="password" id="password" required>
         </div>
         <div class="btns">
-            <button type="button" class="btn">Login Help</button>
-            <button type="submit" class="btn" id="login">Sign In</button>
+            <button class="btn">Login Help</button>
+            <button class="btn" id="login" onclick="login()">Sign In</button>
         </div>
-    </form>
+    </div>
 </Layout>
 
 <script>
@@ -30,15 +30,13 @@ import Layout from '../layouts/Layout.astro'
     var urlParms = new URLSearchParams(queryString);
     var dest = urlParms.get('dest') ?? '/tracker';
 
-    var form = document.querySelector('form.form')!
+    var form = document.querySelector('[role="form"]')!
 
-    // Submit (button or Enter) runs only after the browser's required/pattern validation passes
-    form.addEventListener('submit', e => {
-        e.preventDefault()
-        window.setCredentials(
-            form.querySelector<HTMLInputElement>('#email')!.value,
-            form.querySelector<HTMLInputElement>('#password')!.value,
-            dest
-        )
-    })
+    // document.querySelector('.form').addEventListener('submit', e => {e.preventDefault()})
+
+    window.login = function () {
+        var username = form.querySelector<HTMLInputElement>('#email')!.value
+        var password = form.querySelector<HTMLInputElement>('#password')!.value
+        window.setCredentials(username, password, dest)
+    }
 </script>
