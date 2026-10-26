@@ -35,10 +35,10 @@ async function make511Request(
         )
     }
 
+    // The upstream body stays in the server log; the client only gets a generic error
     if (!response.ok) {
-        const errorText = await response.text()
-        console.error('[511 API] Error response body:', errorText)
-        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText.substring(0, 200)}`)
+        console.error('[511 API] Error response body:', await response.text())
+        throw new Error(`Upstream status ${response.status}`)
     }
 
     let data = await response.json()
@@ -64,20 +64,27 @@ export const GET: APIRoute = async ({ url, request }) => {
     const moduleName = url.searchParams.get('module')
     const paramsString = url.searchParams.get('params')
 
-    if (!moduleName) {
-        console.error('[511 API Route] Missing module parameter')
+    if (!moduleName || moduleName.length > 64) {
+        console.error('[511 API Route] Missing or oversized module parameter')
         return new Response(
-            JSON.stringify({ error: 'Missing module parameter' }),
+            JSON.stringify({ error: 'Invalid module parameter' }),
             { status: 400, headers: { 'Content-Type': 'application/json' } }
         )
     }
 
-    let params: string[][] = []
+    // params must be a short list of [name, value] string pairs
+    let params: string[][] | null = []
     if (paramsString) {
         try {
-            params = JSON.parse(paramsString)
+            params = paramsString.length <= 1000 ? JSON.parse(paramsString) : null
         } catch {
-            console.error('[511 API Route] Invalid params format:', paramsString)
+            params = null
+        }
+        if (
+            !Array.isArray(params) || params.length > 10 ||
+            !params.every(p => Array.isArray(p) && p.length === 2 && p.every(v => typeof v === 'string' && v.length <= 100))
+        ) {
+            console.error('[511 API Route] Invalid params format:', paramsString.slice(0, 200))
             return new Response(
                 JSON.stringify({ error: 'Invalid params format' }),
                 { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -86,7 +93,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     }
 
     try {
-        const data = await make511Request(moduleName, params)
+        const data = await make511Request(moduleName, params ?? [])
         if (data instanceof Response) return data
         return new Response(
             JSON.stringify(data),
@@ -101,8 +108,8 @@ export const GET: APIRoute = async ({ url, request }) => {
     } catch (err) {
         console.error('[511 API Route] Request failed, returning error:', err instanceof Error ? err.message : String(err))
         return new Response(
-            JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: 'Upstream request failed' }),
+            { status: 502, headers: { 'Content-Type': 'application/json' } }
         )
     }
 }
